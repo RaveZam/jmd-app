@@ -16,7 +16,13 @@ const defaultData: DayDatum[] = [
   { day: "S", value: 48, tone: "striped" },
 ];
 
-function AnalyticsSvg({ data, max }: { data: DayDatum[]; max: number }): ReactElement {
+function AnalyticsSvg({
+  data,
+  max,
+}: {
+  data: DayDatum[];
+  max: number;
+}): ReactElement {
   const paddingX = 18;
   const paddingTop = 10;
   const paddingBottom = 28;
@@ -24,14 +30,38 @@ function AnalyticsSvg({ data, max }: { data: DayDatum[]; max: number }): ReactEl
   const height = 190;
   const keys = data.map((d, i) => `${d.day}-${i}`);
   const yMax = height - paddingBottom;
-  const xScale = scaleBand<string>({ domain: keys, range: [paddingX, width - paddingX], padding: 0.25 });
-  const yScale = scaleLinear<number>({ domain: [0, max], range: [yMax, paddingTop] });
+  const xScale = scaleBand<string>({
+    domain: keys,
+    range: [paddingX, width - paddingX],
+    padding: 0.25,
+  });
+  const yScale = scaleLinear<number>({
+    domain: [0, max],
+    range: [yMax, paddingTop],
+  });
 
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} className="h-[170px] w-full" role="img" aria-label="Weekly project analytics">
+    <svg
+      viewBox={`0 0 ${width} ${height}`}
+      className="h-[170px] w-full"
+      role="img"
+      aria-label="Weekly project analytics"
+    >
       <defs>
-        <linearGradient id="solidBar" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="rgba(16,185,129,0.95)" /><stop offset="100%" stopColor="rgba(5,150,105,0.95)" /></linearGradient>
-        <pattern id="diagStripe" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="10" height="10" fill="rgba(16,185,129,0.08)" /><rect width="4" height="10" fill="rgba(16,185,129,0.22)" /></pattern>
+        <linearGradient id="solidBar" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="rgba(16,185,129,0.95)" />
+          <stop offset="100%" stopColor="rgba(5,150,105,0.95)" />
+        </linearGradient>
+        <pattern
+          id="diagStripe"
+          width="10"
+          height="10"
+          patternUnits="userSpaceOnUse"
+          patternTransform="rotate(45)"
+        >
+          <rect width="10" height="10" fill="rgba(16,185,129,0.08)" />
+          <rect width="4" height="10" fill="rgba(16,185,129,0.22)" />
+        </pattern>
       </defs>
       {data.map((d, i) => {
         const key = keys[i]!;
@@ -45,7 +75,15 @@ function AnalyticsSvg({ data, max }: { data: DayDatum[]; max: number }): ReactEl
         return (
           <g key={`${d.day}-${i}`}>
             <Bar x={x} y={y} width={barW} height={h} rx={rx} fill={fill} />
-            <text x={x + barW / 2} y={height - 10} textAnchor="middle" fontSize="12" fill="rgba(100,116,139,1)">{d.day}</text>
+            <text
+              x={x + barW / 2}
+              y={height - 10}
+              textAnchor="middle"
+              fontSize="12"
+              fill="rgba(100,116,139,1)"
+            >
+              {d.day}
+            </text>
           </g>
         );
       })}
@@ -73,4 +111,3 @@ export function ProjectAnalyticsChart({
     </Card>
   );
 }
-
