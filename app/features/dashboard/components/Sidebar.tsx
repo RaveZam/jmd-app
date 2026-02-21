@@ -3,7 +3,7 @@
 import type { ComponentType, ReactElement, ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Download, FileText, LayoutGrid } from "lucide-react";
+import { Download, FileText, LayoutGrid, Package } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -17,6 +17,7 @@ type NavItem = {
 const menuItems: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutGrid },
   { href: "/records", label: "Records", icon: FileText },
+  { href: "/products", label: "Products", icon: Package },
 ];
 
 function SidebarNavItem({
