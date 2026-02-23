@@ -4,87 +4,25 @@ import Link from "next/link";
 import { FiltersBar } from "@/components/admin/FiltersBar";
 import { RecordsToolbar } from "@/app/features/records/components/RecordsToolbar";
 import { Badge } from "@/components/ui/badge";
+import { formatCurrencyPHP } from "@/lib/utils";
 import { mockRecords } from "@/lib/mock/records";
-import { ALL_AGENTS, parseAdminFilters } from "@/lib/selectors/filters";
-import { deriveRecord, filterRecords, selectAgents } from "@/lib/selectors/metrics";
+import { ALL_AGENTS } from "@/lib/selectors/filters";
+import {
+  buildRecordsPageUrl,
+  getRecordsPageData,
+} from "@/app/features/records/server/records-page-data";
 
-function firstParam(
-  searchParams: Record<string, string | string[] | undefined>,
-  key: string
-): string | undefined {
-  const v = searchParams[key];
-  return Array.isArray(v) ? v[0] : v;
-}
-
-function formatCurrencyPHP(value: number): string {
-  const abs = Math.abs(value);
-  const sign = value < 0 ? "-" : "";
-  return `${sign}₱${abs.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
-}
-
-export function RecordsPage({
+export default async function RecordsPage({
   searchParams,
 }: {
-  searchParams: Record<string, string | string[] | undefined>;
-}): ReactElement {
-  const filters = parseAdminFilters(searchParams);
-  const agents = selectAgents(mockRecords);
-
-  const rawQuery = (firstParam(searchParams, "q") ?? "").trim();
-  const q = rawQuery.toLowerCase();
-  const sort = firstParam(searchParams, "sort") ?? "varianceDesc";
-
-  const pageSize = 25;
-  const rawPage = Number(firstParam(searchParams, "page") ?? "1");
-  const requestedPage =
-    Number.isFinite(rawPage) && rawPage > 0 ? Math.floor(rawPage) : 1;
-
-  const base = filterRecords(mockRecords, filters);
-  const searched = q
-    ? base.filter((r) => {
-        return (
-          r.store.toLowerCase().includes(q) || r.product.toLowerCase().includes(q)
-        );
-      })
-    : base;
-
-  const rows = searched
-    .map((r) => ({ record: r, derived: deriveRecord(r) }))
-    .sort((a, b) => {
-      const diff = a.derived.varianceQty - b.derived.varianceQty;
-      if (sort === "varianceAsc") return diff;
-      return -diff;
-    });
-
-  const totalPages = Math.max(1, Math.ceil(rows.length / pageSize));
-  const page = Math.min(requestedPage, totalPages);
-  const pageStart = (page - 1) * pageSize;
-  const pageRows = rows.slice(pageStart, pageStart + pageSize);
-
-  const totals = rows.reduce(
-    (acc, row) => {
-      acc.deliveredQty += row.record.deliveredQty;
-      acc.soldQty += row.record.soldQty;
-      acc.boQty += row.record.boQty;
-      acc.lineTotal += row.derived.lineTotal;
-      acc.varianceQty += row.derived.varianceQty;
-      return acc;
-    },
-    { deliveredQty: 0, soldQty: 0, boQty: 0, lineTotal: 0, varianceQty: 0 }
-  );
-
-  function hrefWith(next: Record<string, string | null>): string {
-    const params = new URLSearchParams();
-    for (const [k, v] of Object.entries(searchParams)) {
-      const value = Array.isArray(v) ? v[0] : v;
-      if (typeof value === "string" && value.length) params.set(k, value);
-    }
-    for (const [k, v] of Object.entries(next)) {
-      if (!v) params.delete(k);
-      else params.set(k, v);
-    }
-    return `/records?${params.toString()}`;
-  }
+  searchParams:
+    | Promise<Record<string, string | string[] | undefined>>
+    | Record<string, string | string[] | undefined>;
+}): Promise<ReactElement> {
+  const sp = await searchParams;
+  const data = getRecordsPageData(mockRecords, sp);
+  const { agents, filters, pageRows, totals, page, totalPages, rowCount, rawQuery, sort } =
+    data;
 
   return (
     <>
@@ -112,12 +50,12 @@ export function RecordsPage({
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm text-muted-foreground">
               Showing{" "}
-              <span className="font-medium text-foreground">{rows.length}</span>{" "}
+              <span className="font-medium text-foreground">{rowCount}</span>{" "}
               records
             </p>
             <div className="flex items-center gap-2 text-sm">
               <Link
-                href={hrefWith({ page: String(Math.max(1, page - 1)) })}
+                href={buildRecordsPageUrl(sp, { page: String(Math.max(1, page - 1)) })}
                 className={`rounded-xl border px-3 py-2 ${
                   page <= 1
                     ? "pointer-events-none opacity-50"
@@ -131,7 +69,9 @@ export function RecordsPage({
                 / {totalPages}
               </span>
               <Link
-                href={hrefWith({ page: String(Math.min(totalPages, page + 1)) })}
+                href={buildRecordsPageUrl(sp, {
+                  page: String(Math.min(totalPages, page + 1)),
+                })}
                 className={`rounded-xl border px-3 py-2 ${
                   page >= totalPages
                     ? "pointer-events-none opacity-50"
@@ -151,11 +91,15 @@ export function RecordsPage({
                   <th className="px-3 py-3 text-left font-medium">Agent</th>
                   <th className="px-3 py-3 text-left font-medium">Store</th>
                   <th className="px-3 py-3 text-left font-medium">Product</th>
-                  <th className="px-3 py-3 text-right font-medium">Delivered</th>
+                  <th className="px-3 py-3 text-right font-medium">
+                    Delivered
+                  </th>
                   <th className="px-3 py-3 text-right font-medium">Sold</th>
                   <th className="px-3 py-3 text-right font-medium">BO</th>
                   <th className="px-3 py-3 text-right font-medium">Unit ₱</th>
-                  <th className="px-3 py-3 text-right font-medium">Line Total</th>
+                  <th className="px-3 py-3 text-right font-medium">
+                    Line Total
+                  </th>
                   <th className="px-3 py-3 text-right font-medium">Variance</th>
                   <th className="px-3 py-3 text-left font-medium">Status</th>
                 </tr>
@@ -242,6 +186,3 @@ export function RecordsPage({
     </>
   );
 }
-
-export default RecordsPage;
-

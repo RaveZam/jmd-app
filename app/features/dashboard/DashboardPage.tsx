@@ -29,12 +29,15 @@ function formatPercent(p: number): string {
   return `${(p * 100).toFixed(1)}%`;
 }
 
-export function DashboardPage({
+export async function DashboardPage({
   searchParams,
 }: {
-  searchParams: Record<string, string | string[] | undefined>;
-}): ReactElement {
-  const filters = parseAdminFilters(searchParams);
+  searchParams:
+    | Promise<Record<string, string | string[] | undefined>>
+    | Record<string, string | string[] | undefined>;
+}): Promise<ReactElement> {
+  const sp = await searchParams;
+  const filters = parseAdminFilters(sp);
   const agents = selectAgents(mockRecords);
 
   const kpis = selectDashboardKpis(mockRecords, filters);
