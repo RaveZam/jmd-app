@@ -3,7 +3,13 @@
 import type { ComponentType, ReactElement, ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Download, FileText, LayoutGrid, Package } from "lucide-react";
+import {
+  Download,
+  FileText,
+  LayoutGrid,
+  Package,
+  Sparkles,
+} from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -16,6 +22,7 @@ type NavItem = {
 
 const menuItems: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutGrid },
+  { href: "/Intelligence", label: "AI Forecasting", icon: Sparkles },
   { href: "/records", label: "Records", icon: FileText },
   { href: "/products", label: "Products", icon: Package },
 ];

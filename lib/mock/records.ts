@@ -178,5 +178,35 @@ export const mockRecords: LedgerRecord[] = [
     boQty: 2,
     unitPrice: 60,
   },
+  // 2026-02-19
+  { id: "r-016", date: "2026-02-19", agent: "Angel", store: "SM City", product: "Pandesal (12pc)", deliveredQty: 28, soldQty: 25, boQty: 2, unitPrice: 55 },
+  { id: "r-017", date: "2026-02-19", agent: "Ben", store: "Robinsons", product: "Ensaymada", deliveredQty: 20, soldQty: 18, boQty: 2, unitPrice: 35 },
+  { id: "r-018", date: "2026-02-19", agent: "Cara", store: "Ayala Mall", product: "Spanish Bread", deliveredQty: 24, soldQty: 22, boQty: 2, unitPrice: 30 },
+  { id: "r-019", date: "2026-02-19", agent: "Drew", store: "Puregold", product: "Cheese Bread", deliveredQty: 22, soldQty: 20, boQty: 1, unitPrice: 40 },
+  { id: "r-020", date: "2026-02-19", agent: "Elise", store: "Landmark", product: "Brownies (4pc)", deliveredQty: 12, soldQty: 10, boQty: 2, unitPrice: 95 },
+  // 2026-02-18
+  { id: "r-021", date: "2026-02-18", agent: "Angel", store: "SM City", product: "Ensaymada", deliveredQty: 22, soldQty: 20, boQty: 1, unitPrice: 35 },
+  { id: "r-022", date: "2026-02-18", agent: "Ben", store: "Robinsons", product: "Pandesal (12pc)", deliveredQty: 30, soldQty: 27, boQty: 3, unitPrice: 55 },
+  { id: "r-023", date: "2026-02-18", agent: "Cara", store: "Ayala Mall", product: "Chocolate Crinkles (10pc)", deliveredQty: 14, soldQty: 13, boQty: 1, unitPrice: 60 },
+  { id: "r-024", date: "2026-02-18", agent: "Drew", store: "Puregold", product: "Brioche", deliveredQty: 10, soldQty: 9, boQty: 1, unitPrice: 85 },
+  { id: "r-025", date: "2026-02-18", agent: "Elise", store: "Landmark", product: "Banana Bread Slice", deliveredQty: 20, soldQty: 19, boQty: 0, unitPrice: 45 },
+  // 2026-02-17
+  { id: "r-026", date: "2026-02-17", agent: "Angel", store: "SM City", product: "Spanish Bread", deliveredQty: 26, soldQty: 24, boQty: 2, unitPrice: 30 },
+  { id: "r-027", date: "2026-02-17", agent: "Ben", store: "Robinsons", product: "Cheese Bread", deliveredQty: 20, soldQty: 18, boQty: 2, unitPrice: 40 },
+  { id: "r-028", date: "2026-02-17", agent: "Cara", store: "Ayala Mall", product: "Ube Cheese Pandesal (6pc)", deliveredQty: 16, soldQty: 15, boQty: 1, unitPrice: 75 },
+  { id: "r-029", date: "2026-02-17", agent: "Drew", store: "Puregold", product: "Pandesal (12pc)", deliveredQty: 32, soldQty: 29, boQty: 2, unitPrice: 55 },
+  { id: "r-030", date: "2026-02-17", agent: "Elise", store: "Landmark", product: "Chocolate Crinkles (10pc)", deliveredQty: 12, soldQty: 11, boQty: 1, unitPrice: 60 },
+  // 2026-02-16
+  { id: "r-031", date: "2026-02-16", agent: "Angel", store: "SM City", product: "Pandesal (12pc)", deliveredQty: 26, soldQty: 24, boQty: 2, unitPrice: 55 },
+  { id: "r-032", date: "2026-02-16", agent: "Ben", store: "Robinsons", product: "Ensaymada", deliveredQty: 18, soldQty: 16, boQty: 3, unitPrice: 35 },
+  { id: "r-033", date: "2026-02-16", agent: "Cara", store: "Ayala Mall", product: "Spanish Bread", deliveredQty: 24, soldQty: 22, boQty: 2, unitPrice: 30 },
+  { id: "r-034", date: "2026-02-16", agent: "Drew", store: "Puregold", product: "Cheese Bread", deliveredQty: 18, soldQty: 17, boQty: 0, unitPrice: 40 },
+  { id: "r-035", date: "2026-02-16", agent: "Elise", store: "Landmark", product: "Brownies (4pc)", deliveredQty: 10, soldQty: 9, boQty: 1, unitPrice: 95 },
+  // 2026-02-15
+  { id: "r-036", date: "2026-02-15", agent: "Angel", store: "SM City", product: "Pandesal (12pc)", deliveredQty: 30, soldQty: 28, boQty: 1, unitPrice: 55 },
+  { id: "r-037", date: "2026-02-15", agent: "Ben", store: "Robinsons", product: "Spanish Bread", deliveredQty: 28, soldQty: 26, boQty: 2, unitPrice: 30 },
+  { id: "r-038", date: "2026-02-15", agent: "Cara", store: "Ayala Mall", product: "Ensaymada", deliveredQty: 20, soldQty: 19, boQty: 1, unitPrice: 35 },
+  { id: "r-039", date: "2026-02-15", agent: "Drew", store: "Puregold", product: "Pandesal (12pc)", deliveredQty: 34, soldQty: 32, boQty: 1, unitPrice: 55 },
+  { id: "r-040", date: "2026-02-15", agent: "Elise", store: "Landmark", product: "Banana Bread Slice", deliveredQty: 22, soldQty: 21, boQty: 0, unitPrice: 45 },
 ];
 
