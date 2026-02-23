@@ -1,8 +1,6 @@
 import type { ReactElement } from "react";
 import { mockRecords } from "@/lib/mock/records";
-import { parseAdminFilters } from "@/lib/selectors/filters";
-import { getDashboardSnapshot } from "@/lib/intelligence/snapshot";
-import { runInsightRules } from "@/lib/intelligence/rules";
+import { buildIntelligenceContext } from "../../../lib/intelligence/compute";
 import { KpiCard } from "@/app/features/dashboard/components/phase1/KpiCard";
 import { IntelligenceActionCard } from "@/app/features/Intelligence/components/IntelligenceActionCard";
 import { IntelligenceForecastChart } from "@/app/features/Intelligence/components/IntelligenceForecastChart";
@@ -10,28 +8,10 @@ import { IntelligenceRangeDropdown } from "@/app/features/Intelligence/component
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { IntelligenceRiskChart } from "@/app/features/Intelligence/components/IntelligenceRiskChart";
-
-function formatCurrencyPHP(value: number): string {
-  return `₱${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
-}
-function formatPercent(p: number): string {
-  return `${(p * 100).toFixed(1)}%`;
-}
-
-function getBORiskLevel(boRate: number): "Low" | "Med" | "High" {
-  if (boRate < 0.1) return "Low";
-  if (boRate < 0.2) return "Med";
-  return "High";
-}
-function getVarianceRiskLevel(
-  varianceQty: number,
-  avgVariance: number,
-): "Low" | "Med" | "High" {
-  const threshold = Math.max(5, avgVariance * 1.5);
-  if (varianceQty <= 0) return "Low";
-  if (varianceQty <= threshold) return "Med";
-  return "High";
-}
+import {
+  formatCurrencyPHP,
+  formatPercent,
+} from "@/app/features/Intelligence/helpers";
 
 export async function IntelligencePage({
   searchParams,
@@ -40,44 +20,17 @@ export async function IntelligencePage({
     | Promise<Record<string, string | string[] | undefined>>
     | Record<string, string | string[] | undefined>;
 }): Promise<ReactElement> {
-  const sp = await searchParams;
-  const filters = parseAdminFilters(sp);
-  const rawRange = Array.isArray(sp.range) ? sp.range[0] : sp.range;
-  const rangeDays = rawRange === "30" ? 30 : 7;
-  const snapshot = getDashboardSnapshot(mockRecords, {
-    endDate: filters.date,
+  const {
+    filters,
     rangeDays,
-  });
-  const actions = runInsightRules(snapshot);
-  const p0Count = actions.filter((a) => a.priority === "P0").length;
-
-  const last7 = snapshot.history.slice(-7);
-  const avgRevenue = last7.length
-    ? last7.reduce((s, h) => s + h.revenue, 0) / last7.length
-    : 0;
-  const avgVariance = last7.length
-    ? last7.reduce((s, h) => s + h.varianceQty, 0) / last7.length
-    : 0;
-  const prevPeriodRevenue =
-    snapshot.history.length >= 2
-      ? snapshot.history[snapshot.history.length - 2]!.revenue
-      : avgRevenue;
-  const revenueTrendPct =
-    prevPeriodRevenue > 0
-      ? ((snapshot.totals.revenue - prevPeriodRevenue) / prevPeriodRevenue) *
-        100
-      : 0;
-  const boRisk = getBORiskLevel(snapshot.totals.boRate);
-  const varianceRisk = getVarianceRiskLevel(
-    snapshot.totals.varianceQty,
-    avgVariance,
-  );
-
-  const chartData = snapshot.history.map((h) => ({
-    date: h.date,
-    varianceQty: h.varianceQty,
-    boRatePct: Math.round(h.boRate * 1000) / 10,
-  }));
+    snapshot,
+    actions,
+    p0Count,
+    revenueTrendPct,
+    boRisk,
+    varianceRisk,
+    chartData,
+  } = await buildIntelligenceContext(searchParams, mockRecords);
 
   return (
     <>
@@ -102,25 +55,6 @@ export async function IntelligencePage({
 
       <div className="flex-1 overflow-y-auto px-6 py-6">
         <div className="mx-auto w-full max-w-[1200px] space-y-6">
-          <section>
-            <h2 className="mb-3 text-lg font-semibold">Next best actions</h2>
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {actions.length ? (
-                actions.map((action) => (
-                  <IntelligenceActionCard key={action.id} action={action} />
-                ))
-              ) : (
-                <Card className="shadow-soft">
-                  <CardContent className="p-5">
-                    <p className="text-sm text-muted-foreground">
-                      No priority actions right now.
-                    </p>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-          </section>
-
           <section>
             <h2 className="mb-3 text-lg font-semibold">
               Business health overview
@@ -158,6 +92,26 @@ export async function IntelligencePage({
               />
             </div>
           </section>
+          <section>
+            <h2 className="mb-3 text-lg font-semibold">Next best actions</h2>
+            <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-3">
+              {actions.length ? (
+                actions
+                  .slice(0, 3)
+                  .map((action: any) => (
+                    <IntelligenceActionCard key={action.id} action={action} />
+                  ))
+              ) : (
+                <Card className="shadow-soft">
+                  <CardContent className="p-5">
+                    <p className="text-sm text-muted-foreground">
+                      No priority actions right now.
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </section>
 
           <section>
             <IntelligenceForecastChart snapshot={snapshot} />
@@ -173,13 +127,13 @@ export async function IntelligencePage({
                 <CardContent className="space-y-3">
                   {snapshot.agents.length ? (
                     snapshot.agents
-                      .filter((a) => a.varianceQty > 0 || a.boRate > 0.1)
+                      .filter((a: any) => a.varianceQty > 0 || a.boRate > 0.1)
                       .sort(
-                        (a, b) =>
+                        (a: any, b: any) =>
                           Math.abs(b.varianceQty) - Math.abs(a.varianceQty) ||
                           b.boRate - a.boRate,
                       )
-                      .map((a) => {
+                      .map((a: any) => {
                         const risk =
                           a.varianceQty > 10 || a.boRate > 0.2
                             ? "High"

@@ -34,8 +34,8 @@ export type InsightAction = {
   title: string;
   why: string;
   action: string;
-  priority: "P0" | "P1" | "P2";
-  confidence: "Low" | "Med" | "High";
+  priority: "P0" | "P1" | "P2" | "P3";
+  confidence: "Low" | "Med" | "High" | "Critical";
 };
 
 export type ForecastDay = {
