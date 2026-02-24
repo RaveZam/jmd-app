@@ -1,4 +1,5 @@
 import type { ReactElement } from "react";
+import Link from "next/link";
 
 import type { StoreListItem } from "@/lib/mock/storelists";
 import { StoreCard } from "./StoreCard";
@@ -28,7 +29,9 @@ export function StoreList({
     <ul className="space-y-3">
       {ordered.map((store) => (
         <li key={store.id}>
-          <StoreCard store={store} />
+          <Link href={`/store?id=${store.id}`}>
+            <StoreCard store={store} />
+          </Link>
         </li>
       ))}
     </ul>

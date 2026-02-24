@@ -47,7 +47,7 @@ export function StorePage(): ReactElement {
       <Link
         href="/add-store"
         aria-label="Add store"
-        className="fixed right-6 bottom-6 z-30"
+        className="fixed right-6 bottom-6 z-30 focus:outline-none"
       >
         <div className="h-14 w-14 rounded-full bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-600 text-white flex items-center justify-center shadow-lg">
           <span className="text-2xl leading-none">+</span>

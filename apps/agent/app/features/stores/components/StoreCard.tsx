@@ -14,7 +14,7 @@ export function StoreCard({ store }: { store: StoreListItem }): ReactElement {
     <div
       className={
         visitedToday
-          ? "rounded-2xl overflow-hidden border-transparent p-4 text-white shadow-soft opacity-50"
+          ? "rounded-2xl overflow-hidden border-transparent p-4 text-white shadow-soft opacity-70"
           : "rounded-2xl border border-emerald-100 bg-white/80  p-4 shadow-sm backdrop-blur transition-colors hover:bg-white dark:border-zinc-800 dark:bg-black dark:hover:bg-zinc-950"
       }
       style={visitedToday ? { background: VISITED_TODAY_GRADIENT } : undefined}

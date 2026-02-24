@@ -65,7 +65,7 @@ export function AddstorePage(): ReactElement {
                 <select
                   value={province}
                   onChange={(e) => setProvince(e.target.value)}
-                  className="mt-1 w-full rounded-full border-b border-black px-4 py-3 bg-white text-sm"
+                  className="mt-1 w-full rounded-full border-b border-black/40 px-4 py-3 bg-white text-sm"
                 >
                   <option>Isabela</option>
                   <option>Kalinga</option>
@@ -79,7 +79,7 @@ export function AddstorePage(): ReactElement {
                   value={municipality}
                   onChange={(e) => setMunicipality(e.target.value)}
                   placeholder="e.g. Santiago"
-                  className="mt-1 w-full rounded-full border-b border-black px-4 py-3 bg-white text-sm placeholder:text-muted-foreground"
+                  className="mt-1 w-full rounded-full border-b border-black/40 px-4 py-3 bg-white text-sm placeholder:text-muted-foreground"
                 />
               </label>
 
@@ -89,7 +89,7 @@ export function AddstorePage(): ReactElement {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Puregold"
-                  className="mt-1 w-full rounded-full border-b border-black px-4 py-3 bg-white text-sm placeholder:text-muted-foreground"
+                  className="mt-1 w-full rounded-full border-b border-black/40 px-4 py-3 bg-white text-sm placeholder:text-muted-foreground"
                 />
               </label>
             </div>
@@ -99,18 +99,17 @@ export function AddstorePage(): ReactElement {
               <input
                 value={addressLine}
                 onChange={(e) => setAddressLine(e.target.value)}
-                className="mt-1 w-full rounded-full border-b border-black px-4 py-3 bg-white text-sm"
+                className="mt-1 w-full rounded-full border-b border-black/40 px-4 py-3 bg-white text-sm"
                 placeholder="e.g. Brgy. San Roque"
               />
             </label>
-
             <div className="grid grid-cols-2 gap-3">
               <label className="block">
                 <span className="text-sm font-medium">Contact name</span>
                 <input
                   value={contactName}
                   onChange={(e) => setContactName(e.target.value)}
-                  className="mt-1 w-full rounded-full border-b border-black px-4 py-3 bg-white text-sm"
+                  className="mt-1 w-full rounded-full border-b border-black/40 px-4 py-3 bg-white text-sm"
                   placeholder="e.g. Aira"
                 />
               </label>
@@ -119,7 +118,7 @@ export function AddstorePage(): ReactElement {
                 <input
                   value={contactPhone}
                   onChange={(e) => setContactPhone(e.target.value)}
-                  className="mt-1 w-full rounded-full border-b border-black px-4 py-3 bg-white text-sm"
+                  className="mt-1 w-full rounded-full border-b border-black/40 px-4 py-3 bg-white text-sm"
                   placeholder="e.g. 0917 000 0001"
                 />
               </label>
