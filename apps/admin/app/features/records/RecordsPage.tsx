@@ -21,8 +21,17 @@ export default async function RecordsPage({
 }): Promise<ReactElement> {
   const sp = await searchParams;
   const data = getRecordsPageData(mockRecords, sp);
-  const { agents, filters, pageRows, totals, page, totalPages, rowCount, rawQuery, sort } =
-    data;
+  const {
+    agents,
+    filters,
+    pageRows,
+    totals,
+    page,
+    totalPages,
+    rowCount,
+    rawQuery,
+    sort,
+  } = data;
 
   return (
     <>
@@ -55,7 +64,9 @@ export default async function RecordsPage({
             </p>
             <div className="flex items-center gap-2 text-sm">
               <Link
-                href={buildRecordsPageUrl(sp, { page: String(Math.max(1, page - 1)) })}
+                href={buildRecordsPageUrl(sp, {
+                  page: String(Math.max(1, page - 1)),
+                })}
                 className={`rounded-xl border px-3 py-2 ${
                   page <= 1
                     ? "pointer-events-none opacity-50"

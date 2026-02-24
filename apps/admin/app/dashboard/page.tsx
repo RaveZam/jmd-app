@@ -1,10 +1,9 @@
-import { RecordsPage } from "@/app/features/records";
+import { DashboardPage } from "@/app/features/dashboard";
 
 export default function Page({
   searchParams,
 }: {
   searchParams: Record<string, string | string[] | undefined>;
 }) {
-  return <RecordsPage searchParams={searchParams} />;
+  return <DashboardPage searchParams={searchParams} />;
 }
-

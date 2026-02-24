@@ -22,7 +22,7 @@ type NavItem = {
 
 const menuItems: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutGrid },
-  { href: "/Intelligence", label: "AI Forecasting", icon: Sparkles },
+  { href: "/Intelligence", label: "Forecast", icon: Sparkles },
   { href: "/records", label: "Records", icon: FileText },
   { href: "/products", label: "Products", icon: Package },
 ];
