@@ -1,0 +1,2 @@
+export { AddstorePage } from "./AddstorePage";
+

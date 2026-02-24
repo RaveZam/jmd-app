@@ -16,9 +16,17 @@ export function StoreList({
     );
   }
 
+  const ordered = [...stores].sort((a, b) => {
+    // Untendered (visitedToday === false) first
+    if (a.visitedToday === b.visitedToday) {
+      return a.name.localeCompare(b.name);
+    }
+    return a.visitedToday ? 1 : -1;
+  });
+
   return (
     <ul className="space-y-3">
-      {stores.map((store) => (
+      {ordered.map((store) => (
         <li key={store.id}>
           <StoreCard store={store} />
         </li>
