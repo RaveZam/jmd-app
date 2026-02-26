@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { Product } from "@/lib/mock/products";
 import { mockProducts } from "@/lib/mock/products";
 
@@ -11,20 +11,15 @@ export type LoggedItem = {
   unitPrice: number;
 };
 
-let nextId = 1;
-
-export function useItems() {
-  const [items, setItems] = useState<LoggedItem[]>([]);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editQty, setEditQty] = useState(0);
-
-  function logItem(productId: string, qty: number, boQty: number) {
-    const product = mockProducts.find((p) => p.id === productId) as Product;
+const makeLogItem =
+  (setItems: React.Dispatch<React.SetStateAction<LoggedItem[]>>, mockProductsLocal: Product[], nextIdRef: React.MutableRefObject<number>) =>
+  (productId: string, qty: number, boQty: number): void => {
+    const product = mockProductsLocal.find((p) => p.id === productId) as Product;
     if (!product || qty < 1) return;
     setItems((prev) => [
       ...prev,
       {
-        id: `log-${nextId++}`,
+        id: `log-${nextIdRef.current++}`,
         productId: product.id,
         productName: product.name,
         qty,
@@ -32,27 +27,45 @@ export function useItems() {
         unitPrice: product.unitPrice,
       },
     ]);
-  }
+  };
 
-  function deleteItem(id: string) {
-    setItems((prev) => prev.filter((item) => item.id !== id));
-  }
+const makeDeleteItem = (setItems: React.Dispatch<React.SetStateAction<LoggedItem[]>>) => (id: string): void => {
+  setItems((prev) => prev.filter((item) => item.id !== id));
+};
 
-  function startEdit(item: LoggedItem) {
+const makeStartEdit =
+  (setEditingId: React.Dispatch<React.SetStateAction<string | null>>, setEditQty: (v: number) => void) =>
+  (item: LoggedItem): void => {
     setEditingId(item.id);
     setEditQty(item.qty);
-  }
+  };
 
-  function commitEdit(id: string) {
+const makeCommitEdit =
+  (editQtyRef: React.MutableRefObject<number>, setItems: React.Dispatch<React.SetStateAction<LoggedItem[]>>, setEditingId: React.Dispatch<React.SetStateAction<string | null>>) =>
+  (id: string): void => {
+    const editQty = editQtyRef.current;
     if (editQty < 1) {
-      deleteItem(id);
+      setItems((prev) => prev.filter((item) => item.id !== id));
     } else {
-      setItems((prev) =>
-        prev.map((item) => (item.id === id ? { ...item, qty: editQty } : item)),
-      );
+      setItems((prev) => prev.map((item) => (item.id === id ? { ...item, qty: editQty } : item)));
     }
     setEditingId(null);
-  }
+  };
+
+export function useItems() {
+  const [items, setItems] = useState<LoggedItem[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editQty, setEditQty] = useState(0);
+  const editQtyRef = useRef(editQty);
+  const nextIdRef = useRef(1);
+
+  // keep ref in sync
+  editQtyRef.current = editQty;
+
+  const logItem = makeLogItem(setItems, mockProducts, nextIdRef);
+  const deleteItem = makeDeleteItem(setItems);
+  const startEdit = makeStartEdit(setEditingId, setEditQty);
+  const commitEdit = makeCommitEdit(editQtyRef, setItems, setEditingId);
 
   const totalPrice = items.reduce((sum, i) => sum + i.qty * i.unitPrice, 0);
   const totalBoQty = items.reduce((sum, i) => sum + i.boQty, 0);

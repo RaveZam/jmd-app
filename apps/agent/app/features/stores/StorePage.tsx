@@ -31,7 +31,7 @@ export function StorePage(): ReactElement {
       <header className="sticky top-0 z-20 border-b border-emerald-100/80 bg-white/65 px-5 py-4 backdrop-blur dark:border-zinc-800/80 dark:bg-black/60">
         <div className="mx-auto w-full max-w-[720px] space-y-1">
           <h1 className="text-2xl font-semibold tracking-tight text-emerald-950 dark:text-zinc-50">
-            Stores
+            Store Distribution Logs
           </h1>
           <p className="text-sm text-emerald-900/70 dark:text-zinc-400">
             View stores first — pick one to start your run.
