@@ -10,19 +10,19 @@ export const ROUTES: Route[] = [
     id: "route_cauayan",
     name: "Cauayan City",
     provinceIds: ["province_pasig", "province_makati"],
-    totalStores: 2,
+    totalStores: 8,
   },
   {
     id: "route_quirino_maddela",
     name: "Quirino – Maddela",
-    provinceIds: [],
-    totalStores: 0,
+    provinceIds: ["province_quirino", "province_maddela"],
+    totalStores: 4,
   },
   {
     id: "route_aurora",
     name: "Aurora Province",
-    provinceIds: [],
-    totalStores: 0,
+    provinceIds: ["province_baler", "province_dipaculao"],
+    totalStores: 4,
   },
 ];
 

@@ -12,7 +12,12 @@ import { router, useLocalSearchParams } from "expo-router";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { StoreCard, TenderedCard } from "../components/RouteComponents";
-import { RoutesProvider, useRoutes, useStores } from "../context/RoutesContext";
+import {
+  RoutesProvider,
+  useProvinces,
+  useRoutes,
+  useStores,
+} from "../context/RoutesContext";
 
 export default function ListRoute() {
   return (
@@ -25,7 +30,7 @@ export default function ListRoute() {
 function ListRouteContent() {
   const { routes } = useRoutes();
   const { stores } = useStores();
-
+  const { provinces } = useProvinces();
   const params = useLocalSearchParams<{ routeId?: string }>();
   const routeId =
     typeof params.routeId === "string" ? params.routeId : undefined;
@@ -35,8 +40,8 @@ function ListRouteContent() {
       ? (routes.find((item) => item.id === routeId) ?? null)
       : (routes[0] ?? null);
 
-  const storesForRoute = stores.filter((store) =>
-    selectedRoute?.provinceIds.includes(store.provinceId),
+  const provincesForRoute = provinces.filter((province) =>
+    selectedRoute?.provinceIds.includes(province.id),
   );
 
   return (
@@ -85,17 +90,29 @@ function ListRouteContent() {
             showsVerticalScrollIndicator={false}
           >
             <View style={styles.sectionSpacing}>
-              {/* Untendered Cards */}
-              {storesForRoute.map((store) => (
-                <StoreCard
-                  key={store.id}
-                  name={store.name}
-                  areaTag={store.provinceId}
-                  address={store.address}
-                  status="Not yet today"
-                  contactName={store.contactName}
-                  contactNumber={store.contactNumber}
-                />
+              {provincesForRoute.map((province) => (
+                <View key={province.id}>
+                  <ThemedText type="defaultSemiBold" style={styles.subtitle}>
+                    {province.name}
+                  </ThemedText>
+                  {province.storeIds.map((storeId) => {
+                    const store = stores.find((store) => store.id === storeId);
+                    if (!store) {
+                      return null;
+                    }
+                    return (
+                      <StoreCard
+                        key={store.id}
+                        name={store.name}
+                        areaTag={province.name}
+                        address={store.address}
+                        status="Not yet today"
+                        contactName={store.contactName}
+                        contactNumber={store.contactNumber}
+                      />
+                    );
+                  })}
+                </View>
               ))}
             </View>
             {/* Tendered Cards */}
@@ -159,6 +176,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     lineHeight: 18,
+    color: "#0F172A",
   },
   divider: {
     height: 1,

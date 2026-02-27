@@ -68,6 +68,11 @@ export function useStores() {
   return { stores };
 }
 
+export function useProvinces() {
+  const { provinces } = useRoutesContext();
+  return { provinces };
+}
+
 export function useRouteDetail(routeId: string) {
   const { routes, getProvincesByRoute, getStoresByProvince, getStoresByRoute } =
     useRoutesContext();
