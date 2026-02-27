@@ -1,27 +1,31 @@
 import { StyleSheet, View, ScrollView, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { Colors } from "@/constants/Colors";
 import { RouteSelectionItem } from "../components/SelectRouteComponents";
-
-const ROUTES = [
-  {
-    title: "Cauayan City",
-    storeCount: 50,
-  },
-  {
-    title: "Quirino – Maddela",
-    storeCount: 40,
-  },
-  {
-    title: "Aurora Province",
-    storeCount: 44,
-  },
-];
+import { RoutesProvider, useRoutes } from "../context/RoutesContext";
 
 export default function SelectRouteScreen() {
+  return (
+    <RoutesProvider>
+      <SelectRouteContent />
+    </RoutesProvider>
+  );
+}
+
+function SelectRouteContent() {
+  const { routes } = useRoutes();
+
+  const handleSelectRoute = (routeId: string) => {
+    router.push({
+      pathname: "/main/routes",
+      params: { routeId },
+    });
+  };
+
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
       <ThemedView style={styles.container}>
@@ -44,12 +48,17 @@ export default function SelectRouteScreen() {
             showsVerticalScrollIndicator={false}
           >
             <View style={styles.sectionSpacing}>
-              {ROUTES.map((route) => (
-                <RouteSelectionItem
-                  key={route.title}
-                  title={route.title}
-                  storeCount={route.storeCount}
-                />
+              {routes.map((route) => (
+                <TouchableOpacity
+                  key={route.id}
+                  activeOpacity={0.8}
+                  onPress={() => handleSelectRoute(route.id)}
+                >
+                  <RouteSelectionItem
+                    title={route.name}
+                    storeCount={route.totalStores}
+                  />
+                </TouchableOpacity>
               ))}
             </View>
           </ScrollView>

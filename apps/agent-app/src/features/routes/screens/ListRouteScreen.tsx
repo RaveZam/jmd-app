@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { StoreCard, TenderedCard } from "../components/RouteComponents";
@@ -24,7 +24,14 @@ export default function ListRoute() {
 
 function ListRouteContent() {
   const { routes } = useRoutes();
-  const firstRoute = routes[0];
+  const params = useLocalSearchParams<{ routeId?: string }>();
+  const routeId =
+    typeof params.routeId === "string" ? params.routeId : undefined;
+
+  const selectedRoute =
+    routeId !== undefined
+      ? routes.find((item) => item.id === routeId) ?? null
+      : routes[0] ?? null;
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
@@ -45,7 +52,7 @@ function ListRouteContent() {
                 lightColor="#0F172A"
                 darkColor="#0F172A"
               >
-                Route: {firstRoute?.name ?? "Selected Route"}
+                Route: {selectedRoute?.name ?? "Selected Route"}
               </ThemedText>
             </View>
 
