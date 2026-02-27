@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { StoreCard, TenderedCard } from "../components/RouteComponents";
@@ -18,21 +19,24 @@ export default function ListRoute() {
       <ThemedView style={styles.container}>
         <View style={styles.content}>
           <View style={styles.headerSection}>
-            <ThemedText
-              type="defaultSemiBold"
-              style={styles.title}
-              lightColor="#0F172A"
-              darkColor="#0F172A"
-            >
-              Store Distribution Logs
-            </ThemedText>
-            <ThemedText
-              style={styles.subtitle}
-              lightColor="#64748B"
-              darkColor="#64748B"
-            >
-              View stores first — pick one to start your run.
-            </ThemedText>
+            <View style={styles.headerRow}>
+              <TouchableOpacity
+                style={styles.backButton}
+                activeOpacity={0.8}
+                onPress={() => router.push("/main/routes/select")}
+              >
+                <Ionicons name="arrow-back-outline" size={16} color="#0F172A" />
+              </TouchableOpacity>
+              <ThemedText
+                type="defaultSemiBold"
+                style={styles.title}
+                lightColor="#0F172A"
+                darkColor="#0F172A"
+              >
+                Route: "Selected Route"
+              </ThemedText>
+            </View>
+
             <View style={styles.divider} />
           </View>
 
@@ -125,10 +129,25 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   headerSection: {
-    gap: 4,
+    gap: 6,
+  },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  backButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderColor: "#E2E8F0",
+    backgroundColor: "#FFFFFF",
+    gap: 6,
   },
   title: {
-    fontSize: 22,
+    fontSize: 16,
     lineHeight: 26,
   },
   subtitle: {
