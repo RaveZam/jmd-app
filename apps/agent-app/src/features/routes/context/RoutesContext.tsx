@@ -60,8 +60,12 @@ function useRoutesContext(): RoutesContextValue {
 
 export function useRoutes() {
   const { routes } = useRoutesContext();
-
   return { routes };
+}
+
+export function useStores() {
+  const { stores } = useRoutesContext();
+  return { stores };
 }
 
 export function useRouteDetail(routeId: string) {

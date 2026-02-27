@@ -12,7 +12,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { StoreCard, TenderedCard } from "../components/RouteComponents";
-import { RoutesProvider, useRoutes } from "../context/RoutesContext";
+import { RoutesProvider, useRoutes, useStores } from "../context/RoutesContext";
 
 export default function ListRoute() {
   return (
@@ -24,14 +24,20 @@ export default function ListRoute() {
 
 function ListRouteContent() {
   const { routes } = useRoutes();
+  const { stores } = useStores();
+
   const params = useLocalSearchParams<{ routeId?: string }>();
   const routeId =
     typeof params.routeId === "string" ? params.routeId : undefined;
 
   const selectedRoute =
     routeId !== undefined
-      ? routes.find((item) => item.id === routeId) ?? null
-      : routes[0] ?? null;
+      ? (routes.find((item) => item.id === routeId) ?? null)
+      : (routes[0] ?? null);
+
+  const storesForRoute = stores.filter((store) =>
+    selectedRoute?.provinceIds.includes(store.provinceId),
+  );
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
@@ -80,17 +86,20 @@ function ListRouteContent() {
           >
             <View style={styles.sectionSpacing}>
               {/* Untendered Cards */}
-              <StoreCard
-                name="Kapitolyo"
-                areaTag="Pasig"
-                address="Kapitolyo, Pasig City"
-                status="Not yet today"
-                contactName="Mia"
-                contactNumber="0917 000 0003"
-              />
+              {storesForRoute.map((store) => (
+                <StoreCard
+                  key={store.id}
+                  name={store.name}
+                  areaTag={store.provinceId}
+                  address={store.address}
+                  status="Not yet today"
+                  contactName={store.contactName}
+                  contactNumber={store.contactNumber}
+                />
+              ))}
             </View>
             {/* Tendered Cards */}
-            <View style={styles.sectionSpacing}>
+            {/* <View style={styles.sectionSpacing}>
               <TenderedCard
                 routeName="Guadalupe"
                 areaTag="Makati"
@@ -98,7 +107,7 @@ function ListRouteContent() {
                 contactName="Rico"
                 contactNumber="0917 000 0002"
               />
-            </View>
+            </View> */}
           </ScrollView>
         </View>
 
