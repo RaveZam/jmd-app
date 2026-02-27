@@ -8,19 +8,16 @@ import { RouteSelectionItem } from "../components/SelectRouteComponents";
 
 const ROUTES = [
   {
-    title: "Morning Makati Run",
-    storeCount: 5,
-    meta: "Guadalupe · Poblacion",
+    title: "Cauayan City",
+    storeCount: 50,
   },
   {
-    title: "Pasig – Kapitolyo",
-    storeCount: 3,
-    meta: "Kapitolyo cluster",
+    title: "Quirino – Maddela",
+    storeCount: 40,
   },
   {
-    title: "Quezon City – Primark",
-    storeCount: 4,
-    meta: "QC east corridor",
+    title: "Aurora Province",
+    storeCount: 44,
   },
 ];
 
@@ -52,7 +49,6 @@ export default function SelectRouteScreen() {
                   key={route.title}
                   title={route.title}
                   storeCount={route.storeCount}
-                  meta={route.meta}
                 />
               ))}
             </View>

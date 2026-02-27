@@ -12,8 +12,20 @@ import { router } from "expo-router";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { StoreCard, TenderedCard } from "../components/RouteComponents";
+import { RoutesProvider, useRoutes } from "../context/RoutesContext";
 
 export default function ListRoute() {
+  return (
+    <RoutesProvider>
+      <ListRouteContent />
+    </RoutesProvider>
+  );
+}
+
+function ListRouteContent() {
+  const { routes } = useRoutes();
+  const firstRoute = routes[0];
+
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
       <ThemedView style={styles.container}>
@@ -33,7 +45,7 @@ export default function ListRoute() {
                 lightColor="#0F172A"
                 darkColor="#0F172A"
               >
-                Route: "Selected Route"
+                Route: {firstRoute?.name ?? "Selected Route"}
               </ThemedText>
             </View>
 
@@ -60,6 +72,7 @@ export default function ListRoute() {
             showsVerticalScrollIndicator={false}
           >
             <View style={styles.sectionSpacing}>
+              {/* Untendered Cards */}
               <StoreCard
                 name="Kapitolyo"
                 areaTag="Pasig"
@@ -68,24 +81,8 @@ export default function ListRoute() {
                 contactName="Mia"
                 contactNumber="0917 000 0003"
               />
-              <StoreCard
-                name="Primark"
-                areaTag="Quezon City"
-                address="Cubao, Quezon City"
-                status="Not yet today"
-                contactName="Jessa"
-                contactNumber="0917 000 0005"
-              />
-              <StoreCard
-                name="PureGold"
-                areaTag="Taguig"
-                address="Bonifacio Global City, Taguig"
-                status="Not yet today"
-                contactName="Ken"
-                contactNumber="0917 000 0004"
-              />
             </View>
-
+            {/* Tendered Cards */}
             <View style={styles.sectionSpacing}>
               <TenderedCard
                 routeName="Guadalupe"
@@ -93,13 +90,6 @@ export default function ListRoute() {
                 address="Guadalupe Nuevo, Makati City"
                 contactName="Rico"
                 contactNumber="0917 000 0002"
-              />
-              <TenderedCard
-                routeName="Poblacion"
-                areaTag="Makati"
-                address="Poblacion, Makati City"
-                contactName="Aira"
-                contactNumber="0917 000 0001"
               />
             </View>
           </ScrollView>
