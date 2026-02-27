@@ -64,7 +64,11 @@ function SelectRouteContent() {
           </ScrollView>
         </View>
 
-        <TouchableOpacity style={styles.fab} activeOpacity={0.9}>
+        <TouchableOpacity
+          style={styles.fab}
+          activeOpacity={0.9}
+          onPress={() => router.push("/main/routes/add")}
+        >
           <Ionicons name="add" size={26} color={Colors.light.background} />
         </TouchableOpacity>
       </ThemedView>
