@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 
 export type StoreCardProps = {
@@ -8,6 +8,7 @@ export type StoreCardProps = {
   status: string;
   contactName: string;
   contactNumber: string;
+  onPress?: () => void;
 };
 
 export type TenderedCardProps = {
@@ -25,8 +26,9 @@ export function StoreCard({
   status,
   contactName,
   contactNumber,
+  onPress,
 }: StoreCardProps) {
-  return (
+  const content = (
     <View style={styles.storeCard}>
       <View style={styles.cardHeaderRow}>
         <ThemedText
@@ -49,6 +51,14 @@ export function StoreCard({
       </ThemedText>
     </View>
   );
+  if (onPress) {
+    return (
+      <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
+        {content}
+      </TouchableOpacity>
+    );
+  }
+  return content;
 }
 
 export function TenderedCard({

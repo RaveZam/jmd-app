@@ -109,6 +109,12 @@ function ListRouteContent() {
                         status="Not yet today"
                         contactName={store.contactName}
                         contactNumber={store.contactNumber}
+                        onPress={() =>
+                          router.push({
+                            pathname: "/main/routes/store/[storeId]",
+                            params: { storeId: store.id },
+                          })
+                        }
                       />
                     );
                   })}
