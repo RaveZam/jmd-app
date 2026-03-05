@@ -9,6 +9,7 @@ import {
   LayoutGrid,
   Package,
   Sparkles,
+  Users,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -25,6 +26,7 @@ const menuItems: NavItem[] = [
   { href: "/Intelligence", label: "Forecast", icon: Sparkles },
   { href: "/records", label: "Records", icon: FileText },
   { href: "/products", label: "Products", icon: Package },
+  { href: "/agents", label: "Agents", icon: Users },
 ];
 
 function SidebarNavItem({

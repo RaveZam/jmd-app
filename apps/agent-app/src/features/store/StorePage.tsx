@@ -15,16 +15,14 @@ export default function StorePage() {
   const storeId =
     typeof params.storeId === "string" ? params.storeId : undefined;
 
-  const store = storeId
-    ? STORES.find((s) => s.id === storeId) ?? null
-    : null;
+  const store = storeId ? (STORES.find((s) => s.id === storeId) ?? null) : null;
 
   const province = store
-    ? PROVINCES.find((p) => p.storeIds.includes(store.id)) ?? null
+    ? (PROVINCES.find((p) => p.storeIds.includes(store.id)) ?? null)
     : null;
   const location = province
     ? `${province.name} • ${store?.address ?? ""}`
-    : store?.address ?? "";
+    : (store?.address ?? "");
 
   const {
     selectedProduct,
