@@ -152,6 +152,11 @@ function RegisterForm(): ReactElement {
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          role: "admin",
+        },
+      },
     });
 
     console.log("signUp data", data);

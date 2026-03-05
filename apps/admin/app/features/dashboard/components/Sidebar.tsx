@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import AccountCard from "./AccountCard";
 
 type NavItem = {
   href: string;
@@ -106,18 +107,8 @@ export function Sidebar(): ReactElement {
         <SidebarNavSection title="MENU" items={menuItems} />
       </div>
 
-      <div className="mt-4 rounded-2xl bg-gradient-to-br from-emerald-900 via-emerald-900 to-emerald-700 p-4 text-white shadow-soft">
-        <p className="text-sm font-semibold">Download our Mobile App</p>
-        <p className="mt-1 text-xs text-emerald-50/80">
-          Get easy access on the go.
-        </p>
-        <Link
-          href="#"
-          className="mt-3 inline-flex w-fit items-center gap-2 rounded-xl bg-white/10 px-3 py-2 text-xs font-medium hover:bg-white/15"
-        >
-          <Download className="h-4 w-4" />
-          Download
-        </Link>
+      <div className="mt-4">
+        <AccountCard />
       </div>
     </aside>
   );
