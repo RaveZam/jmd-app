@@ -2,8 +2,8 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { LogOut } from "lucide-react";
-import { createClient } from "@/utils/supabase/client";
 import { getUserEmail } from "../services/getUserEmail";
+import { signOutUser } from "../services/signOutUser";
 
 export function AccountCard() {
   const [open, setOpen] = useState(false);
@@ -54,8 +54,7 @@ export function AccountCard() {
             <button
               type="button"
               onClick={() => {
-                // Placeholder action: actual sign-out logic to be implemented
-                console.log("sign out");
+                signOutUser();
               }}
               className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-destructive hover:bg-destructive/5"
             >
