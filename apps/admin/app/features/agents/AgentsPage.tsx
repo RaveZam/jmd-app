@@ -6,14 +6,23 @@ import { Plus, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { RegisterAgentModal, type NewAgent } from "./components/RegisterAgentModal";
+import {
+  RegisterAgentModal,
+  type NewAgent,
+} from "./components/RegisterAgentModal";
+import { createAgent } from "./services/createAgent";
 
 function AgentsPage(): ReactElement {
   const [modalOpen, setModalOpen] = useState(false);
   const [agents] = useState<{ id: string; username: string }[]>([]);
 
-  function handleRegister(_agent: NewAgent): void {
-    // TODO: persist agent when backend is ready
+  function handleRegister(agent: NewAgent): void {
+    createAgent({
+      email: agent.email,
+      name: agent.name,
+      password: agent.password,
+      confirmPassword: agent.password,
+    });
   }
 
   return (

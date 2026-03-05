@@ -8,7 +8,7 @@ import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export type NewAgent = { username: string; password: string };
+export type NewAgent = { email: string; name: string; password: string };
 
 type RegisterAgentModalProps = {
   onClose: () => void;
@@ -62,22 +62,25 @@ function ModalHeader({
 
 function RegisterAgentForm({
   titleId,
-  usernameId,
+  emailId,
+  nameId,
   passwordId,
   confirmId,
-  usernameRef,
+  emailRef,
   onClose,
   onRegister,
 }: {
   titleId: string;
-  usernameId: string;
+  emailId: string;
+  nameId: string;
   passwordId: string;
   confirmId: string;
-  usernameRef: React.RefObject<HTMLInputElement | null>;
+  emailRef: React.RefObject<HTMLInputElement | null>;
   onClose: () => void;
   onRegister: (agent: NewAgent) => void;
 }): ReactElement {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -85,9 +88,14 @@ function RegisterAgentForm({
   function submit(e: FormEvent<HTMLFormElement>): void {
     e.preventDefault();
     setError(null);
-    const trimmed = username.trim();
-    if (!trimmed) {
-      setError("Username is required.");
+    const trimmedEmail = email.trim();
+    const trimmedName = name.trim();
+    if (!trimmedEmail) {
+      setError("Email is required.");
+      return;
+    }
+    if (!trimmedName) {
+      setError("Name is required.");
       return;
     }
     if (!password) {
@@ -98,29 +106,47 @@ function RegisterAgentForm({
       setError("Passwords do not match.");
       return;
     }
-    onRegister({ username: trimmed, password });
+    onRegister({ email: trimmedEmail, name: trimmedName, password });
     onClose();
   }
 
   return (
-    <form onSubmit={submit} className="space-y-4 px-5 py-4" aria-labelledby={titleId}>
+    <form
+      onSubmit={submit}
+      className="space-y-4 px-5 py-4"
+      aria-labelledby={titleId}
+    >
       {error ? (
         <p className="text-sm text-destructive" role="alert">
           {error}
         </p>
       ) : null}
       <div className="space-y-2">
-        <label htmlFor={usernameId} className="text-sm font-medium">
-          Username
+        <label htmlFor={emailId} className="text-sm font-medium">
+          Email
         </label>
         <Input
-          ref={usernameRef}
-          id={usernameId}
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          placeholder="Agent username"
+          ref={emailRef}
+          id={emailId}
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Agent email"
           className="rounded-2xl"
-          autoComplete="username"
+          autoComplete="email"
+        />
+      </div>
+      <div className="space-y-2">
+        <label htmlFor={nameId} className="text-sm font-medium">
+          Name
+        </label>
+        <Input
+          id={nameId}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Agent name"
+          className="rounded-2xl"
+          autoComplete="name"
         />
       </div>
       <div className="space-y-2">
@@ -152,7 +178,12 @@ function RegisterAgentForm({
         />
       </div>
       <div className="flex items-center justify-end gap-2 pt-1">
-        <Button type="button" variant="outline" className="rounded-2xl" onClick={onClose}>
+        <Button
+          type="button"
+          variant="outline"
+          className="rounded-2xl"
+          onClick={onClose}
+        >
           Cancel
         </Button>
         <Button type="submit" className="rounded-2xl">
@@ -165,40 +196,48 @@ function RegisterAgentForm({
 
 function RegisterAgentPortal({
   titleId,
-  usernameId,
+  emailId,
+  nameId,
   passwordId,
   confirmId,
-  usernameRef,
+  emailRef,
   onClose,
   onRegister,
 }: {
   titleId: string;
-  usernameId: string;
+  emailId: string;
+  nameId: string;
   passwordId: string;
   confirmId: string;
-  usernameRef: React.RefObject<HTMLInputElement | null>;
+  emailRef: React.RefObject<HTMLInputElement | null>;
   onClose: () => void;
   onRegister: (agent: NewAgent) => void;
 }): ReactElement {
   return createPortal(
-    <div className="fixed inset-0 z-50" aria-labelledby={titleId} role="dialog" aria-modal="true">
+    <div
+      className="fixed inset-0 z-50"
+      aria-labelledby={titleId}
+      role="dialog"
+      aria-modal="true"
+    >
       <ModalOverlay onClose={onClose} />
       <div className="pointer-events-none relative flex h-full w-full items-start justify-center p-4 sm:p-8">
         <ModalPanel>
           <ModalHeader titleId={titleId} onClose={onClose} />
           <RegisterAgentForm
             titleId={titleId}
-            usernameId={usernameId}
+            emailId={emailId}
+            nameId={nameId}
             passwordId={passwordId}
             confirmId={confirmId}
-            usernameRef={usernameRef}
+            emailRef={emailRef}
             onClose={onClose}
             onRegister={onRegister}
           />
         </ModalPanel>
       </div>
     </div>,
-    document.body
+    document.body,
   );
 }
 
@@ -207,15 +246,16 @@ export function RegisterAgentModal({
   onRegister,
 }: RegisterAgentModalProps): ReactElement | null {
   const titleId = `${useId()}-title`;
-  const usernameId = useId();
+  const emailId = useId();
+  const nameId = useId();
   const passwordId = useId();
   const confirmId = useId();
-  const usernameRef = useRef<HTMLInputElement | null>(null);
+  const emailRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    usernameRef.current?.focus();
+    emailRef.current?.focus();
     const onKeyDown = (e: KeyboardEvent): void => {
       if (e.key === "Escape") onClose();
     };
@@ -230,10 +270,11 @@ export function RegisterAgentModal({
   return (
     <RegisterAgentPortal
       titleId={titleId}
-      usernameId={usernameId}
+      emailId={emailId}
+      nameId={nameId}
       passwordId={passwordId}
       confirmId={confirmId}
-      usernameRef={usernameRef}
+      emailRef={emailRef}
       onClose={onClose}
       onRegister={onRegister}
     />
