@@ -13,6 +13,8 @@ import { useCreateRoute } from "./useCreateRoute";
 
 export function CreateRouteForm() {
   const {
+    routeName,
+    setRouteName,
     provinceName,
     setProvinceName,
     provinces,
@@ -55,6 +57,17 @@ export function CreateRouteForm() {
       </ThemedText>
 
       <View style={styles.divider} />
+
+      <View style={styles.inputWrapper}>
+        <Text style={styles.label}>Route name</Text>
+        <TextInput
+          value={routeName}
+          onChangeText={setRouteName}
+          placeholder="Enter route name"
+          placeholderTextColor="#94A3B8"
+          style={styles.input}
+        />
+      </View>
 
       <View style={styles.fieldRow}>
         <View style={styles.inputWrapper}>

@@ -1,5 +1,11 @@
 import { useState } from "react";
 
+type LocalProvince = {
+  id: string;
+  name: string;
+  stores: LocalStore[];
+};
+
 type LocalStore = {
   id: string;
   name: string;
@@ -9,14 +15,9 @@ type LocalStore = {
   visitedToday: boolean;
 };
 
-type LocalProvince = {
-  id: string;
-  name: string;
-  stores: LocalStore[];
-};
-
 export function useCreateRoute() {
   const [provinceName, setProvinceName] = useState("");
+  const [routeName, setRouteName] = useState("");
   const [provinces, setProvinces] = useState<LocalProvince[]>([]);
   const [storeModalVisible, setStoreModalVisible] = useState(false);
   const [storeProvinceId, setStoreProvinceId] = useState<string | null>(null);
@@ -188,6 +189,8 @@ export function useCreateRoute() {
   }
 
   return {
+    routeName,
+    setRouteName,
     provinceName,
     setProvinceName,
     provinces,

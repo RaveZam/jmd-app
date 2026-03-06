@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemedView } from "@/components/ThemedView";
-import { CreateRouteForm } from "../components/CreateRouteComponents";
+import { CreateRouteForm } from "../components/create-route-components/CreateRouteComponents";
 
 export default function CreateRouteScreen() {
   return (
