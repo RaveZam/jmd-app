@@ -26,7 +26,7 @@ export const routeSaveService = {
 
         if (!provinceName) return;
 
-        const provinceId = ProvincesDao.insertProvince(routeId!, provinceName);
+        const provinceId = ProvincesDao.insertProvince(routeId, provinceName);
 
         province.stores.forEach((store) => {
           const storeName = store.name.trim();
@@ -34,7 +34,7 @@ export const routeSaveService = {
           if (!storeName) return;
 
           StoresDao.insertStore({
-            provinceId: provinceId!,
+            provinceId: provinceId,
             name: storeName,
             address: store.address.trim(),
             contactName: store.contactName.trim(),

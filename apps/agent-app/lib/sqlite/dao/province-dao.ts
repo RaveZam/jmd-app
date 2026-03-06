@@ -9,6 +9,7 @@ const ProvincesDao = {
       routeId,
       name,
     ]);
+    return id;
   },
 };
 

@@ -14,17 +14,18 @@ const StoresDao = {
     const id = uuidv4();
     db.runSync(
       `INSERT INTO stores
-       (id, province_id, name, address, contact_name, contact_phone)
+       (id, province_id, name, address, contact_number, contact_name)
        VALUES (?, ?, ?, ?, ?, ?)`,
       [
         id,
         input.provinceId,
         input.name,
         input.address ?? "",
-        input.contactName ?? "",
         input.contactPhone ?? "",
+        input.contactName ?? "",
       ],
     );
+    return id;
   },
 };
 
