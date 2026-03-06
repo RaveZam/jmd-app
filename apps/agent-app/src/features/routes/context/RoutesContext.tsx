@@ -27,7 +27,7 @@ export function RoutesProvider({ children }: RoutesProviderProps) {
   function fetchRoutes() {
     console.log("fetching routes");
     const routes = routesServices.getRoutes();
-    setRoutes(routes ?? []);
+    setRoutes(routes);
   }
 
   useEffect(() => {
