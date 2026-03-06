@@ -11,6 +11,8 @@ import { useEffect, useState } from "react";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { supabase } from "@/lib/supabase";
+import { initDb } from "@/lib/sqlite/db-migration";
+import RoutesDao from "@/lib/sqlite/dao/routes-dao";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -21,6 +23,8 @@ export default function RootLayout() {
   const [checkingSession, setCheckingSession] = useState(true);
 
   useEffect(() => {
+    initDb();
+    console.log("db initialized");
     let mounted = true;
     (async () => {
       try {

@@ -11,6 +11,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { supabase } from "@/lib/supabase";
+import useLogin from "../hooks/useLogin";
 
 export default function AuthScreen(): ReactElement {
   const [email, setEmail] = useState("");
@@ -24,7 +25,6 @@ export default function AuthScreen(): ReactElement {
         const { data } = await supabase.auth.getSession();
         const session = data?.session ?? null;
         if (mounted && session) {
-          // If there's an active session, go to the app index
           router.replace("/");
         }
       } catch (err) {
@@ -35,26 +35,6 @@ export default function AuthScreen(): ReactElement {
       mounted = false;
     };
   }, []);
-
-  async function handleSignIn(): Promise<void> {
-    setLoading(true);
-    try {
-      const res = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (res.error) {
-        Alert.alert("Sign in failed", res.error.message);
-        return;
-      }
-      // on success navigate to main index
-      router.replace("/");
-    } catch (error: unknown) {
-      Alert.alert("Sign in failed", String(error));
-    } finally {
-      setLoading(false);
-    }
-  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -84,7 +64,7 @@ export default function AuthScreen(): ReactElement {
 
         <TouchableOpacity
           style={[styles.button, loading ? styles.buttonDisabled : null]}
-          onPress={handleSignIn}
+          onPress={useLogin(email, password)}
           activeOpacity={0.8}
           disabled={loading}
         >

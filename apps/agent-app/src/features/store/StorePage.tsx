@@ -7,8 +7,8 @@ import { ProductLogForm } from "./components/ProductLogForm";
 import { LoggedItemsArea } from "./components/LoggedItemsArea";
 import { useDistributionLog } from "./hooks/useDistributionLog";
 import { PRODUCTS } from "./mock/products";
-import { STORES } from "../routes/mock/stores";
-import { PROVINCES } from "../routes/mock/province";
+import { STORES } from "../routes/types/stores";
+import { PROVINCES } from "../routes/types/province";
 
 export default function StorePage() {
   const params = useLocalSearchParams<{ storeId?: string }>();

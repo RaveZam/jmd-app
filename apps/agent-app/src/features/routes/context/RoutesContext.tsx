@@ -1,9 +1,10 @@
-import { createContext, useContext, useMemo } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 import type { ReactNode } from "react";
-
-import { ROUTES, type Route } from "../mock/routeslist";
-import { PROVINCES, type Province } from "../mock/province";
-import { STORES, type Store } from "../mock/stores";
+import type { Route } from "../types/routes-type";
+import { PROVINCES, type Province } from "../types/province";
+import { STORES, type Store } from "../types/stores";
+import { useEffect } from "react";
+import { routesServices } from "../services/routes-services";
 
 type RoutesContextValue = {
   routes: Route[];
@@ -21,9 +22,21 @@ type RoutesProviderProps = {
 };
 
 export function RoutesProvider({ children }: RoutesProviderProps) {
+  const [routes, setRoutes] = useState<Route[]>([]);
+
+  function fetchRoutes() {
+    console.log("fetching routes");
+    const routes = routesServices.getRoutes();
+    setRoutes(routes ?? []);
+  }
+
+  useEffect(() => {
+    fetchRoutes();
+  }, []);
+
   const value = useMemo<RoutesContextValue>(
     () => ({
-      routes: ROUTES,
+      routes: routes,
       provinces: PROVINCES,
       stores: STORES,
       getProvincesByRoute: (routeId: string) =>
@@ -50,7 +63,6 @@ export function RoutesProvider({ children }: RoutesProviderProps) {
 
 function useRoutesContext(): RoutesContextValue {
   const context = useContext(RoutesContext);
-
   if (!context) {
     throw new Error("useRoutesContext must be used within a RoutesProvider");
   }

@@ -7,6 +7,7 @@ import { ThemedView } from "@/components/ThemedView";
 import { Colors } from "@/constants/Colors";
 import { RouteSelectionItem } from "../components/SelectRouteComponents";
 import { RoutesProvider, useRoutes } from "../context/RoutesContext";
+import RoutesDao from "@/lib/sqlite/dao/routes-dao";
 
 export default function SelectRouteScreen() {
   return (
@@ -31,14 +32,28 @@ function SelectRouteContent() {
       <ThemedView style={styles.container}>
         <View style={styles.content}>
           <View style={styles.headerSection}>
-            <ThemedText
-              type="defaultSemiBold"
-              style={styles.title}
-              lightColor={Colors.light.text}
-              darkColor={Colors.light.text}
-            >
-              Select Route
-            </ThemedText>
+            <View style={styles.headerRow}>
+              <ThemedText
+                type="defaultSemiBold"
+                style={styles.title}
+                lightColor={Colors.light.text}
+                darkColor={Colors.light.text}
+              >
+                Select Route
+              </ThemedText>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => router.push("/main/settings" as any)}
+                style={styles.settingsButton}
+                testID="open-settings"
+              >
+                <Ionicons
+                  name="settings-outline"
+                  size={20}
+                  color={Colors.light.text}
+                />
+              </TouchableOpacity>
+            </View>
             <View style={styles.divider} />
           </View>
 
@@ -53,12 +68,7 @@ function SelectRouteContent() {
                   key={route.id}
                   activeOpacity={0.8}
                   onPress={() => handleSelectRoute(route.id)}
-                >
-                  <RouteSelectionItem
-                    title={route.name}
-                    storeCount={route.totalStores}
-                  />
-                </TouchableOpacity>
+                ></TouchableOpacity>
               ))}
             </View>
           </ScrollView>
@@ -112,6 +122,16 @@ const styles = StyleSheet.create({
   sectionSpacing: {
     gap: 12,
     marginTop: 8,
+  },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
+  },
+  settingsButton: {
+    paddingHorizontal: 8,
+    paddingVertical: 6,
   },
   fab: {
     position: "absolute",
