@@ -1,1 +1,1 @@
-export { default } from "./main/routes";
+export { default } from "./main/routes/select";

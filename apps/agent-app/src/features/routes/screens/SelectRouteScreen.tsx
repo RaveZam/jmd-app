@@ -21,7 +21,7 @@ function SelectRouteContent() {
 
   const handleSelectRoute = (routeId: string) => {
     router.push({
-      pathname: "/main/routes",
+      pathname: "/main/routes/select",
       params: { routeId },
     });
   };

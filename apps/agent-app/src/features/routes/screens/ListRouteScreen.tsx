@@ -53,7 +53,7 @@ function ListRouteContent() {
               <TouchableOpacity
                 style={styles.backButton}
                 activeOpacity={0.8}
-                onPress={() => router.push("/main/routes/select")}
+                onPress={() => router.push("/main/routes")}
               >
                 <Ionicons name="arrow-back-outline" size={16} color="#0F172A" />
               </TouchableOpacity>
