@@ -1,5 +1,5 @@
 ---
-description: Keep AI code output plain, simple, and effective
+description: 
 alwaysApply: true
 ---
 
@@ -23,4 +23,3 @@ Examples:
 - ✅ Good: Wrap a screen with a small provider and read data via a simple hook.
 - ✅ Good: Replace a hardcoded array with a typed mock array imported from a single mock file.
 - ❌ Avoid: Introducing new global state management or complex architectural patterns for simple screens.
-

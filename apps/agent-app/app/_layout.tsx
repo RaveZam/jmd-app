@@ -13,6 +13,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { supabase } from "@/lib/supabase";
 import { initDb } from "@/lib/sqlite/db-migration";
 import RoutesDao from "@/lib/sqlite/dao/routes-dao";
+import "react-native-get-random-values";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();

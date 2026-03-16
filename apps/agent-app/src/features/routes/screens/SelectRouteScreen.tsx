@@ -6,14 +6,24 @@ import { router } from "expo-router";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { Colors } from "@/constants/Colors";
-import { RouteSelectionItem } from "../components/SelectRouteComponents";
-import RoutesDao from "@/lib/sqlite/dao/routes-dao";
+
 import { Route } from "../types/routes-type";
 import { CreateRouteModal } from "../components/create-route-components/createRouteModal";
+import useGetRoutes from "../hooks/useGetRoutes";
+import { useEffect } from "react";
 
 export default function SelectRouteScreen() {
   const [showCreateRouteModal, setShowCreateRouteModal] = useState(false);
+  const { getAllRoutes } = useGetRoutes();
+  const [routes, setRoutes] = useState<Route[]>([]);
 
+  useEffect(() => {
+    (async () => {
+      const routes = await getAllRoutes();
+      setRoutes(routes);
+    })();
+  }, [showCreateRouteModal]);
+  console.log("routes", routes);
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
       <ThemedView style={styles.container}>
@@ -50,13 +60,30 @@ export default function SelectRouteScreen() {
             showsVerticalScrollIndicator={false}
           >
             <View style={styles.sectionSpacing}>
-              {/* {routes.map((route: Route) => (
+              {routes.map((route: Route) => (
                 <TouchableOpacity
                   key={route.id}
-                  activeOpacity={0.8}
-                  onPress={() => handleSelectRoute(route.id)}
-                ></TouchableOpacity>
-              ))} */}
+                  activeOpacity={0.7}
+                  style={styles.routeCard}
+                  onPress={() => {
+                    console.log("Selected route:", route.id);
+                    router.push({
+                      pathname: "/main/routes/list",
+                      params: { routeId: route.id, routeName: route.name },
+                    });
+                  }}
+                  testID={`route-item-${route.id}`}
+                >
+                  <ThemedText type="default" style={styles.routeName}>
+                    {route.name}
+                  </ThemedText>
+                </TouchableOpacity>
+              ))}
+              {routes.length === 0 && (
+                <ThemedText style={styles.emptyStateText}>
+                  No routes yet. Create one to get started!
+                </ThemedText>
+              )}
             </View>
           </ScrollView>
         </View>
@@ -115,6 +142,28 @@ const styles = StyleSheet.create({
   sectionSpacing: {
     gap: 12,
     marginTop: 8,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    color: "#000000",
+    marginBottom: 4,
+  },
+  routeCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 8,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+  },
+  routeName: {
+    fontSize: 16,
+    color: "#000000",
+  },
+  emptyStateText: {
+    textAlign: "center",
+    color: "#6B7280",
+    marginTop: 32,
+    fontSize: 15,
   },
   headerRow: {
     flexDirection: "row",

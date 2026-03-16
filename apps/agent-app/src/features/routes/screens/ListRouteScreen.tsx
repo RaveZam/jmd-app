@@ -14,8 +14,11 @@ import { ThemedView } from "@/components/ThemedView";
 import { StoreCard, TenderedCard } from "../components/RouteComponents";
 import { CreateRouteModal } from "../components/create-route-components/createRouteModal";
 
-function ListRouteScreen() {
-  const params = useLocalSearchParams<{ routeId?: string }>();
+export default function ListRouteScreen() {
+  const params = useLocalSearchParams<{
+    routeId?: string;
+    routeName?: string;
+  }>();
   const routeId =
     typeof params.routeId === "string" ? params.routeId : undefined;
 
@@ -38,7 +41,7 @@ function ListRouteScreen() {
                 lightColor="#0F172A"
                 darkColor="#0F172A"
               >
-                Route: {"Selected Route"}
+                Route: {params?.routeName}
               </ThemedText>
             </View>
 
@@ -113,8 +116,6 @@ function ListRouteScreen() {
           <Text style={styles.fabIcon}>+</Text>
         </TouchableOpacity>
       </ThemedView>
-
-      <CreateRouteModal onClose={() => {}} />
     </SafeAreaView>
   );
 }
