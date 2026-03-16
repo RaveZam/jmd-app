@@ -8,6 +8,7 @@ import {
   Modal,
 } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
+import { Colors } from "@/constants/Colors";
 
 interface CreateRouteModalProps {
   onClose: () => void;
@@ -15,7 +16,6 @@ interface CreateRouteModalProps {
 
 export function CreateRouteModal({ onClose }: CreateRouteModalProps) {
   const [routeName, setRouteName] = useState("");
-  const [visible, setVisible] = useState(false);
   const handleCancel = () => {
     setRouteName("");
     onClose();
@@ -23,9 +23,10 @@ export function CreateRouteModal({ onClose }: CreateRouteModalProps) {
 
   return (
     <Modal
-      visible={visible}
-      animationType="slide"
+      visible={true}
+      animationType="fade"
       transparent={true}
+      statusBarTranslucent={true}
       onRequestClose={handleCancel}
     >
       <View style={styles.modalBackdrop}>
@@ -75,13 +76,17 @@ export function CreateRouteModal({ onClose }: CreateRouteModalProps) {
 const styles = StyleSheet.create({
   modalBackdrop: {
     flex: 1,
+    width: "100%",
     backgroundColor: "rgba(15, 23, 42, 0.45)",
-    justifyContent: "flex-end",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 16,
   },
   modalContent: {
+    width: "100%",
+    maxWidth: 420,
     backgroundColor: "#FFFFFF",
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderRadius: 24,
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 24,
@@ -89,6 +94,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 18,
+    color: Colors.light.text,
   },
   modalField: {
     gap: 4,
@@ -100,7 +106,7 @@ const styles = StyleSheet.create({
   },
   modalInput: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 999,
+    borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderWidth: 1,
@@ -134,7 +140,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#1F6B46",
+    backgroundColor: Colors.light.tint,
   },
   modalPrimaryButtonText: {
     fontSize: 14,

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { StyleSheet, View, ScrollView, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -8,14 +9,10 @@ import { Colors } from "@/constants/Colors";
 import { RouteSelectionItem } from "../components/SelectRouteComponents";
 import RoutesDao from "@/lib/sqlite/dao/routes-dao";
 import { Route } from "../types/routes-type";
+import { CreateRouteModal } from "../components/create-route-components/createRouteModal";
 
-function SelectRouteScreen() {
-  const handleSelectRoute = (routeId: string) => {
-    router.push({
-      pathname: "/main/routes/select",
-      params: { routeId },
-    });
-  };
+export default function SelectRouteScreen() {
+  const [showCreateRouteModal, setShowCreateRouteModal] = useState(false);
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
@@ -64,13 +61,19 @@ function SelectRouteScreen() {
           </ScrollView>
         </View>
 
-        <TouchableOpacity
-          style={styles.fab}
-          activeOpacity={0.9}
-          onPress={() => router.push("/main/routes/add")}
-        >
-          <Ionicons name="add" size={26} color={Colors.light.background} />
-        </TouchableOpacity>
+        {!showCreateRouteModal && (
+          <TouchableOpacity
+            style={styles.fab}
+            activeOpacity={0.9}
+            onPress={() => setShowCreateRouteModal(true)}
+          >
+            <Ionicons name="add" size={26} color={Colors.light.background} />
+          </TouchableOpacity>
+        )}
+
+        {showCreateRouteModal && (
+          <CreateRouteModal onClose={() => setShowCreateRouteModal(false)} />
+        )}
       </ThemedView>
     </SafeAreaView>
   );
