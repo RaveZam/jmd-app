@@ -28,5 +28,4 @@ const StoresDao = {
     return id;
   },
 };
-
 export default StoresDao;

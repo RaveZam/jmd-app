@@ -12,5 +12,4 @@ const ProvincesDao = {
     return id;
   },
 };
-
 export default ProvincesDao;

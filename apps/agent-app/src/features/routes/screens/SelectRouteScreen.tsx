@@ -6,20 +6,10 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { Colors } from "@/constants/Colors";
 import { RouteSelectionItem } from "../components/SelectRouteComponents";
-import { RoutesProvider, useRoutes } from "../context/RoutesContext";
 import RoutesDao from "@/lib/sqlite/dao/routes-dao";
+import { Route } from "../types/routes-type";
 
-export default function SelectRouteScreen() {
-  return (
-    <RoutesProvider>
-      <SelectRouteContent />
-    </RoutesProvider>
-  );
-}
-
-function SelectRouteContent() {
-  const { routes } = useRoutes();
-
+function SelectRouteScreen() {
   const handleSelectRoute = (routeId: string) => {
     router.push({
       pathname: "/main/routes/select",
@@ -63,13 +53,13 @@ function SelectRouteContent() {
             showsVerticalScrollIndicator={false}
           >
             <View style={styles.sectionSpacing}>
-              {routes.map((route) => (
+              {/* {routes.map((route: Route) => (
                 <TouchableOpacity
                   key={route.id}
                   activeOpacity={0.8}
                   onPress={() => handleSelectRoute(route.id)}
                 ></TouchableOpacity>
-              ))}
+              ))} */}
             </View>
           </ScrollView>
         </View>

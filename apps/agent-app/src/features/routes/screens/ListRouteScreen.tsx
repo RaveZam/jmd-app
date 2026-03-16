@@ -12,37 +12,12 @@ import { router, useLocalSearchParams } from "expo-router";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { StoreCard, TenderedCard } from "../components/RouteComponents";
-import {
-  RoutesProvider,
-  useProvinces,
-  useRoutes,
-  useStores,
-} from "../context/RoutesContext";
+import { CreateRouteModal } from "../components/create-route-components/createRouteModal";
 
-export default function ListRoute() {
-  return (
-    <RoutesProvider>
-      <ListRouteContent />
-    </RoutesProvider>
-  );
-}
-
-function ListRouteContent() {
-  const { routes } = useRoutes();
-  const { stores } = useStores();
-  const { provinces } = useProvinces();
+function ListRouteScreen() {
   const params = useLocalSearchParams<{ routeId?: string }>();
   const routeId =
     typeof params.routeId === "string" ? params.routeId : undefined;
-
-  const selectedRoute =
-    routeId !== undefined
-      ? (routes.find((item) => item.id === routeId) ?? null)
-      : (routes[0] ?? null);
-
-  const provincesForRoute = provinces.filter((province) =>
-    selectedRoute?.provinceIds.includes(province.id),
-  );
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
@@ -63,7 +38,7 @@ function ListRouteContent() {
                 lightColor="#0F172A"
                 darkColor="#0F172A"
               >
-                Route: {selectedRoute?.name ?? "Selected Route"}
+                Route: {"Selected Route"}
               </ThemedText>
             </View>
 
@@ -90,7 +65,7 @@ function ListRouteContent() {
             showsVerticalScrollIndicator={false}
           >
             <View style={styles.sectionSpacing}>
-              {provincesForRoute.map((province) => (
+              {/* {provincesForRoute.map((province) => (
                 <View key={province.id}>
                   <ThemedText type="defaultSemiBold" style={styles.subtitle}>
                     {province.name}
@@ -119,7 +94,7 @@ function ListRouteContent() {
                     );
                   })}
                 </View>
-              ))}
+              ))} */}
             </View>
             {/* Tendered Cards */}
             {/* <View style={styles.sectionSpacing}>
@@ -138,6 +113,8 @@ function ListRouteContent() {
           <Text style={styles.fabIcon}>+</Text>
         </TouchableOpacity>
       </ThemedView>
+
+      <CreateRouteModal onClose={() => {}} />
     </SafeAreaView>
   );
 }

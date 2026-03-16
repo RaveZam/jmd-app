@@ -43,10 +43,18 @@ export function StoreCard({
           <Text style={styles.chipText}>{areaTag}</Text>
         </View>
       </View>
-      <ThemedText style={styles.cardAddress} lightColor="#475569" darkColor="#475569">
+      <ThemedText
+        style={styles.cardAddress}
+        lightColor="#475569"
+        darkColor="#475569"
+      >
         {address}
       </ThemedText>
-      <ThemedText style={styles.cardMeta} lightColor="#7C8DA0" darkColor="#7C8DA0">
+      <ThemedText
+        style={styles.cardMeta}
+        lightColor="#7C8DA0"
+        darkColor="#7C8DA0"
+      >
         {status} {"\u2022"} {contactName} {contactNumber}
       </ThemedText>
     </View>
@@ -83,11 +91,19 @@ export function TenderedCard({
         <View style={styles.chipMuted}>
           <Text style={styles.chipMutedText}>{areaTag}</Text>
         </View>
-        <ThemedText style={styles.tenderedAddress} lightColor="#EAF7F3" darkColor="#EAF7F3">
+        <ThemedText
+          style={styles.tenderedAddress}
+          lightColor="#EAF7F3"
+          darkColor="#EAF7F3"
+        >
           {address}
         </ThemedText>
       </View>
-      <ThemedText style={styles.tenderedContact} lightColor="#EAF7F3" darkColor="#EAF7F3">
+      <ThemedText
+        style={styles.tenderedContact}
+        lightColor="#EAF7F3"
+        darkColor="#EAF7F3"
+      >
         {contactName} · {contactNumber}
       </ThemedText>
     </View>
