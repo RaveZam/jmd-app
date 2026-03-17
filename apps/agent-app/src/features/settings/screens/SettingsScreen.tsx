@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   View,
@@ -14,9 +14,15 @@ import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { supabase } from "@/lib/supabase";
 import { Colors } from "@/constants/Colors";
+import type { Session } from "@supabase/supabase-js";
 
 export default function SettingsScreen() {
   const [loading, setLoading] = useState(false);
+  const [session, setSession] = useState<Session | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setSession(data.session));
+  }, []);
 
   const handleSignOut = async () => {
     setLoading(true);
@@ -57,9 +63,63 @@ export default function SettingsScreen() {
 
         <View style={styles.content}>
           <ThemedText style={styles.sectionTitle}>Account</ThemedText>
-          <ThemedText style={styles.sectionNote}>
-            Manage your account and sign out when you're finished using the app.
-          </ThemedText>
+
+          {session && (
+            <View style={styles.sessionCard}>
+              <View style={styles.avatarCircle}>
+                <Text style={styles.avatarText}>
+                  {(session.user.email ?? "?")[0].toUpperCase()}
+                </Text>
+              </View>
+
+              <View style={styles.sessionRows}>
+                <View style={styles.sessionRow}>
+                  <Ionicons name="person-outline" size={14} color="#64748B" />
+                  <Text style={styles.sessionLabel}>Name</Text>
+                  <Text style={styles.sessionValue} numberOfLines={1}>
+                    {session.user.user_metadata?.full_name ??
+                      session.user.email ??
+                      "—"}
+                  </Text>
+                </View>
+
+                <View style={styles.divider} />
+
+                <View style={styles.sessionRow}>
+                  <Ionicons name="mail-outline" size={14} color="#64748B" />
+                  <Text style={styles.sessionLabel}>Email</Text>
+                  <Text style={styles.sessionValue} numberOfLines={1}>
+                    {session.user.email ?? "—"}
+                  </Text>
+                </View>
+
+                <View style={styles.divider} />
+
+                <View style={styles.sessionRow}>
+                  <Ionicons name="key-outline" size={14} color="#64748B" />
+                  <Text style={styles.sessionLabel}>Session ID</Text>
+                  <Text
+                    style={[styles.sessionValue, styles.mono]}
+                    numberOfLines={1}
+                  >
+                    {session.access_token.slice(0, 20)}…
+                  </Text>
+                </View>
+
+                <View style={styles.divider} />
+
+                <View style={styles.sessionRow}>
+                  <Ionicons name="shield-checkmark-outline" size={14} color="#64748B" />
+                  <Text style={styles.sessionLabel}>Role</Text>
+                  <View style={styles.roleBadge}>
+                    <Text style={styles.roleBadgeText}>
+                      {session.user.role ?? "authenticated"}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+          )}
         </View>
 
         <TouchableOpacity
@@ -113,6 +173,72 @@ const styles = StyleSheet.create({
   },
   sectionNote: {
     color: "#64748B",
+  },
+  sessionCard: {
+    marginTop: 16,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    backgroundColor: "#F9FAFB",
+    overflow: "hidden",
+  },
+  avatarCircle: {
+    alignSelf: "center",
+    marginTop: 20,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: Colors.light.tint,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
+  },
+  avatarText: {
+    color: "#FFFFFF",
+    fontSize: 22,
+    fontWeight: "700",
+  },
+  sessionRows: {
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+  },
+  sessionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingVertical: 10,
+  },
+  sessionLabel: {
+    fontSize: 13,
+    color: "#64748B",
+    width: 74,
+  },
+  sessionValue: {
+    flex: 1,
+    fontSize: 13,
+    color: Colors.light.text,
+    fontWeight: "500",
+    textAlign: "right",
+  },
+  mono: {
+    fontFamily: "monospace",
+    fontSize: 12,
+    color: "#475569",
+  },
+  roleBadge: {
+    backgroundColor: "#DCFCE7",
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+  roleBadgeText: {
+    fontSize: 12,
+    color: "#16A34A",
+    fontWeight: "600",
+  },
+  divider: {
+    height: 1,
+    backgroundColor: "#E5E7EB",
   },
   signOut: {
     height: 48,

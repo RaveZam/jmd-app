@@ -6,11 +6,12 @@ import {
   View,
   TouchableOpacity,
   Text,
-  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { supabase } from "@/lib/supabase";
+import { Colors } from "@/constants/Colors";
 import useLogin from "../hooks/useLogin";
 
 export default function AuthScreen(): ReactElement {
@@ -39,79 +40,122 @@ export default function AuthScreen(): ReactElement {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.title}>Sign in</Text>
-        <Text style={styles.subtitle}>
-          Welcome back — please sign in to continue.
-        </Text>
+        <View style={styles.card}>
+          {/* Logo mark */}
+          <View style={styles.logoWrap}>
+            <Ionicons name="storefront-outline" size={28} color="#FFFFFF" />
+          </View>
 
-        <TextInput
-          placeholder="Email"
-          placeholderTextColor="#94A3B8"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          style={styles.input}
-        />
-        <TextInput
-          placeholder="Password"
-          placeholderTextColor="#94A3B8"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          style={styles.input}
-        />
+          <Text style={styles.title}>Welcome back</Text>
+          <Text style={styles.subtitle}>Sign in to your account to continue.</Text>
 
-        <TouchableOpacity
-          style={[styles.button, loading ? styles.buttonDisabled : null]}
-          onPress={useLogin(email, password)}
-          activeOpacity={0.8}
-          disabled={loading}
-        >
-          <Text style={styles.buttonText}>
-            {loading ? "Signing in..." : "Sign in"}
-          </Text>
-        </TouchableOpacity>
+          {/* Email */}
+          <View style={styles.inputWrap}>
+            <Ionicons name="mail-outline" size={16} color="#94A3B8" style={styles.inputIcon} />
+            <TextInput
+              placeholder="Email"
+              placeholderTextColor="#94A3B8"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              style={styles.input}
+            />
+          </View>
+
+          {/* Password */}
+          <View style={styles.inputWrap}>
+            <Ionicons name="lock-closed-outline" size={16} color="#94A3B8" style={styles.inputIcon} />
+            <TextInput
+              placeholder="Password"
+              placeholderTextColor="#94A3B8"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              style={styles.input}
+            />
+          </View>
+
+          <TouchableOpacity
+            style={[styles.button, loading ? styles.buttonDisabled : null]}
+            onPress={useLogin(email, password)}
+            activeOpacity={0.8}
+            disabled={loading}
+          >
+            <Text style={styles.buttonText}>
+              {loading ? "Signing in..." : "Sign in"}
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: "#FFFFFF" },
+  safeArea: { flex: 1, backgroundColor: Colors.light.background },
   container: {
     flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: 36,
+    paddingHorizontal: 24,
+    justifyContent: "center",
+  },
+  card: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    padding: 24,
     gap: 12,
   },
+  logoWrap: {
+    alignSelf: "center",
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    backgroundColor: Colors.light.tint,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 8,
+  },
   title: {
-    fontSize: 28,
+    fontSize: 22,
     fontWeight: "700",
-    color: "#0F172A",
-    marginBottom: 4,
+    color: Colors.light.text,
+    textAlign: "center",
   },
   subtitle: {
-    fontSize: 14,
-    color: "#475569",
-    marginBottom: 18,
+    fontSize: 13,
+    color: "#64748B",
+    textAlign: "center",
+    marginBottom: 8,
   },
-  input: {
+  inputWrap: {
+    flexDirection: "row",
+    alignItems: "center",
     height: 48,
     borderWidth: 1,
     borderColor: "#E2E8F0",
     borderRadius: 10,
+    backgroundColor: "#F8FAFC",
     paddingHorizontal: 12,
-    marginBottom: 12,
-    color: "#0F172A",
+    gap: 8,
+  },
+  inputIcon: {
+    width: 20,
+  },
+  input: {
+    flex: 1,
+    height: "100%",
+    color: Colors.light.text,
+    fontSize: 14,
   },
   button: {
     height: 48,
     borderRadius: 10,
-    backgroundColor: "#0F172A",
+    backgroundColor: Colors.light.tint,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 8,
+    marginTop: 4,
   },
   buttonDisabled: {
     opacity: 0.6,

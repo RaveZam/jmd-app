@@ -61,14 +61,28 @@ export default function SelectRouteScreen() {
         <Header
           title="Routes"
           rightElement={
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={() => router.push("/main/settings" as any)}
-              style={styles.settingsButton}
-              testID="open-settings"
-            >
-              <Ionicons name="settings-outline" size={22} color="#FFFFFF" />
-            </TouchableOpacity>
+            <View style={{ flexDirection: "row", gap: 4 }}>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() =>
+                  router.push({
+                    pathname: "/main/routes/store/[storeId]",
+                    params: { storeId: "store_kapitolyo" },
+                  })
+                }
+                style={styles.settingsButton}
+              >
+                <Ionicons name="storefront-outline" size={22} color="#FFFFFF" />
+              </TouchableOpacity>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => router.push("/main/settings" as any)}
+                style={styles.settingsButton}
+                testID="open-settings"
+              >
+                <Ionicons name="settings-outline" size={22} color="#FFFFFF" />
+              </TouchableOpacity>
+            </View>
           }
         />
 
