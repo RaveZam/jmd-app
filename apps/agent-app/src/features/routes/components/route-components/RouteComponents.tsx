@@ -1,23 +1,6 @@
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
-
-export type StoreCardProps = {
-  name: string;
-  areaTag: string;
-  address: string;
-  status: string;
-  contactName: string;
-  contactNumber: string;
-  onPress?: () => void;
-};
-
-export type TenderedCardProps = {
-  routeName: string;
-  areaTag: string;
-  address: string;
-  contactName: string;
-  contactNumber: string;
-};
+import { StoreCard, TenderedCard } from "../../types/routes-type";
 
 export function StoreCard({
   name,
@@ -27,7 +10,7 @@ export function StoreCard({
   contactName,
   contactNumber,
   onPress,
-}: StoreCardProps) {
+}: StoreCard) {
   const content = (
     <View style={styles.storeCard}>
       <View style={styles.cardHeaderRow}>
@@ -75,7 +58,7 @@ export function TenderedCard({
   address,
   contactName,
   contactNumber,
-}: TenderedCardProps) {
+}: TenderedCard) {
   return (
     <View style={styles.tenderedCard}>
       <Text style={styles.tenderedLabel}>Tendered</Text>

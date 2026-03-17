@@ -6,13 +6,18 @@ import {
   Text,
   ScrollView,
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { StoreCard, TenderedCard } from "../components/RouteComponents";
+import {
+  StoreCard,
+  TenderedCard,
+} from "../components/route-components/RouteComponents";
 import { CreateRouteModal } from "../components/create-route-components/createRouteModal";
+import { Header } from "@/components/ui/header";
 
 export default function ListRouteScreen() {
   const params = useLocalSearchParams<{
@@ -23,31 +28,14 @@ export default function ListRouteScreen() {
     typeof params.routeId === "string" ? params.routeId : undefined;
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+    <SafeAreaView style={styles.safeArea} edges={["left", "right"]}>
       <ThemedView style={styles.container}>
+        <Header
+          title={params?.routeName ?? "Route"}
+          onBack={() => router.push("/main/routes")}
+        />
+
         <View style={styles.content}>
-          <View style={styles.headerSection}>
-            <View style={styles.headerRow}>
-              <TouchableOpacity
-                style={styles.backButton}
-                activeOpacity={0.8}
-                onPress={() => router.push("/main/routes")}
-              >
-                <Ionicons name="arrow-back-outline" size={16} color="#0F172A" />
-              </TouchableOpacity>
-              <ThemedText
-                type="defaultSemiBold"
-                style={styles.title}
-                lightColor="#0F172A"
-                darkColor="#0F172A"
-              >
-                Route: {params?.routeName}
-              </ThemedText>
-            </View>
-
-            <View style={styles.divider} />
-          </View>
-
           <View style={styles.searchRow}>
             <View style={styles.searchInputWrapper}>
               <Ionicons name="search-outline" size={18} color="#94A3B8" />
@@ -112,9 +100,29 @@ export default function ListRouteScreen() {
           </ScrollView>
         </View>
 
-        <TouchableOpacity style={styles.fab} activeOpacity={0.9}>
+        <View style={styles.startRouteBar}>
+          <TouchableOpacity
+            style={styles.startRouteButton}
+            activeOpacity={0.85}
+            onPress={() => {
+              // TODO: Start route / begin expedition
+            }}
+          >
+            <LinearGradient
+              colors={["#1b6e40", "#0b4c29"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.startRouteButtonGradient}
+            >
+              <Ionicons name="navigate" size={22} color="#FFFFFF" />
+              <Text style={styles.startRouteButtonText}>Start Route</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+
+        {/* <TouchableOpacity style={styles.fab} activeOpacity={0.9}>
           <Text style={styles.fabIcon}>+</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </ThemedView>
     </SafeAreaView>
   );
@@ -132,40 +140,13 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 16,
-    paddingTop: 18,
+    paddingTop: 12,
     gap: 12,
-  },
-  headerSection: {
-    gap: 6,
-  },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  backButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    alignSelf: "flex-start",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderColor: "#E2E8F0",
-    backgroundColor: "#FFFFFF",
-    gap: 6,
-  },
-  title: {
-    fontSize: 16,
-    lineHeight: 26,
   },
   subtitle: {
     fontSize: 14,
     lineHeight: 18,
     color: "#0F172A",
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#E2E8F0",
-    marginTop: 10,
   },
   searchRow: {
     flexDirection: "row",
@@ -208,6 +189,35 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: 96,
+  },
+  startRouteBar: {
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 32,
+    backgroundColor: "#FFFFFF",
+  },
+  startRouteButton: {
+    borderRadius: 20,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 5,
+  },
+  startRouteButtonGradient: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+    paddingVertical: 18,
+    paddingHorizontal: 24,
+    borderRadius: 14,
+  },
+  startRouteButtonText: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "700",
   },
   fab: {
     position: "absolute",

@@ -4,164 +4,148 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a **monorepo** containing three applications:
+Monorepo for a bakery/retail distribution management system with three apps:
 
-1. **admin** - Next.js 16 admin dashboard with Supabase authentication and data visualization
-2. **agent** - Next.js web application for store/agent management
-3. **agent-app** - React Native mobile app using Expo with Expo Router and EAS Workflows
+1. **admin** (`apps/admin`) - Next.js 16 admin dashboard; Supabase auth, data visualization
+2. **agent** (`apps/agent`) - Next.js 16 web app for store/agent management
+3. **agent-app** (`apps/agent-app`) - Expo React Native mobile app for field agents
 
-## Architecture & Technology Stack
+## Code Philosophy
 
-### Admin App (`apps/admin`)
-- **Framework**: Next.js 16.1.6 (App Router)
-- **UI**: React 19.2.3, Tailwind CSS 4.x
-- **Database**: Supabase (via @supabase/supabase-js)
-- **Auth**: Supabase SSR authentication with middleware-based route protection
-- **Charts**: Recharts, @visx visualization libraries
-- **Structure**:
-  - Route groups: `(auth)`, `(dashboard)` for authenticated/dashboard areas
-  - Feature-based organization: `app/features/` contains agents, auth, dashboard, products, records, intelligence
-  - Server-side utilities: `app/server/` (db, services)
-  - Shared components: `components/`
-  - Supabase utilities: `utils/supabase/` (client, server, middleware, admin)
+From `.cursor/rules/simple-effective-output.mdc`:
 
-### Agent App (`apps/agent`)
-- **Framework**: Next.js 16.1.6 (App Router)
-- **UI**: React 19.2.3, Tailwind CSS 4.x
-- **Features**: Store management, logging
-- **React Compiler**: Enabled via babel-plugin-react-compiler
-
-### Agent Mobile App (`apps/agent-app`)
-- **Framework**: Expo SDK 54 with React Native 0.81
-- **Navigation**: Expo Router (file-based routing)
-- **Storage**: expo-sqlite for persistent local storage
-- **CI/CD**: EAS Workflows (preview, development builds, production deployments)
-- **Key packages**: expo-blur, expo-haptics, expo-image, react-native-reanimated, react-native-gesture-handler
-
-## Development Guidelines
-
-### Code Philosophy (from `.cursor/rules/simple-effective-output.mdc`)
-
-- **Keep it simple**: Prefer plain, obvious solutions over clever ones
-- **Small diffs**: Touch as few files and lines as necessary
-- **Reuse patterns**: Follow existing codebase patterns; avoid new abstractions unless there are at least two real call sites
+- **Keep it simple**: Prefer obvious solutions over clever ones
+- **Small diffs**: Touch as few files/lines as necessary
+- **Reuse patterns**: Follow existing patterns; no new abstractions without 2+ real call sites
 - **Logic proximity**: Keep logic close to where it's used unless clearly reused
-- **Direct data flows**: Favor props, simple context/hooks over global state or complex indirection
-- **TypeScript**: Practical and strict - avoid `any` but don't over-genericize
-- **Comments**: Only for complex business logic or design decisions, not for restating obvious code
+- **Direct data flows**: Props and simple context/hooks over global state
+- **TypeScript**: Practical and strict — avoid `any` but don't over-genericize
+- **Comments**: Only for complex business logic, not to restate obvious code
 
-## Common Development Commands
+## Development Commands
 
-### Admin & Agent Apps (Next.js)
+### Admin & Agent (Next.js)
 
 ```bash
-# Navigate to app directory
 cd apps/admin   # or apps/agent
-
-# Development
-npm run dev          # Start dev server (typically http://localhost:3000)
-npm run build       # Production build
-npm run start       # Start production server
-npm run lint        # Run ESLint
+npm run dev     # Dev server
+npm run build   # Production build
+npm run lint    # ESLint
 ```
+
+> Use **pnpm** in the Next.js apps (pnpm-lock.yaml present).
 
 ### Agent Mobile App (Expo)
 
 ```bash
-# Navigate to app directory
 cd apps/agent-app
+npm run start               # Start Metro bundler
+npm run start --clear       # Clear cache and start
+npm run android             # Android emulator
+npm run ios                 # iOS simulator
+npx expo lint               # Lint
+npx expo install <package>  # Install Expo-compatible packages
 
-# Development
-npm run start                 # Start Expo dev server ( Metro bundler )
-npm run start --clear         # Clear cache and start
-npm run android              # Start on Android emulator
-npm run ios                  # Start on iOS simulator
-npm run web                  # Start in web browser
-
-# Building & Testing
-npx expo doctor              # Check project health
-npx expo lint                # Run ESLint
-npx expo install <package>   # Install Expo-compatible packages
-npm run development-builds  # Create development builds via EAS
-
-# Production
-npm run draft                # Publish preview update
-npm run deploy               # Deploy to production (workflow)
+# EAS
+npm run development-builds  # Create dev build via EAS
+npm run draft               # Publish preview update
+npm run deploy              # Deploy to production
 ```
 
-## Environment Configuration
+> Use **npm** in the Expo app (package-lock.json present).
 
-- **Admin App**: Requires `.env.local` with Supabase credentials (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`)
-- **Agent App**: No special environment variables identified
-- **Agent Mobile App**: `.env.local` present for local configuration
+## Admin App Architecture
 
-## Routing & Navigation
+- **Route groups**: `(auth)` and `(dashboard)` for layout separation
+- **Feature modules**: `app/features/` — agents, auth, dashboard, products, records, intelligence
+- **Server layer**: `app/server/` — db and service utilities (server components only)
+- **Supabase utilities**: `utils/supabase/` — client, server, middleware, admin variants
+- **Auth**: Middleware-based session validation (`middleware.ts`)
+- **Charts**: Recharts + @visx
 
-### Next.js Apps (Admin & Agent)
-- Uses App Router with `app/` directory
-- Route groups (e.g., `(auth)`, `(dashboard)`) for layout grouping
-- Server components by default; client components use `'use client'` directive
-- Middleware-based authentication (admin app)
+## Agent Mobile App Architecture
 
-### Expo Mobile App
-- File-based routing with Expo Router
-- Routes in `app/` directory:
-  - `_layout.tsx` - Root layout with theme provider
-  - `(tabs)/` - Tab-based navigation screens
-  - `auth/` - Authentication screens
-  - `main/` - Main app screens
+### Feature-Based Structure
 
-## Testing Approach
+```
+src/features/
+  auth/         # useLogin hook, sign-in screen
+  routes/       # Route management (main feature)
+    screens/    # SelectRouteScreen, ListRouteScreen
+    components/ # RouteComponents (StoreCard, TenderedCard), createRouteModal
+    hooks/      # useGetRoutes
+    services/   # routesServices, routeSaveService
+    types/      # Route, CreateRouteDraft, DraftProvince, DraftStore
+  store/        # Distribution log (useDistributionLog, ProductLogForm)
+  settings/     # Settings screen
+lib/
+  sqlite/
+    db-migration.ts         # DB init (called on app launch)
+    dao/
+      routes-dao.ts         # getAllRoutes, insertRoute
+      province-dao.ts       # insertProvince
+      store-dao.ts          # insertStore
+  supabase.ts               # Supabase client (expo-sqlite/localStorage for session)
+```
 
-No explicit testing framework is configured. If adding tests:
+### SQLite Database Layer
 
-- **Next.js apps**: Consider Jest + React Testing Library or Vitest
-- **Expo app**: Consider Jest + React Native Testing Library
-- Add component/testIDs for automation (MCP automation tools mentioned in agent-app AGENTS.md)
+Database: `routeledger.db` opened via `expo-sqlite`. Initialized in `app/_layout.tsx` via `initDb()`.
 
-## Database & Backend
+**Schema:**
+```sql
+routes     (id TEXT PK, name TEXT NOT NULL)
+provinces  (id TEXT PK, name TEXT NOT NULL, route_id FK)
+stores     (id TEXT PK, name, province_id FK, address, contact_number, contact_name)
+```
 
-- **Supabase**: Used in admin app for PostgreSQL database and authentication
-  - Client utilities in `utils/supabase/`
-  - Server components in `app/server/` for database operations
-  - Middleware handles session validation
+**Patterns:**
+- All DAOs use **synchronous** API: `db.runSync()`, `db.getAllSync()`
+- IDs are UUIDs generated via `uuid` v4 package (`uuidv4()`)
+- Multi-table inserts wrapped in `db.withTransactionSync()` (see `routeSaveService`)
+- No versioned migrations — tables created with `IF NOT EXISTS`
 
-## CI/CD
+### Navigation (Expo Router)
 
-- **Admin & Agent**: Manual deployment (likely Vercel based on Next.js)
-- **Agent Mobile App**: Automated via EAS Workflows (`.eas/workflows/`)
-  - Profiles: development, preview, production
-  - Commands: `npm run draft`, `npm run development-builds`, `npm run deploy`
+File-based routing under `app/`. Key routes:
+- `app/index.tsx` → re-exports `/main/routes/index` (home)
+- `app/auth/sign-in.tsx` → sign-in screen
+- `app/main/routes/index.tsx` → SelectRouteScreen
+- `app/main/routes/list.tsx` → ListRouteScreen
+- `app/main/routes/store/[storeId].tsx` → dynamic store detail
+- `app/main/settings/index.tsx` → settings
 
-## Important Files & Directories
+**Navigation patterns:**
+```typescript
+// Typed params
+const params = useLocalSearchParams<{ routeId?: string; routeName?: string }>();
 
-- `apps/admin/middleware.ts` - Authentication middleware
-- `apps/admin/utils/supabase/` - Supabase client setup
-- `apps/agent-app/AGENTS.md` - Detailed Expo/React Native guidance
-- `apps/agent-app/eas.json` - EAS build configuration
-- `apps/agent-app/app.json` - Expo app configuration
+// Navigate with params
+router.push({ pathname: "/main/routes/list", params: { routeId, routeName } });
 
-## Package Management
+// Auth redirect (prevent back nav)
+router.replace("/auth/sign-in");
+```
 
-- **pnpm**: Preferred for Next.js apps (pnpm-lock.yaml present)
-- **npm**: Used in Expo app (package-lock.json present)
-- No root workspace file detected; each app manages its own dependencies
+**Auth guard** in `app/_layout.tsx`: checks `supabase.auth.getSession()` on mount, redirects unauthenticated users to `/auth/sign-in`, redirects authenticated users away from auth routes.
 
-## Linting & TypeScript
+### Styling Conventions
 
-- **Admin & Agent**: ESLint 9 with eslint-config-next, TypeScript 5.x
-- **Expo**: ESLint with eslint-config-expo, TypeScript ~5.8.3
-- Config files: `eslint.config.mjs` (or `.js`), `tsconfig.json`
+- All styles via `StyleSheet.create()` (React Native)
+- Flexbox for layout; `SafeAreaView` wraps screens
+- Theme colors from `constants/Colors.ts` (light/dark variants)
+- Reusable header: `components/ui/header.tsx` (back button, title, right element slot)
+- FABs: absolutely positioned with `expo-linear-gradient` backgrounds
+- Cards: `borderRadius: 8`, `borderColor: "#E5E7EB"`
 
-## Debugging & Tools
+## Environment Variables
 
-- **Next.js**: Use browser DevTools; Next.js DevTools available
-- **Expo**: MCP `open_devtools` for React Native DevTools; network inspection; element inspector
-- **Logging**: console.log/warn/error; error boundaries for production
+- **Admin app**: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` in `.env.local`
+- **Agent mobile app**: Supabase credentials in `.env.local`
 
-## Notes
+## Key Reference Files
 
-- This monorepo appears to be a bakery/retail management system with admin dashboard for oversight and a mobile app for field agents/stores
-- Admin app includes modules for agents, products, records, intelligence/dashboards
-- Agent mobile app uses SQLite for offline-first data persistence
-- All apps are TypeScript-first with strong typing
+- `apps/agent-app/AGENTS.md` — detailed Expo/React Native guidance, MCP debug commands
+- `apps/agent-app/eas.json` — build profiles (development, preview, production)
+- `apps/agent-app/app.json` — Expo config (SDK 54, new arch enabled, typedRoutes)
+- `.cursor/rules/simple-effective-output.mdc` — code philosophy

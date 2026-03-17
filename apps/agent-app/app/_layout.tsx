@@ -14,6 +14,7 @@ import { supabase } from "@/lib/supabase";
 import { initDb } from "@/lib/sqlite/db-migration";
 import RoutesDao from "@/lib/sqlite/dao/routes-dao";
 import "react-native-get-random-values";
+import SelectRouteScreen from "@/src/features/routes/screens/SelectRouteScreen";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -34,14 +35,11 @@ export default function RootLayout() {
         if (!mounted) return;
         const onAuthRoute = segments[0] === "auth";
         if (!session && !onAuthRoute) {
-          // no session => send to sign-in
           router.replace("/auth/sign-in");
         } else if (session && onAuthRoute) {
-          // already signed in => don't show auth route
           router.replace("/");
         }
       } catch {
-        // ignore errors and allow navigation to decide
       } finally {
         if (mounted) setCheckingSession(false);
       }
@@ -59,7 +57,9 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack screenOptions={{ headerShown: false }}>
+      <Stack
+        screenOptions={{ headerShown: false, animation: "fade_from_bottom" }}
+      >
         <Stack.Screen name="index" />
         <Stack.Screen name="auth/sign-in" />
         <Stack.Screen name="+not-found" />

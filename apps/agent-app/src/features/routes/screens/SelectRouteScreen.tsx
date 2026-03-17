@@ -9,6 +9,7 @@ import { Colors } from "@/constants/Colors";
 
 import { Route } from "../types/routes-type";
 import { CreateRouteModal } from "../components/create-route-components/createRouteModal";
+import { Header } from "@/components/ui/header";
 import useGetRoutes from "../hooks/useGetRoutes";
 import { useEffect } from "react";
 
@@ -25,35 +26,23 @@ export default function SelectRouteScreen() {
   }, [showCreateRouteModal]);
   console.log("routes", routes);
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+    <SafeAreaView style={styles.safeArea} edges={["left", "right"]}>
       <ThemedView style={styles.container}>
-        <View style={styles.content}>
-          <View style={styles.headerSection}>
-            <View style={styles.headerRow}>
-              <ThemedText
-                type="defaultSemiBold"
-                style={styles.title}
-                lightColor={Colors.light.text}
-                darkColor={Colors.light.text}
-              >
-                Select Route
-              </ThemedText>
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={() => router.push("/main/settings" as any)}
-                style={styles.settingsButton}
-                testID="open-settings"
-              >
-                <Ionicons
-                  name="settings-outline"
-                  size={20}
-                  color={Colors.light.text}
-                />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.divider} />
-          </View>
+        <Header
+          title="Select Route"
+          rightElement={
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => router.push("/main/settings" as any)}
+              style={styles.settingsButton}
+              testID="open-settings"
+            >
+              <Ionicons name="settings-outline" size={22} color="#FFFFFF" />
+            </TouchableOpacity>
+          }
+        />
 
+        <View style={styles.content}>
           <ScrollView
             style={styles.scrollArea}
             contentContainerStyle={styles.scrollContent}
@@ -118,20 +107,8 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 16,
-    paddingTop: 18,
+    paddingTop: 12,
     gap: 12,
-  },
-  headerSection: {
-    gap: 4,
-  },
-  title: {
-    fontSize: 22,
-    lineHeight: 26,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: Colors.light.border,
-    marginTop: 10,
   },
   scrollArea: {
     flex: 1,
@@ -165,15 +142,8 @@ const styles = StyleSheet.create({
     marginTop: 32,
     fontSize: 15,
   },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 8,
-  },
   settingsButton: {
-    paddingHorizontal: 8,
-    paddingVertical: 6,
+    padding: 6,
   },
   fab: {
     position: "absolute",
