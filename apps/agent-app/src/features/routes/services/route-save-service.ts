@@ -16,10 +16,8 @@ export const routeSaveService = {
       throw new Error("Add at least one province.");
     }
 
-    const routesDao = new RoutesDao();
-
     db.withTransactionSync(() => {
-      const routeId = routesDao.insertRoute(trimmedRouteName);
+      const routeId = RoutesDao.insertRoute(trimmedRouteName);
 
       draft.provinces.forEach((province) => {
         const provinceName = province.name.trim();
@@ -44,6 +42,6 @@ export const routeSaveService = {
       });
     });
 
-    return routesDao.getAllRoutes();
+    return RoutesDao.getAllRoutes();
   },
 };

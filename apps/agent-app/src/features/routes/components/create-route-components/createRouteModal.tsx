@@ -24,8 +24,7 @@ export function CreateRouteModal({ onClose }: CreateRouteModalProps) {
 
   const handleCreateRoute = () => {
     if (!routeName.trim()) return;
-    const routesDao = new RoutesDao();
-    routesDao.insertRoute(routeName);
+    RoutesDao.insertRoute(routeName);
     setRouteName("");
     onClose();
   };

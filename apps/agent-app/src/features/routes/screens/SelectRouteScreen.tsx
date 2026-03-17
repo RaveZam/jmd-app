@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import {
   StyleSheet,
   View,
@@ -15,32 +15,20 @@ import { Swipeable } from "react-native-gesture-handler";
 import { ThemedView } from "@/components/ThemedView";
 import { Colors } from "@/constants/Colors";
 
-import { Route } from "../types/routes-type";
 import { CreateRouteModal } from "../components/create-route-components/createRouteModal";
 import { Header } from "@/components/ui/header";
-import useGetRoutes from "../hooks/useGetRoutes";
+import { useRoutes } from "../hooks/useRoutes";
 import RoutesDao from "@/lib/sqlite/dao/routes-dao";
 
 export default function SelectRouteScreen() {
   const [showCreateRouteModal, setShowCreateRouteModal] = useState(false);
-  const [routes, setRoutes] = useState<Route[]>([]);
-  const [pendingDelete, setPendingDelete] = useState<Route | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<{ id: string; name: string } | null>(null);
   const swipeableRefs = useRef<Record<string, Swipeable | null>>({});
-  const { getAllRoutes } = useGetRoutes();
-
-  const loadRoutes = async () => {
-    const data = await getAllRoutes();
-    setRoutes(data);
-  };
-
-  useEffect(() => {
-    loadRoutes();
-  }, [showCreateRouteModal]);
+  const { routes, loadRoutes } = useRoutes();
 
   const handleDeleteConfirm = () => {
     if (!pendingDelete) return;
-    const dao = new RoutesDao();
-    dao.deleteRoute(pendingDelete.id);
+    RoutesDao.deleteRoute(pendingDelete.id);
     setPendingDelete(null);
     loadRoutes();
   };
@@ -52,7 +40,7 @@ export default function SelectRouteScreen() {
     setPendingDelete(null);
   };
 
-  const renderRightActions = (route: Route) => (
+  const renderRightActions = (route: { id: string; name: string }) => (
     <TouchableOpacity
       style={styles.deleteAction}
       activeOpacity={0.8}
@@ -103,7 +91,7 @@ export default function SelectRouteScreen() {
                 </Text>
               </View>
             ) : (
-              routes.map((route: Route) => (
+              routes.map((route) => (
                 <Swipeable
                   key={route.id}
                   ref={(ref) => { swipeableRefs.current[route.id] = ref; }}
@@ -155,7 +143,12 @@ export default function SelectRouteScreen() {
         )}
 
         {showCreateRouteModal && (
-          <CreateRouteModal onClose={() => setShowCreateRouteModal(false)} />
+          <CreateRouteModal
+            onClose={() => {
+              setShowCreateRouteModal(false);
+              loadRoutes();
+            }}
+          />
         )}
 
         <Modal
