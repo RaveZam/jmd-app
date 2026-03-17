@@ -19,10 +19,14 @@ import { CreateRouteModal } from "../components/create-route-components/createRo
 import { Header } from "@/components/ui/header";
 import { useRoutes } from "../hooks/useRoutes";
 import RoutesDao from "@/lib/sqlite/dao/routes-dao";
+import { modalStyles as m } from "@/styles/modalStyles";
 
 export default function SelectRouteScreen() {
   const [showCreateRouteModal, setShowCreateRouteModal] = useState(false);
-  const [pendingDelete, setPendingDelete] = useState<{ id: string; name: string } | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
   const swipeableRefs = useRef<Record<string, Swipeable | null>>({});
   const { routes, loadRoutes } = useRoutes();
 
@@ -52,7 +56,7 @@ export default function SelectRouteScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["left", "right"]}>
+    <SafeAreaView style={styles.safeArea} edges={["left", "right", "bottom"]}>
       <ThemedView style={styles.container}>
         <Header
           title="Routes"
@@ -71,7 +75,8 @@ export default function SelectRouteScreen() {
         <View style={styles.content}>
           {routes.length > 0 && (
             <Text style={styles.sectionLabel}>
-              {routes.length} {routes.length === 1 ? "route" : "routes"} available
+              {routes.length} {routes.length === 1 ? "route" : "routes"}{" "}
+              available
             </Text>
           )}
 
@@ -94,7 +99,9 @@ export default function SelectRouteScreen() {
               routes.map((route) => (
                 <Swipeable
                   key={route.id}
-                  ref={(ref) => { swipeableRefs.current[route.id] = ref; }}
+                  ref={(ref) => {
+                    swipeableRefs.current[route.id] = ref;
+                  }}
                   renderRightActions={() => renderRightActions(route)}
                   rightThreshold={60}
                   overshootRight={false}
@@ -111,13 +118,23 @@ export default function SelectRouteScreen() {
                     testID={`route-item-${route.id}`}
                   >
                     <View style={styles.routeIconWrap}>
-                      <Ionicons name="location-outline" size={18} color="#1b6e40" />
+                      <Ionicons
+                        name="location-outline"
+                        size={18}
+                        color="#1b6e40"
+                      />
                     </View>
                     <View style={styles.routeInfo}>
                       <Text style={styles.routeName}>{route.name}</Text>
-                      <Text style={styles.routeSubtitle}>Tap to view stores</Text>
+                      <Text style={styles.routeSubtitle}>
+                        Tap to view stores
+                      </Text>
                     </View>
-                    <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
+                    <Ionicons
+                      name="chevron-forward"
+                      size={18}
+                      color="#CBD5E1"
+                    />
                   </TouchableOpacity>
                 </Swipeable>
               ))
@@ -158,29 +175,29 @@ export default function SelectRouteScreen() {
           statusBarTranslucent
           onRequestClose={handleDeleteCancel}
         >
-          <View style={styles.modalBackdrop}>
-            <View style={styles.modalContent}>
-              <View style={styles.modalIconWrap}>
+          <View style={m.backdrop}>
+            <View style={m.content}>
+              <View style={m.deleteIconWrap}>
                 <Ionicons name="trash-outline" size={28} color="#EF4444" />
               </View>
-              <Text style={styles.modalTitle}>Delete Route</Text>
-              <Text style={styles.modalBody}>
+              <Text style={m.title}>Delete Route</Text>
+              <Text style={m.body}>
                 Are you sure you want to delete{" "}
-                <Text style={styles.modalRouteName}>{pendingDelete?.name}</Text>?{"\n"}
+                <Text style={m.highlight}>{pendingDelete?.name}</Text>?{"\n"}
                 All provinces and stores will be removed.
               </Text>
-              <View style={styles.modalButtons}>
+              <View style={m.buttons}>
                 <TouchableOpacity
-                  style={styles.cancelButton}
+                  style={m.cancelButton}
                   onPress={handleDeleteCancel}
                 >
-                  <Text style={styles.cancelButtonText}>Cancel</Text>
+                  <Text style={m.cancelText}>Cancel</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={styles.deleteButton}
+                  style={m.deleteButton}
                   onPress={handleDeleteConfirm}
                 >
-                  <Text style={styles.deleteButtonText}>Delete</Text>
+                  <Text style={m.deleteText}>Delete</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -318,79 +335,5 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-  },
-  // Delete modal
-  modalBackdrop: {
-    flex: 1,
-    backgroundColor: "rgba(15, 23, 42, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 24,
-  },
-  modalContent: {
-    width: "100%",
-    maxWidth: 360,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 24,
-    padding: 24,
-    alignItems: "center",
-    gap: 8,
-  },
-  modalIconWrap: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: "#FEF2F2",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 4,
-  },
-  modalTitle: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: "#0F172A",
-  },
-  modalBody: {
-    fontSize: 14,
-    color: "#64748B",
-    textAlign: "center",
-    lineHeight: 21,
-    marginBottom: 8,
-  },
-  modalRouteName: {
-    fontWeight: "700",
-    color: "#0F172A",
-  },
-  modalButtons: {
-    flexDirection: "row",
-    gap: 10,
-    width: "100%",
-  },
-  cancelButton: {
-    flex: 1,
-    height: 44,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: "#E2E8F0",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  cancelButtonText: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#0F172A",
-  },
-  deleteButton: {
-    flex: 1,
-    height: 44,
-    borderRadius: 999,
-    backgroundColor: "#EF4444",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  deleteButtonText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#FFFFFF",
   },
 });

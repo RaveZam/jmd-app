@@ -109,7 +109,7 @@ export default function ListRouteScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["left", "right"]}>
+    <SafeAreaView style={styles.safeArea} edges={["left", "right", "bottom"]}>
       <ThemedView style={styles.container}>
         <Header
           title={routeName}

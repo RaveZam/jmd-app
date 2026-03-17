@@ -1,6 +1,7 @@
 import { Modal, View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { StoreRow } from "../../types/db-rows";
+import { modalStyles as m } from "@/styles/modalStyles";
 
 type Props = {
   store: StoreRow | null;
@@ -16,12 +17,12 @@ export function ViewStoreModal({ store, onClose }: Props) {
       statusBarTranslucent
       onRequestClose={onClose}
     >
-      <View style={styles.backdrop}>
-        <View style={styles.content}>
+      <View style={m.backdrop}>
+        <View style={m.content}>
           <View style={styles.iconWrap}>
             <Ionicons name="storefront-outline" size={26} color="#1b6e40" />
           </View>
-          <Text style={styles.title}>{store?.name}</Text>
+          <Text style={m.title}>{store?.name}</Text>
 
           <View style={styles.fields}>
             {store?.address ? (
@@ -48,7 +49,7 @@ export function ViewStoreModal({ store, onClose }: Props) {
           </View>
 
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <Text style={styles.closeButtonText}>Close</Text>
+            <Text style={m.cancelText}>Close</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -57,22 +58,6 @@ export function ViewStoreModal({ store, onClose }: Props) {
 }
 
 const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1,
-    backgroundColor: "rgba(15, 23, 42, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 24,
-  },
-  content: {
-    width: "100%",
-    maxWidth: 360,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 24,
-    padding: 24,
-    alignItems: "center",
-    gap: 8,
-  },
   iconWrap: {
     width: 52,
     height: 52,
@@ -81,11 +66,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 4,
-  },
-  title: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: "#0F172A",
   },
   fields: {
     width: "100%",
@@ -117,10 +97,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginTop: 4,
-  },
-  closeButtonText: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#0F172A",
   },
 });
