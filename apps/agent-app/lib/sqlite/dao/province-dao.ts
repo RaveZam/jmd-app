@@ -21,12 +21,14 @@ const ProvincesDao = {
   getProvincesForRoute(routeId: string) {
     return db.getAllSync<{ id: string; name: string; route_id: string }>(
       `SELECT * FROM provinces WHERE route_id = ?`,
-      [routeId]
+      [routeId],
     );
   },
 
   logAll() {
-    const rows = db.getAllSync<{ id: string; name: string; route_id: string }>(`SELECT * FROM provinces`);
+    const rows = db.getAllSync<{ id: string; name: string; route_id: string }>(
+      `SELECT * FROM provinces`,
+    );
     logTable("provinces", rows as Record<string, unknown>[]);
   },
 };

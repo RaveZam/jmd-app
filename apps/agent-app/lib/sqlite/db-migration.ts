@@ -8,6 +8,7 @@ export function initDb() {
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL
     );
+
     CREATE TABLE IF NOT EXISTS provinces (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
@@ -23,6 +24,15 @@ CREATE TABLE IF NOT EXISTS stores (
   contact_number TEXT,
   contact_name TEXT,
   FOREIGN KEY (province_id) REFERENCES provinces(id)
+);
+
+CREATE TABLE IF NOT EXISTS outbox (
+  id TEXT PRIMARY KEY,
+  type TEXT NOT NULL,       
+  payload TEXT NOT NULL,    
+  priority INTEGER NOT NULL,
+  created_at INTEGER NOT NULL,
+  status TEXT DEFAULT 'pending'
 );
 
 

@@ -13,6 +13,7 @@ import {
 import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
 import StoresDao from "@/lib/sqlite/dao/store-dao";
+import { useAddStore } from "../../hooks/useAddStore";
 
 type ExistingStore = {
   id: string;
@@ -43,8 +44,12 @@ export function AddStoreModal({
 
   const [name, setName] = useState(initialStore?.name ?? "");
   const [address, setAddress] = useState(initialStore?.address ?? "");
-  const [contactName, setContactName] = useState(initialStore?.contact_name ?? "");
-  const [contactPhone, setContactPhone] = useState(initialStore?.contact_number ?? "");
+  const [contactName, setContactName] = useState(
+    initialStore?.contact_name ?? "",
+  );
+  const [contactPhone, setContactPhone] = useState(
+    initialStore?.contact_number ?? "",
+  );
 
   const handleCancel = () => {
     onClose();
@@ -61,13 +66,14 @@ export function AddStoreModal({
       });
       onUpdated?.();
     } else {
-      StoresDao.insertStore({
+      useAddStore(
         provinceId,
-        name: name.trim(),
-        address: address.trim(),
-        contactName: contactName.trim(),
-        contactPhone: contactPhone.trim(),
-      });
+        name.trim(),
+        address.trim(),
+        contactName.trim(),
+        contactPhone.trim(),
+      );
+
       onAdded();
     }
     handleCancel();
