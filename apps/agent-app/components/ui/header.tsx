@@ -7,9 +7,10 @@ type HeaderProps = {
   title: string;
   onBack?: () => void;
   rightElement?: ReactNode;
+  titleElement?: ReactNode;
 };
 
-export function Header({ title, onBack, rightElement }: HeaderProps) {
+export function Header({ title, onBack, rightElement, titleElement }: HeaderProps) {
   const insets = useSafeAreaInsets();
 
   return (
@@ -27,9 +28,11 @@ export function Header({ title, onBack, rightElement }: HeaderProps) {
             </TouchableOpacity>
           ) : null}
         </View>
-        <Text style={styles.title} numberOfLines={1}>
-          {title}
-        </Text>
+        {titleElement ?? (
+          <Text style={styles.title} numberOfLines={1}>
+            {title}
+          </Text>
+        )}
         <View style={styles.right}>{rightElement ?? null}</View>
       </View>
     </View>

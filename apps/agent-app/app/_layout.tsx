@@ -14,6 +14,8 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { supabase } from "@/lib/supabase";
 import { initDb } from "@/lib/sqlite/db-migration";
 import RoutesDao from "@/lib/sqlite/dao/routes-dao";
+import ProvincesDao from "@/lib/sqlite/dao/province-dao";
+import StoresDao from "@/lib/sqlite/dao/store-dao";
 import "react-native-get-random-values";
 import SelectRouteScreen from "@/src/features/routes/screens/SelectRouteScreen";
 
@@ -28,6 +30,9 @@ export default function RootLayout() {
   useEffect(() => {
     initDb();
     console.log("db initialized");
+    new RoutesDao().logAll();
+    ProvincesDao.logAll();
+    StoresDao.logAll();
     let mounted = true;
     (async () => {
       try {

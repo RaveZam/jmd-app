@@ -14,11 +14,21 @@ import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
 import StoresDao from "@/lib/sqlite/dao/store-dao";
 
+type ExistingStore = {
+  id: string;
+  name: string;
+  address: string;
+  contact_name: string;
+  contact_number: string;
+};
+
 interface AddStoreModalProps {
   provinceId: string;
   provinceName: string;
   onClose: () => void;
   onAdded: () => void;
+  initialStore?: ExistingStore;
+  onUpdated?: () => void;
 }
 
 export function AddStoreModal({
@@ -26,31 +36,41 @@ export function AddStoreModal({
   provinceName,
   onClose,
   onAdded,
+  initialStore,
+  onUpdated,
 }: AddStoreModalProps) {
-  const [name, setName] = useState("");
-  const [address, setAddress] = useState("");
-  const [contactName, setContactName] = useState("");
-  const [contactPhone, setContactPhone] = useState("");
+  const isEditing = !!initialStore;
+
+  const [name, setName] = useState(initialStore?.name ?? "");
+  const [address, setAddress] = useState(initialStore?.address ?? "");
+  const [contactName, setContactName] = useState(initialStore?.contact_name ?? "");
+  const [contactPhone, setContactPhone] = useState(initialStore?.contact_number ?? "");
 
   const handleCancel = () => {
-    setName("");
-    setAddress("");
-    setContactName("");
-    setContactPhone("");
     onClose();
   };
 
-  const handleAdd = () => {
+  const handleSubmit = () => {
     if (!name.trim()) return;
-    StoresDao.insertStore({
-      provinceId,
-      name: name.trim(),
-      address: address.trim(),
-      contactName: contactName.trim(),
-      contactPhone: contactPhone.trim(),
-    });
+    if (isEditing && initialStore) {
+      StoresDao.updateStore(initialStore.id, {
+        name: name.trim(),
+        address: address.trim(),
+        contactName: contactName.trim(),
+        contactPhone: contactPhone.trim(),
+      });
+      onUpdated?.();
+    } else {
+      StoresDao.insertStore({
+        provinceId,
+        name: name.trim(),
+        address: address.trim(),
+        contactName: contactName.trim(),
+        contactPhone: contactPhone.trim(),
+      });
+      onAdded();
+    }
     handleCancel();
-    onAdded();
   };
 
   return (
@@ -68,9 +88,11 @@ export function AddStoreModal({
         <View style={styles.modalBackdrop}>
           <View style={styles.modalContent}>
             <ThemedText type="defaultSemiBold" style={styles.modalTitle}>
-              Add Store
+              {isEditing ? "Edit Store" : "Add Store"}
             </ThemedText>
-            <Text style={styles.subtitle}>to {provinceName}</Text>
+            <Text style={styles.subtitle}>
+              {isEditing ? `in ${provinceName}` : `to ${provinceName}`}
+            </Text>
 
             <ScrollView
               showsVerticalScrollIndicator={false}
@@ -139,9 +161,11 @@ export function AddStoreModal({
                   !name.trim() && styles.addButtonDisabled,
                 ]}
                 disabled={!name.trim()}
-                onPress={handleAdd}
+                onPress={handleSubmit}
               >
-                <Text style={styles.addButtonText}>Add Store</Text>
+                <Text style={styles.addButtonText}>
+                  {isEditing ? "Save Changes" : "Add Store"}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
