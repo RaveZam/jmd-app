@@ -1,9 +1,17 @@
-import { useState, useEffect } from "react";
-import { StyleSheet, View, ScrollView, TouchableOpacity, Text } from "react-native";
+import { useState, useEffect, useRef } from "react";
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  TouchableOpacity,
+  Text,
+  Modal,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
+import { Swipeable } from "react-native-gesture-handler";
 import { ThemedView } from "@/components/ThemedView";
 import { Colors } from "@/constants/Colors";
 
@@ -11,18 +19,49 @@ import { Route } from "../types/routes-type";
 import { CreateRouteModal } from "../components/create-route-components/createRouteModal";
 import { Header } from "@/components/ui/header";
 import useGetRoutes from "../hooks/useGetRoutes";
+import RoutesDao from "@/lib/sqlite/dao/routes-dao";
 
 export default function SelectRouteScreen() {
   const [showCreateRouteModal, setShowCreateRouteModal] = useState(false);
-  const { getAllRoutes } = useGetRoutes();
   const [routes, setRoutes] = useState<Route[]>([]);
+  const [pendingDelete, setPendingDelete] = useState<Route | null>(null);
+  const swipeableRefs = useRef<Record<string, Swipeable | null>>({});
+  const { getAllRoutes } = useGetRoutes();
+
+  const loadRoutes = async () => {
+    const data = await getAllRoutes();
+    setRoutes(data);
+  };
 
   useEffect(() => {
-    (async () => {
-      const data = await getAllRoutes();
-      setRoutes(data);
-    })();
+    loadRoutes();
   }, [showCreateRouteModal]);
+
+  const handleDeleteConfirm = () => {
+    if (!pendingDelete) return;
+    const dao = new RoutesDao();
+    dao.deleteRoute(pendingDelete.id);
+    setPendingDelete(null);
+    loadRoutes();
+  };
+
+  const handleDeleteCancel = () => {
+    if (pendingDelete) {
+      swipeableRefs.current[pendingDelete.id]?.close();
+    }
+    setPendingDelete(null);
+  };
+
+  const renderRightActions = (route: Route) => (
+    <TouchableOpacity
+      style={styles.deleteAction}
+      activeOpacity={0.8}
+      onPress={() => setPendingDelete(route)}
+    >
+      <Ionicons name="trash-outline" size={22} color="#FFFFFF" />
+      <Text style={styles.deleteActionText}>Delete</Text>
+    </TouchableOpacity>
+  );
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["left", "right"]}>
@@ -65,27 +104,34 @@ export default function SelectRouteScreen() {
               </View>
             ) : (
               routes.map((route: Route) => (
-                <TouchableOpacity
+                <Swipeable
                   key={route.id}
-                  activeOpacity={0.7}
-                  style={styles.routeCard}
-                  onPress={() =>
-                    router.push({
-                      pathname: "/main/routes/list",
-                      params: { routeId: route.id, routeName: route.name },
-                    })
-                  }
-                  testID={`route-item-${route.id}`}
+                  ref={(ref) => { swipeableRefs.current[route.id] = ref; }}
+                  renderRightActions={() => renderRightActions(route)}
+                  rightThreshold={60}
+                  overshootRight={false}
                 >
-                  <View style={styles.routeIconWrap}>
-                    <Ionicons name="location-outline" size={18} color="#1b6e40" />
-                  </View>
-                  <View style={styles.routeInfo}>
-                    <Text style={styles.routeName}>{route.name}</Text>
-                    <Text style={styles.routeSubtitle}>Tap to view stores</Text>
-                  </View>
-                  <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
-                </TouchableOpacity>
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    style={styles.routeCard}
+                    onPress={() =>
+                      router.push({
+                        pathname: "/main/routes/list",
+                        params: { routeId: route.id, routeName: route.name },
+                      })
+                    }
+                    testID={`route-item-${route.id}`}
+                  >
+                    <View style={styles.routeIconWrap}>
+                      <Ionicons name="location-outline" size={18} color="#1b6e40" />
+                    </View>
+                    <View style={styles.routeInfo}>
+                      <Text style={styles.routeName}>{route.name}</Text>
+                      <Text style={styles.routeSubtitle}>Tap to view stores</Text>
+                    </View>
+                    <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
+                  </TouchableOpacity>
+                </Swipeable>
               ))
             )}
           </ScrollView>
@@ -111,6 +157,42 @@ export default function SelectRouteScreen() {
         {showCreateRouteModal && (
           <CreateRouteModal onClose={() => setShowCreateRouteModal(false)} />
         )}
+
+        <Modal
+          visible={!!pendingDelete}
+          transparent
+          animationType="fade"
+          statusBarTranslucent
+          onRequestClose={handleDeleteCancel}
+        >
+          <View style={styles.modalBackdrop}>
+            <View style={styles.modalContent}>
+              <View style={styles.modalIconWrap}>
+                <Ionicons name="trash-outline" size={28} color="#EF4444" />
+              </View>
+              <Text style={styles.modalTitle}>Delete Route</Text>
+              <Text style={styles.modalBody}>
+                Are you sure you want to delete{" "}
+                <Text style={styles.modalRouteName}>{pendingDelete?.name}</Text>?{"\n"}
+                All provinces and stores will be removed.
+              </Text>
+              <View style={styles.modalButtons}>
+                <TouchableOpacity
+                  style={styles.cancelButton}
+                  onPress={handleDeleteCancel}
+                >
+                  <Text style={styles.cancelButtonText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.deleteButton}
+                  onPress={handleDeleteConfirm}
+                >
+                  <Text style={styles.deleteButtonText}>Delete</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </ThemedView>
     </SafeAreaView>
   );
@@ -205,6 +287,21 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#94A3B8",
   },
+  // Swipe delete action
+  deleteAction: {
+    backgroundColor: "#EF4444",
+    justifyContent: "center",
+    alignItems: "center",
+    width: 80,
+    borderRadius: 16,
+    marginLeft: 8,
+    gap: 4,
+  },
+  deleteActionText: {
+    color: "#FFFFFF",
+    fontSize: 11,
+    fontWeight: "600",
+  },
   // Settings
   settingsButton: {
     padding: 6,
@@ -228,5 +325,79 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+  },
+  // Delete modal
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: "rgba(15, 23, 42, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 24,
+  },
+  modalContent: {
+    width: "100%",
+    maxWidth: 360,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
+    padding: 24,
+    alignItems: "center",
+    gap: 8,
+  },
+  modalIconWrap: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: "#FEF2F2",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 4,
+  },
+  modalTitle: {
+    fontSize: 17,
+    fontWeight: "700",
+    color: "#0F172A",
+  },
+  modalBody: {
+    fontSize: 14,
+    color: "#64748B",
+    textAlign: "center",
+    lineHeight: 21,
+    marginBottom: 8,
+  },
+  modalRouteName: {
+    fontWeight: "700",
+    color: "#0F172A",
+  },
+  modalButtons: {
+    flexDirection: "row",
+    gap: 10,
+    width: "100%",
+  },
+  cancelButton: {
+    flex: 1,
+    height: 44,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cancelButtonText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#0F172A",
+  },
+  deleteButton: {
+    flex: 1,
+    height: 44,
+    borderRadius: 999,
+    backgroundColor: "#EF4444",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  deleteButtonText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#FFFFFF",
   },
 });

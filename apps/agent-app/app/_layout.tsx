@@ -7,6 +7,7 @@ import { useFonts } from "expo-font";
 import { Stack, useSegments, router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useEffect, useState } from "react";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -56,15 +57,17 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack
-        screenOptions={{ headerShown: false, animation: "fade_from_bottom" }}
-      >
-        <Stack.Screen name="index" />
-        <Stack.Screen name="auth/sign-in" />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+        <Stack
+          screenOptions={{ headerShown: false, animation: "fade_from_bottom" }}
+        >
+          <Stack.Screen name="index" />
+          <Stack.Screen name="auth/sign-in" />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+        <StatusBar style="auto" />
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }

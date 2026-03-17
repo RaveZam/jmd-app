@@ -11,4 +11,12 @@ export default class RoutesDao {
     db.runSync(`INSERT INTO routes (id, name) VALUES (?, ?)`, [id, name]);
     return id;
   }
+
+  deleteRoute(id: string) {
+    db.withTransactionSync(() => {
+      db.runSync(`DELETE FROM stores WHERE province_id IN (SELECT id FROM provinces WHERE route_id = ?)`, [id]);
+      db.runSync(`DELETE FROM provinces WHERE route_id = ?`, [id]);
+      db.runSync(`DELETE FROM routes WHERE id = ?`, [id]);
+    });
+  }
 }

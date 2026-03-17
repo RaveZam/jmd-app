@@ -3,21 +3,20 @@ export type Route = {
   name: string;
 };
 
-export type DraftStore = {
-  id: string;
+export type StoreCard = {
   name: string;
+  areaTag: string;
+  address: string;
+  status: string;
+  contactName: string;
+  contactNumber: string;
+  onPress?: () => void;
+};
+
+export type TenderedCard = {
+  routeName: string;
+  areaTag: string;
   address: string;
   contactName: string;
-  contactPhone: string;
-};
-
-export type DraftProvince = {
-  id: string;
-  name: string;
-  stores: DraftStore[];
-};
-
-export type CreateRouteDraft = {
-  name: string;
-  provinces: DraftProvince[];
+  contactNumber: string;
 };
