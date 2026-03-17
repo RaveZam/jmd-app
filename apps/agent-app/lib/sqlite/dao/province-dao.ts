@@ -11,5 +11,12 @@ const ProvincesDao = {
     ]);
     return id;
   },
+
+  getProvincesForRoute(routeId: string) {
+    return db.getAllSync<{ id: string; name: string; route_id: string }>(
+      `SELECT * FROM provinces WHERE route_id = ?`,
+      [routeId]
+    );
+  },
 };
 export default ProvincesDao;

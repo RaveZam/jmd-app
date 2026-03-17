@@ -10,6 +10,17 @@ type InsertStoreInput = {
 };
 
 const StoresDao = {
+  getStoresForProvince(provinceId: string) {
+    return db.getAllSync<{
+      id: string;
+      name: string;
+      province_id: string;
+      address: string;
+      contact_number: string;
+      contact_name: string;
+    }>(`SELECT * FROM stores WHERE province_id = ?`, [provinceId]);
+  },
+
   insertStore(input: InsertStoreInput) {
     const id = uuidv4();
     db.runSync(
