@@ -12,6 +12,25 @@ const SessionStoresDao = {
     return id;
   },
 
+  getBySessionId(sessionId: string) {
+    return db.getAllSync<{
+      id: string;
+      route_session_id: string;
+      store_id: string;
+      store_name: string;
+      store_address: string | null;
+      store_contact_name: string | null;
+      visited: number;
+      created_at: string;
+    }>(
+      `SELECT ss.*, s.name as store_name, s.address as store_address, s.contact_name as store_contact_name
+       FROM session_stores ss
+       INNER JOIN stores s ON ss.store_id = s.id
+       WHERE ss.route_session_id = ?`,
+      [sessionId],
+    );
+  },
+
   logAll() {
     const rows = db.getAllSync<{
       id: string;

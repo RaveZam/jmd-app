@@ -1,55 +1,174 @@
 import { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { View, Text, TouchableOpacity, StyleSheet, FlatList } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import { ThemedView } from "@/components/ThemedView";
-import { Header } from "@/components/ui/header";
 import { EndRouteModal } from "../components/session-route-components/EndRouteModal";
-import usePlanRoute from "../hooks/session_hooks/usePlanRoute";
-import { useEffect } from "react";
+import useSessionRoute, { SessionStore } from "../hooks/session_hooks/useSessionRoute";
+import RouteSessionsDao from "@/lib/sqlite/dao/route-sessions-dao";
+
+function StoreConnector() {
+  return (
+    <View style={styles.connectorWrapper}>
+      <View style={styles.connectorLine} />
+    </View>
+  );
+}
+
+function SessionStoreItem({ store, index }: { store: SessionStore; index: number }) {
+  const visited = store.visited === 1;
+  return (
+    <View style={[styles.storeCard, visited ? styles.storeCardVisited : styles.storeCardPending]}>
+      {visited ? (
+        <View style={styles.checkCircle}>
+          <Ionicons name="checkmark" size={13} color="#FFFFFF" />
+        </View>
+      ) : (
+        <View style={styles.numberCircle}>
+          <Text style={styles.numberText}>{index + 1}</Text>
+        </View>
+      )}
+      <View style={styles.storeInfo}>
+        <Text
+          style={[styles.storeName, visited && styles.storeNameVisited]}
+          numberOfLines={1}
+        >
+          {store.store_name}
+        </Text>
+        {(store.store_address || store.store_contact_name) ? (
+          <View style={styles.storeMeta}>
+            {store.store_address ? (
+              <View style={styles.storeMetaRow}>
+                <Ionicons name="location-outline" size={11} color={visited ? "#4ADE80" : "#94A3B8"} />
+                <Text style={[styles.storeMetaText, visited && styles.storeMetaTextVisited]} numberOfLines={1}>
+                  {store.store_address}
+                </Text>
+              </View>
+            ) : null}
+            {store.store_contact_name ? (
+              <View style={styles.storeMetaRow}>
+                <Ionicons name="person-outline" size={11} color={visited ? "#4ADE80" : "#94A3B8"} />
+                <Text style={[styles.storeMetaText, visited && styles.storeMetaTextVisited]} numberOfLines={1}>
+                  {store.store_contact_name}
+                </Text>
+              </View>
+            ) : null}
+          </View>
+        ) : null}
+      </View>
+      <View
+        style={[
+          styles.statusBadge,
+          visited ? styles.statusBadgeVisited : styles.statusBadgePending,
+        ]}
+      >
+        <Text
+          style={[
+            styles.statusText,
+            visited ? styles.statusTextVisited : styles.statusTextPending,
+          ]}
+        >
+          {visited ? "Visited" : "Pending"}
+        </Text>
+      </View>
+    </View>
+  );
+}
 
 export default function SessionRouteScreen() {
+  const insets = useSafeAreaInsets();
   const params = useLocalSearchParams<{
     routeId?: string;
     routeName?: string;
+    sessionId?: string;
   }>();
 
   const routeName =
     typeof params.routeName === "string" ? params.routeName : "Route";
+  const sessionId =
+    typeof params.sessionId === "string" ? params.sessionId : "";
+
+  const { session, sessionStores, visitedCount, totalCount } =
+    useSessionRoute(sessionId);
+  const progress = totalCount > 0 ? visitedCount / totalCount : 0;
+  const progressPct = Math.round(progress * 100);
 
   const [showEndModal, setShowEndModal] = useState(false);
 
   const handleEndConfirm = () => {
+    if (sessionId) RouteSessionsDao.complete(sessionId);
     setShowEndModal(false);
     router.push("/main/routes");
   };
 
+  const formattedDate = session?.session_date
+    ? new Date(session.session_date).toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      })
+    : "";
+
   return (
     <SafeAreaView style={styles.safeArea} edges={["left", "right", "bottom"]}>
       <ThemedView style={styles.container}>
-        <Header title={routeName} />
-
-        <View style={styles.content}>
-          <Text style={styles.placeholder}>Session screen coming soon.</Text>
+        {/* Header */}
+        <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
+          <View style={styles.headerTopRow}>
+            <Text style={styles.headerLabel}>TODAY'S SESSION</Text>
+            <View style={styles.stopsBadge}>
+              <Text style={styles.stopsBadgeText}>{totalCount} stops</Text>
+            </View>
+          </View>
+          <Text style={styles.headerTitle} numberOfLines={1}>
+            {routeName}
+          </Text>
+          <View style={styles.headerMeta}>
+            {formattedDate ? (
+              <>
+                <View style={styles.metaDot} />
+                <Text style={styles.headerMetaText}>{formattedDate}</Text>
+                <Text style={styles.headerMetaSep}>{"  •  "}</Text>
+              </>
+            ) : null}
+            <Text style={styles.headerMetaText}>
+              {visitedCount} of {totalCount} done
+            </Text>
+          </View>
+          <View style={styles.progressRow}>
+            <View style={styles.progressTrack}>
+              <View
+                style={[styles.progressFill, { width: `${progress * 100}%` }]}
+              />
+            </View>
+            <Text style={styles.progressPct}>{progressPct}% completed</Text>
+          </View>
         </View>
+
+        <FlatList
+          data={sessionStores}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.listContent}
+          ItemSeparatorComponent={StoreConnector}
+          renderItem={({ item, index }) => (
+            <SessionStoreItem store={item} index={index} />
+          )}
+          ListEmptyComponent={
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyText}>No stores in this session.</Text>
+            </View>
+          }
+        />
 
         <View style={styles.footer}>
           <TouchableOpacity
             style={styles.endRouteButton}
-            activeOpacity={0.85}
+            activeOpacity={0.7}
             onPress={() => setShowEndModal(true)}
           >
-            <LinearGradient
-              colors={["#991B1B", "#7F1D1D"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.endRouteButtonGradient}
-            >
-              <Ionicons name="stop-circle-outline" size={22} color="#FFFFFF" />
-              <Text style={styles.endRouteButtonText}>End Route</Text>
-            </LinearGradient>
+            <Ionicons name="stop-circle-outline" size={17} color="#DC2626" />
+            <Text style={styles.endRouteButtonText}>End Route</Text>
           </TouchableOpacity>
         </View>
 
@@ -66,50 +185,244 @@ export default function SessionRouteScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#F0F0EB",
+    backgroundColor: "#0b4c29",
   },
   container: {
     flex: 1,
     backgroundColor: "#F0F0EB",
   },
-  content: {
+
+  // ── Header ────────────────────────────────────────────────
+  header: {
+    backgroundColor: "#0b4c29",
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  headerTopRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 6,
+  },
+  headerLabel: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: "#86EFAC",
+    letterSpacing: 1.2,
+    textTransform: "uppercase",
+  },
+  stopsBadge: {
+    backgroundColor: "rgba(255,255,255,0.15)",
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.25)",
+  },
+  stopsBadgeText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#FFFFFF",
+  },
+  headerTitle: {
+    fontSize: 26,
+    fontWeight: "700",
+    color: "#FFFFFF",
+    marginBottom: 8,
+    letterSpacing: -0.3,
+  },
+  headerMeta: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  metaDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "#4ADE80",
+    marginRight: 6,
+  },
+  headerMetaText: {
+    fontSize: 13,
+    color: "#BBF7D0",
+    fontWeight: "500",
+  },
+  headerMetaSep: {
+    fontSize: 13,
+    color: "#4ADE80",
+  },
+  progressRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  progressTrack: {
     flex: 1,
+    height: 6,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    borderRadius: 3,
+    overflow: "hidden",
+  },
+  progressFill: {
+    height: "100%",
+    backgroundColor: "#4ADE80",
+    borderRadius: 3,
+  },
+  progressPct: {
+    fontSize: 12,
+    color: "#BBF7D0",
+    fontWeight: "500",
+    minWidth: 80,
+    textAlign: "right",
+  },
+
+  // ── List ──────────────────────────────────────────────────
+  listContent: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 8,
+  },
+
+  // ── Connector ─────────────────────────────────────────────
+  connectorWrapper: {
+    alignItems: "center",
+    paddingLeft: 20,
+  },
+  connectorLine: {
+    width: 1.5,
+    height: 10,
+    backgroundColor: "#CBD5E1",
+  },
+
+  // ── Store Card ────────────────────────────────────────────
+  storeCard: {
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 13,
+    borderWidth: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  storeCardVisited: {
+    backgroundColor: "#F0FDF4",
+    borderColor: "#BBF7D0",
+  },
+  storeCardPending: {
+    backgroundColor: "#FFFFFF",
+    borderColor: "#E2E8F0",
+  },
+  checkCircle: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: "#16A34A",
     alignItems: "center",
     justifyContent: "center",
+    flexShrink: 0,
   },
-  placeholder: {
+  numberCircle: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: "#1E293B",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+  numberText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#FFFFFF",
+  },
+  storeInfo: {
+    flex: 1,
+  },
+  storeName: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#0F172A",
+  },
+  storeNameVisited: {
+    color: "#166534",
+  },
+  statusBadge: {
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderWidth: 1,
+  },
+  statusBadgeVisited: {
+    backgroundColor: "#16A34A",
+    borderColor: "#15803D",
+  },
+  statusBadgePending: {
+    backgroundColor: "#F8FAFC",
+    borderColor: "#CBD5E1",
+  },
+  statusText: {
+    fontSize: 11,
+    fontWeight: "600",
+  },
+  statusTextVisited: {
+    color: "#FFFFFF",
+  },
+  statusTextPending: {
+    color: "#94A3B8",
+  },
+
+  // ── Empty ─────────────────────────────────────────────────
+  emptyState: {
+    alignItems: "center",
+    paddingTop: 60,
+  },
+  emptyText: {
     fontSize: 14,
     color: "#94A3B8",
   },
+
+  // ── Footer ────────────────────────────────────────────────
   footer: {
     paddingHorizontal: 16,
     paddingTop: 12,
-    paddingBottom: 32,
+    paddingBottom: 24,
     backgroundColor: "#FFFFFF",
     borderTopWidth: 1,
     borderTopColor: "#E2E8F0",
   },
   endRouteButton: {
-    borderRadius: 14,
-    overflow: "hidden",
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 5,
-  },
-  endRouteButtonGradient: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 10,
-    paddingVertical: 18,
+    gap: 7,
+    paddingVertical: 14,
     paddingHorizontal: 24,
-    borderRadius: 14,
+    borderRadius: 10,
+    backgroundColor: "#991B1B",
   },
   endRouteButtonText: {
     color: "#FFFFFF",
-    fontSize: 18,
-    fontWeight: "700",
+    fontSize: 15,
+    fontWeight: "600",
+  },
+
+  // ── Store Meta ────────────────────────────────────────────
+  storeMeta: {
+    marginTop: 4,
+    gap: 2,
+  },
+  storeMetaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  storeMetaText: {
+    fontSize: 11,
+    color: "#94A3B8",
+    flex: 1,
+  },
+  storeMetaTextVisited: {
+    color: "#4ADE80",
   },
 });

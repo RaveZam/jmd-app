@@ -12,6 +12,24 @@ const RouteSessionsDao = {
     return id;
   },
 
+  complete(id: string) {
+    db.runSync(
+      `UPDATE route_sessions SET status = 'completed' WHERE id = ?`,
+      [id],
+    );
+  },
+
+  getById(id: string) {
+    return db.getFirstSync<{
+      id: string;
+      route_name: string;
+      session_date: string;
+      conducted_by: string;
+      status: string;
+      created_at: string;
+    }>(`SELECT * FROM route_sessions WHERE id = ?`, [id]);
+  },
+
   logAll() {
     const rows = db.getAllSync<{
       id: string;
