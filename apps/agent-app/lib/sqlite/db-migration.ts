@@ -32,7 +32,8 @@ CREATE TABLE IF NOT EXISTS route_sessions (
     session_date TEXT NOT NULL,                 
     conducted_by TEXT NOT NULL,                
     status      TEXT NOT NULL DEFAULT 'ongoing' CHECK(status IN ('ongoing', 'completed')),
-    created_at  TEXT NOT NULL DEFAULT (datetime('now'))
+    created_at  TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (route_id) REFERENCES routes(id)
 );
 
 CREATE TABLE IF NOT EXISTS session_stores (
