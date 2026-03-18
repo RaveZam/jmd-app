@@ -18,6 +18,8 @@ import RoutesDao from "@/lib/sqlite/dao/routes-dao";
 import ProvincesDao from "@/lib/sqlite/dao/province-dao";
 import StoresDao from "@/lib/sqlite/dao/store-dao";
 import OutboxDao from "@/lib/sqlite/dao/outbox-dao";
+import RouteSessionsDao from "@/lib/sqlite/dao/route-sessions-dao";
+import SessionStoresDao from "@/lib/sqlite/dao/session-stores-dao";
 import "react-native-get-random-values";
 import SelectRouteScreen from "@/src/features/routes/screens/SelectRouteScreen";
 
@@ -36,6 +38,8 @@ export default function RootLayout() {
     ProvincesDao.logAll();
     StoresDao.logAll();
     OutboxDao.logAll();
+    RouteSessionsDao.logAll();
+    SessionStoresDao.logAll();
     let mounted = true;
     (async () => {
       try {

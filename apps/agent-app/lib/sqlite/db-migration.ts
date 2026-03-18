@@ -26,6 +26,24 @@ CREATE TABLE IF NOT EXISTS stores (
   FOREIGN KEY (province_id) REFERENCES provinces(id)
 );
 
+CREATE TABLE IF NOT EXISTS route_sessions (
+    id          TEXT PRIMARY KEY,               
+    route_name  TEXT NOT NULL,
+    session_date TEXT NOT NULL,                 
+    conducted_by TEXT NOT NULL,                
+    status      TEXT NOT NULL DEFAULT 'ongoing' CHECK(status IN ('ongoing', 'completed')),
+    created_at  TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS session_stores (
+    id                TEXT PRIMARY KEY,        
+    route_session_id  TEXT NOT NULL REFERENCES route_sessions(id) ON DELETE CASCADE,
+    store_id          TEXT NOT NULL,
+    visited           INTEGER NOT NULL DEFAULT 0, 
+    created_at        TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE(route_session_id, store_id)
+);
+
 CREATE TABLE IF NOT EXISTS outbox (
   id TEXT PRIMARY KEY,
   type TEXT NOT NULL,       

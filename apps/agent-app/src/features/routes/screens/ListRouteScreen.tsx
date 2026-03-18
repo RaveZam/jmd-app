@@ -298,7 +298,10 @@ export default function ListRouteScreen() {
             style={styles.startRouteButton}
             activeOpacity={0.85}
             onPress={() => {
-              // TODO: Start route / begin expedition
+              router.push({
+                pathname: "/main/routes/session",
+                params: { routeId, routeName },
+              });
             }}
           >
             <LinearGradient
