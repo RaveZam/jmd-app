@@ -4,83 +4,26 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Stack, useSegments, router } from "expo-router";
+import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { supabase } from "@/lib/supabase";
-import { initDb } from "@/lib/sqlite/db-migration";
-import { syncOutbox } from "@/lib/sync/sync-outbox";
-import RoutesDao from "@/lib/sqlite/dao/routes-dao";
-import ProvincesDao from "@/lib/sqlite/dao/province-dao";
-import StoresDao from "@/lib/sqlite/dao/store-dao";
-import OutboxDao from "@/lib/sqlite/dao/outbox-dao";
-import RouteSessionsDao from "@/lib/sqlite/dao/route-sessions-dao";
-import SessionStoresDao from "@/lib/sqlite/dao/session-stores-dao";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
+import { useAppReady } from "@/hooks/useAppReady";
 import "react-native-get-random-values";
-import SelectRouteScreen from "@/src/features/routes/screens/SelectRouteScreen";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
-  const segments = useSegments();
   const [checkingSession, setCheckingSession] = useState(true);
 
-  useEffect(() => {
-    initDb();
-    // console.log("db initialized");
-    // RoutesDao.logAll();
-    // ProvincesDao.logAll();
-    // StoresDao.logAll();
-    // OutboxDao.logAll();
-    RouteSessionsDao.logAll();
-    SessionStoresDao.logAll();
-    let mounted = true;
-    (async () => {
-      try {
-        const { data } = await supabase.auth.getSession();
-        const session = data?.session ?? null;
-        if (!mounted) return;
-        const onAuthRoute = segments[0] === "auth";
-        if (!session && !onAuthRoute) {
-          router.replace("/auth/sign-in");
-        } else if (session && onAuthRoute) {
-          router.replace("/");
-        }
-      } catch {
-      } finally {
-        if (mounted) setCheckingSession(false);
-      }
-    })();
-    return () => {
-      mounted = false;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [segments]);
-
-  useEffect(() => {
-    if (checkingSession) return;
-    (async () => {
-      const { data } = await supabase.auth.getSession();
-      if (data?.session) {
-        const ongoing = RouteSessionsDao.getOngoing();
-        if (ongoing) {
-          router.replace({
-            pathname: "/main/routes/session",
-            params: { sessionId: ongoing.id, routeName: ongoing.route_name },
-          });
-        }
-      }
-    })();
-    syncOutbox();
-    const interval = setInterval(syncOutbox, 10_000);
-    return () => clearInterval(interval);
-  }, [checkingSession]);
+  useAuthGuard(setCheckingSession);
+  useAppReady(checkingSession);
 
   if (!loaded || checkingSession) {
     return null;
