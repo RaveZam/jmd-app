@@ -20,12 +20,15 @@ const SessionStoresDao = {
       store_name: string;
       store_address: string | null;
       store_contact_name: string | null;
+      province_name: string | null;
       visited: number;
       created_at: string;
     }>(
-      `SELECT ss.*, s.name as store_name, s.address as store_address, s.contact_name as store_contact_name
+      `SELECT ss.*, s.name as store_name, s.address as store_address,
+              s.contact_name as store_contact_name, p.name as province_name
        FROM session_stores ss
        INNER JOIN stores s ON ss.store_id = s.id
+       LEFT JOIN provinces p ON s.province_id = p.id
        WHERE ss.route_session_id = ?`,
       [sessionId],
     );

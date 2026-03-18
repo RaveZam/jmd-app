@@ -18,6 +18,7 @@ export type SessionStore = {
   store_name: string;
   store_address: string | null;
   store_contact_name: string | null;
+  province_name: string | null;
   visited: number;
   created_at: string;
 };

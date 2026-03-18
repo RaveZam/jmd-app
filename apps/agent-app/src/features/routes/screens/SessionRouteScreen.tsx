@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, FlatList } from "react-native";
+import { useState, useMemo } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, SectionList } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -96,6 +96,24 @@ export default function SessionRouteScreen() {
 
   const [showEndModal, setShowEndModal] = useState(false);
 
+  // Global index map so numbering is continuous across province sections
+  const storeIndexMap = useMemo(() => {
+    const map = new Map<string, number>();
+    sessionStores.forEach((s, i) => map.set(s.id, i + 1));
+    return map;
+  }, [sessionStores]);
+
+  // Group stores by province, preserving insertion order
+  const sections = useMemo(() => {
+    const grouped = new Map<string, typeof sessionStores>();
+    sessionStores.forEach((store) => {
+      const key = store.province_name ?? "Unknown";
+      if (!grouped.has(key)) grouped.set(key, []);
+      grouped.get(key)!.push(store);
+    });
+    return Array.from(grouped.entries()).map(([title, data]) => ({ title, data }));
+  }, [sessionStores]);
+
   const handleEndConfirm = () => {
     if (sessionId) RouteSessionsDao.complete(sessionId);
     setShowEndModal(false);
@@ -146,13 +164,21 @@ export default function SessionRouteScreen() {
           </View>
         </View>
 
-        <FlatList
-          data={sessionStores}
+        <SectionList
+          sections={sections}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContent}
           ItemSeparatorComponent={StoreConnector}
-          renderItem={({ item, index }) => (
-            <SessionStoreItem store={item} index={index} />
+          stickySectionHeadersEnabled={false}
+          renderSectionHeader={({ section }) => (
+            <View style={styles.sectionHeader}>
+              <Ionicons name="map-outline" size={12} color="#64748B" />
+              <Text style={styles.sectionHeaderText}>{section.title}</Text>
+            </View>
+          )}
+          renderSectionFooter={() => <View style={styles.sectionFooter} />}
+          renderItem={({ item }) => (
+            <SessionStoreItem store={item} index={(storeIndexMap.get(item.id) ?? 1) - 1} />
           )}
           ListEmptyComponent={
             <View style={styles.emptyState}>
@@ -282,6 +308,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 8,
+  },
+
+  // ── Section Header ────────────────────────────────────────
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 4,
+    paddingTop: 16,
+    paddingBottom: 8,
+  },
+  sectionHeaderText: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: "#64748B",
+    letterSpacing: 0.8,
+    textTransform: "uppercase",
+    flex: 1,
+  },
+  sectionFooter: {
+    height: 4,
   },
 
   // ── Connector ─────────────────────────────────────────────
