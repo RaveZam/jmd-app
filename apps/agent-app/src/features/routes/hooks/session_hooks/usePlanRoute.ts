@@ -25,10 +25,6 @@ export function usePlanRoute(routeId: string, routeName: string) {
     );
     setSessionId(newSessionId);
 
-    const stores = StoresDao.getStoresForRoute(routeId);
-    const storeIds = stores.map((s) => s.id);
-    createPlannedStores(newSessionId, storeIds);
-
     OutboxDao.insertOutbox(
       "SESSION_PLAN_CREATED",
       JSON.stringify({
@@ -37,21 +33,28 @@ export function usePlanRoute(routeId: string, routeName: string) {
         session_date: sessionDate,
         conducted_by: conductedBy,
         status: "ongoing",
+        created_at: getPhTime().toISOString(),
       }),
       2,
     );
 
-    OutboxDao.insertOutbox(
-      "ROUTE_STARTED",
-      JSON.stringify({
-        id: routeId,
-        route_name: routeName,
-        session_date: sessionDate,
-        conducted_by: conductedBy,
-        status: "ongoing",
-      }),
-      3,
-    );
+    const stores = StoresDao.getStoresForRoute(routeId);
+    const storeIds = stores.map((s) => s.id);
+    const plannedStores = createPlannedStores(newSessionId, storeIds);
+
+    plannedStores.forEach(({ id, storeId }) => {
+      OutboxDao.insertOutbox(
+        "SESSION_STORE_ADDED",
+        JSON.stringify({
+          id,
+          route_session_id: newSessionId,
+          store_id: storeId,
+          visited: false,
+          created_at: getPhTime().toISOString(),
+        }),
+        3,
+      );
+    });
 
     return newSessionId;
   };

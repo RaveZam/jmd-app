@@ -1,11 +1,13 @@
 import OutboxDao from "../sqlite/dao/outbox-dao";
 import { supabase } from "../supabase";
-import { useWifiChecker } from "../hooks/wifi-checker";
+import { checkWifi } from "../hooks/wifi-checker";
 
 const TABLE_MAP: Record<string, string> = {
   STORE_ADDED: "stores",
   STORE_UPDATED: "stores",
   PLANNED_ROUTE_CREATED: "planned_routes",
+  SESSION_PLAN_CREATED: "route_sessions",
+  SESSION_STORE_ADDED: "session_stores",
 };
 
 export async function syncOutbox(): Promise<{
@@ -13,7 +15,7 @@ export async function syncOutbox(): Promise<{
   failed: number;
   total: number;
 }> {
-  const isConnected = await useWifiChecker();
+  const isConnected = await checkWifi();
 
   if (!isConnected) {
     console.warn("No internet connection");
