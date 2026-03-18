@@ -1,11 +1,22 @@
 import { useState, useMemo } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, SectionList } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SectionList,
+} from "react-native";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { ThemedView } from "@/components/ThemedView";
 import { EndRouteModal } from "../components/session-route-components/EndRouteModal";
-import useSessionRoute, { SessionStore } from "../hooks/session_hooks/useSessionRoute";
+import useSessionRoute, {
+  SessionStore,
+} from "../hooks/session_hooks/useSessionRoute";
 import RouteSessionsDao from "@/lib/sqlite/dao/route-sessions-dao";
 
 function StoreConnector() {
@@ -16,10 +27,25 @@ function StoreConnector() {
   );
 }
 
-function SessionStoreItem({ store, index }: { store: SessionStore; index: number }) {
+function SessionStoreItem({
+  store,
+  index,
+  onPress,
+}: {
+  store: SessionStore;
+  index: number;
+  onPress: () => void;
+}) {
   const visited = store.visited === 1;
   return (
-    <View style={[styles.storeCard, visited ? styles.storeCardVisited : styles.storeCardPending]}>
+    <TouchableOpacity
+      style={[
+        styles.storeCard,
+        visited ? styles.storeCardVisited : styles.storeCardPending,
+      ]}
+      onPress={onPress}
+      activeOpacity={0.7}
+    >
       {visited ? (
         <View style={styles.checkCircle}>
           <Ionicons name="checkmark" size={13} color="#FFFFFF" />
@@ -36,20 +62,40 @@ function SessionStoreItem({ store, index }: { store: SessionStore; index: number
         >
           {store.store_name}
         </Text>
-        {(store.store_address || store.store_contact_name) ? (
+        {store.store_address || store.store_contact_name ? (
           <View style={styles.storeMeta}>
             {store.store_address ? (
               <View style={styles.storeMetaRow}>
-                <Ionicons name="location-outline" size={11} color={visited ? "#4ADE80" : "#94A3B8"} />
-                <Text style={[styles.storeMetaText, visited && styles.storeMetaTextVisited]} numberOfLines={1}>
+                <Ionicons
+                  name="location-outline"
+                  size={11}
+                  color={visited ? "#4ADE80" : "#94A3B8"}
+                />
+                <Text
+                  style={[
+                    styles.storeMetaText,
+                    visited && styles.storeMetaTextVisited,
+                  ]}
+                  numberOfLines={1}
+                >
                   {store.store_address}
                 </Text>
               </View>
             ) : null}
             {store.store_contact_name ? (
               <View style={styles.storeMetaRow}>
-                <Ionicons name="person-outline" size={11} color={visited ? "#4ADE80" : "#94A3B8"} />
-                <Text style={[styles.storeMetaText, visited && styles.storeMetaTextVisited]} numberOfLines={1}>
+                <Ionicons
+                  name="person-outline"
+                  size={11}
+                  color={visited ? "#4ADE80" : "#94A3B8"}
+                />
+                <Text
+                  style={[
+                    styles.storeMetaText,
+                    visited && styles.storeMetaTextVisited,
+                  ]}
+                  numberOfLines={1}
+                >
                   {store.store_contact_name}
                 </Text>
               </View>
@@ -72,7 +118,7 @@ function SessionStoreItem({ store, index }: { store: SessionStore; index: number
           {visited ? "Visited" : "Pending"}
         </Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -111,7 +157,10 @@ export default function SessionRouteScreen() {
       if (!grouped.has(key)) grouped.set(key, []);
       grouped.get(key)!.push(store);
     });
-    return Array.from(grouped.entries()).map(([title, data]) => ({ title, data }));
+    return Array.from(grouped.entries()).map(([title, data]) => ({
+      title,
+      data,
+    }));
   }, [sessionStores]);
 
   const handleEndConfirm = () => {
@@ -178,7 +227,23 @@ export default function SessionRouteScreen() {
           )}
           renderSectionFooter={() => <View style={styles.sectionFooter} />}
           renderItem={({ item }) => (
-            <SessionStoreItem store={item} index={(storeIndexMap.get(item.id) ?? 1) - 1} />
+            <SessionStoreItem
+              store={item}
+              index={(storeIndexMap.get(item.id) ?? 1) - 1}
+              onPress={() =>
+                router.push({
+                  pathname: "/main/routes/store/[storeId]",
+                  params: {
+                    storeId: item.store_id,
+                    storeName: item.store_name,
+                    storeAddress: item.store_address ?? "",
+                    contactName: item.store_contact_name ?? "",
+                    provinceName: item.province_name ?? "",
+                    sessionStoreId: item.id,
+                  },
+                })
+              }
+            />
           )}
           ListEmptyComponent={
             <View style={styles.emptyState}>

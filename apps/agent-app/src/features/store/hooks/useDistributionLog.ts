@@ -10,54 +10,34 @@ export type LoggedItem = {
 };
 
 export function useDistributionLog(products: Product[]) {
-  const [selectedProductId, setSelectedProductId] = useState<string | null>(
-    null,
-  );
-  const [qty, setQty] = useState(1);
-  const [boQty, setBoQty] = useState(0);
   const [loggedItems, setLoggedItems] = useState<LoggedItem[]>([]);
 
-  const selectedProduct =
-    selectedProductId === null
-      ? null
-      : products.find((p) => p.id === selectedProductId) ?? null;
+  const logItem = useCallback(
+    (productId: string, qty: number, boQty: number) => {
+      const product = products.find((p) => p.id === productId);
+      if (!product || (qty === 0 && boQty === 0)) return;
+      setLoggedItems((prev) => [
+        ...prev,
+        { productId: product.id, productName: product.name, price: product.price, qty, boQty },
+      ]);
+    },
+    [products],
+  );
 
-  const onSelectProduct = useCallback((product: Product) => {
-    setSelectedProductId(product.id);
+  const updateItemQty = useCallback((index: number, delta: number) => {
+    setLoggedItems((prev) =>
+      prev
+        .map((item, i) => {
+          if (i !== index) return item;
+          return { ...item, qty: Math.max(0, item.qty + delta) };
+        })
+        .filter((item) => item.qty > 0 || item.boQty > 0),
+    );
   }, []);
 
-  const onLogProduct = useCallback(() => {
-    const product = selectedProductId
-      ? products.find((p) => p.id === selectedProductId)
-      : null;
-    if (!product || (qty === 0 && boQty === 0)) return;
-    setLoggedItems((prev) => [
-      ...prev,
-      {
-        productId: product.id,
-        productName: product.name,
-        price: product.price,
-        qty,
-        boQty,
-      },
-    ]);
-    setQty(0);
-    setBoQty(0);
-  }, [selectedProductId, products, qty, boQty]);
-
-  const onRemoveItem = useCallback((index: number) => {
+  const removeItem = useCallback((index: number) => {
     setLoggedItems((prev) => prev.filter((_, i) => i !== index));
   }, []);
 
-  return {
-    selectedProduct,
-    qty,
-    setQty,
-    boQty,
-    setBoQty,
-    loggedItems,
-    onSelectProduct,
-    onLogProduct,
-    onRemoveItem,
-  };
+  return { loggedItems, logItem, updateItemQty, removeItem };
 }

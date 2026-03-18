@@ -45,6 +45,12 @@ CREATE TABLE IF NOT EXISTS session_stores (
     UNIQUE(route_session_id, store_id)
 );
 
+CREATE TABLE IF NOT EXISTS products (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    price REAL NOT NULL
+  );
+
 CREATE TABLE IF NOT EXISTS outbox (
   id TEXT PRIMARY KEY,
   type TEXT NOT NULL,       

@@ -15,7 +15,7 @@ const makeLogItem =
   (setItems: React.Dispatch<React.SetStateAction<LoggedItem[]>>, mockProductsLocal: Product[], nextIdRef: React.MutableRefObject<number>) =>
   (productId: string, qty: number, boQty: number): void => {
     const product = mockProductsLocal.find((p) => p.id === productId) as Product;
-    if (!product || qty < 1) return;
+    if (!product || (qty < 1 && boQty < 1)) return;
     setItems((prev) => [
       ...prev,
       {
@@ -67,6 +67,17 @@ export function useItems() {
   const startEdit = makeStartEdit(setEditingId, setEditQty);
   const commitEdit = makeCommitEdit(editQtyRef, setItems, setEditingId);
 
+  const updateQty = (id: string, delta: number): void => {
+    setItems((prev) =>
+      prev
+        .map((item) => {
+          if (item.id !== id) return item;
+          return { ...item, qty: Math.max(0, item.qty + delta) };
+        })
+        .filter((item) => item.qty > 0 || item.boQty > 0),
+    );
+  };
+
   const totalPrice = items.reduce((sum, i) => sum + i.qty * i.unitPrice, 0);
   const totalBoQty = items.reduce((sum, i) => sum + i.boQty, 0);
 
@@ -79,6 +90,7 @@ export function useItems() {
     commitEdit,
     editQty,
     setEditQty,
+    updateQty,
     totalPrice,
     totalBoQty,
   };
