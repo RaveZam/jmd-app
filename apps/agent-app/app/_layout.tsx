@@ -33,11 +33,11 @@ export default function RootLayout() {
 
   useEffect(() => {
     initDb();
-    console.log("db initialized");
-    RoutesDao.logAll();
-    ProvincesDao.logAll();
-    StoresDao.logAll();
-    OutboxDao.logAll();
+    // console.log("db initialized");
+    // RoutesDao.logAll();
+    // ProvincesDao.logAll();
+    // StoresDao.logAll();
+    // OutboxDao.logAll();
     RouteSessionsDao.logAll();
     SessionStoresDao.logAll();
     let mounted = true;

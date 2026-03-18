@@ -23,6 +23,7 @@ import { useRouteEditing } from "../hooks/useRouteEditing";
 import { useProvinces } from "../hooks/useProvinces";
 import { useRouteModals } from "../hooks/useRouteModals";
 import { StoreRow } from "../types/db-rows";
+import { usePlanRoute } from "../hooks/session_hooks/usePlanRoute";
 
 export default function ListRouteScreen() {
   const params = useLocalSearchParams<{
@@ -43,6 +44,8 @@ export default function ListRouteScreen() {
     handleSaveRouteName,
     handleToggleEditing,
   } = useRouteEditing(routeId, params.routeName ?? "Route");
+
+  const { createSession } = usePlanRoute(routeId ?? "", routeName);
 
   const {
     provinces,
@@ -297,10 +300,11 @@ export default function ListRouteScreen() {
           <TouchableOpacity
             style={styles.startRouteButton}
             activeOpacity={0.85}
-            onPress={() => {
+            onPress={async () => {
+              const newSessionId = await createSession();
               router.push({
                 pathname: "/main/routes/session",
-                params: { routeId, routeName },
+                params: { routeId, routeName, sessionId: newSessionId },
               });
             }}
           >

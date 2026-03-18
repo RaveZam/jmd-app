@@ -11,6 +11,22 @@ type InsertStoreInput = {
 };
 
 const StoresDao = {
+  getStoresForRoute(routeId: string) {
+    return db.getAllSync<{
+      id: string;
+      name: string;
+      province_id: string;
+      address: string;
+      contact_number: string;
+      contact_name: string;
+    }>(
+      `SELECT s.* FROM stores s
+       INNER JOIN provinces p ON s.province_id = p.id
+       WHERE p.route_id = ?`,
+      [routeId],
+    );
+  },
+
   getStoresForProvince(provinceId: string) {
     return db.getAllSync<{
       id: string;
@@ -35,7 +51,7 @@ const StoresDao = {
         input.contactPhone ?? "",
         input.contactName ?? "",
         id,
-      ]
+      ],
     );
   },
 

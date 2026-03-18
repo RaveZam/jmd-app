@@ -13,6 +13,7 @@ import { router } from "expo-router";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { supabase } from "@/lib/supabase";
+import { db } from "@/lib/sqlite/db-migration";
 import { Colors } from "@/constants/Colors";
 import type { Session } from "@supabase/supabase-js";
 
@@ -23,6 +24,25 @@ export default function SettingsScreen() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session));
   }, []);
+
+  const handleClearSessionData = () => {
+    Alert.alert(
+      "Clear Session Data",
+      "This will delete all route_sessions and session_stores records. Continue?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Clear",
+          style: "destructive",
+          onPress: () => {
+            db.runSync(`DELETE FROM session_stores`);
+            db.runSync(`DELETE FROM route_sessions`);
+            Alert.alert("Done", "Session data cleared.");
+          },
+        },
+      ],
+    );
+  };
 
   const handleSignOut = async () => {
     setLoading(true);
@@ -121,6 +141,18 @@ export default function SettingsScreen() {
             </View>
           )}
         </View>
+
+        {/* DEV ONLY */}
+        <TouchableOpacity
+          style={styles.clearSessionButton}
+          activeOpacity={0.8}
+          onPress={handleClearSessionData}
+          disabled={loading}
+        >
+          <Text style={styles.clearSessionText}>
+            [DEV] Clear Session Data
+          </Text>
+        </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.signOut}
@@ -239,6 +271,20 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: "#E5E7EB",
+  },
+  clearSessionButton: {
+    height: 48,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    borderColor: "#F97316",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 10,
+  },
+  clearSessionText: {
+    color: "#F97316",
+    fontWeight: "600",
+    fontSize: 14,
   },
   signOut: {
     height: 48,

@@ -7,6 +7,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import { ThemedView } from "@/components/ThemedView";
 import { Header } from "@/components/ui/header";
 import { EndRouteModal } from "../components/session-route-components/EndRouteModal";
+import usePlanRoute from "../hooks/session_hooks/usePlanRoute";
+import { useEffect } from "react";
 
 export default function SessionRouteScreen() {
   const params = useLocalSearchParams<{
