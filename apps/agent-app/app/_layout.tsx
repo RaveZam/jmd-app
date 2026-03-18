@@ -65,8 +65,19 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (checkingSession) return;
+    (async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data?.session) {
+        const ongoing = RouteSessionsDao.getOngoing();
+        if (ongoing) {
+          router.replace({
+            pathname: "/main/routes/session",
+            params: { sessionId: ongoing.id, routeName: ongoing.route_name },
+          });
+        }
+      }
+    })();
     syncOutbox();
-    console.log("syncing outbox");
     const interval = setInterval(syncOutbox, 10_000);
     return () => clearInterval(interval);
   }, [checkingSession]);

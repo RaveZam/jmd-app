@@ -7,6 +7,7 @@ const TABLE_MAP: Record<string, string> = {
   STORE_UPDATED: "stores",
   PLANNED_ROUTE_CREATED: "planned_routes",
   SESSION_PLAN_CREATED: "route_sessions",
+  SESSION_PLAN_COMPLETED: "route_sessions",
   SESSION_STORE_ADDED: "session_stores",
 };
 
