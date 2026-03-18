@@ -1,6 +1,6 @@
 import * as SQLite from "expo-sqlite";
 
-export const db = SQLite.openDatabaseSync("routeledger.db");
+export const db = SQLite.openDatabaseSync("routeledger-v1.db");
 
 export function initDb() {
   db.execSync(`

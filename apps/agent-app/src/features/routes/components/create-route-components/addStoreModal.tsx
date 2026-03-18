@@ -14,6 +14,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
 import StoresDao from "@/lib/sqlite/dao/store-dao";
 import { useAddStore } from "../../hooks/useAddStore";
+import { useUpdateStore } from "../../hooks/useUpdateStore";
 
 type ExistingStore = {
   id: string;
@@ -58,12 +59,13 @@ export function AddStoreModal({
   const handleSubmit = () => {
     if (!name.trim()) return;
     if (isEditing && initialStore) {
-      StoresDao.updateStore(initialStore.id, {
-        name: name.trim(),
-        address: address.trim(),
-        contactName: contactName.trim(),
-        contactPhone: contactPhone.trim(),
-      });
+      useUpdateStore(
+        initialStore.id,
+        name.trim(),
+        address.trim(),
+        contactName.trim(),
+        contactPhone.trim(),
+      );
       onUpdated?.();
     } else {
       useAddStore(

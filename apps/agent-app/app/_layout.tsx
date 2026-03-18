@@ -8,11 +8,12 @@ import { Stack, useSegments, router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { supabase } from "@/lib/supabase";
 import { initDb } from "@/lib/sqlite/db-migration";
+import { syncOutbox } from "@/lib/sync/sync-outbox";
 import RoutesDao from "@/lib/sqlite/dao/routes-dao";
 import ProvincesDao from "@/lib/sqlite/dao/province-dao";
 import StoresDao from "@/lib/sqlite/dao/store-dao";
@@ -58,8 +59,15 @@ export default function RootLayout() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [segments]);
 
+  useEffect(() => {
+    if (checkingSession) return;
+    syncOutbox();
+    console.log("syncing outbox");
+    const interval = setInterval(syncOutbox, 10_000);
+    return () => clearInterval(interval);
+  }, [checkingSession]);
+
   if (!loaded || checkingSession) {
-    // Wait for fonts and initial auth check to avoid flicker
     return null;
   }
 
