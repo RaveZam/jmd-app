@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -18,7 +18,8 @@ import {
   useDistributionLog,
   type LoggedItem,
 } from "./hooks/useDistributionLog";
-import { PRODUCTS, type Product } from "./mock/products";
+import type { Product } from "./mock/products";
+import { ProductsDao } from "@/lib/sqlite/dao/products-dao";
 
 // ── Shared product picker modal ────────────────────────────
 
@@ -258,8 +259,10 @@ export default function StorePage() {
     ? `${provinceName}  •  ${storeAddress}`
     : storeAddress;
 
+  const products = useMemo(() => ProductsDao.getAllProducts(), []);
+
   const { loggedItems, logItem, updateItemQty, removeItem } =
-    useDistributionLog(PRODUCTS);
+    useDistributionLog(products);
 
   const [showSoldAdder, setShowSoldAdder] = useState(false);
   const [showBadAdder, setShowBadAdder] = useState(false);
@@ -326,7 +329,7 @@ export default function StorePage() {
           />
           {showSoldAdder && (
             <AdderPanel
-              products={PRODUCTS}
+              products={products}
               showPrice
               onAdd={(productId, qty) => {
                 logItem(productId, qty, 0);
@@ -365,7 +368,7 @@ export default function StorePage() {
           />
           {showBadAdder && (
             <AdderPanel
-              products={PRODUCTS}
+              products={products}
               showPrice={false}
               onAdd={(productId, qty) => {
                 logItem(productId, 0, qty);
