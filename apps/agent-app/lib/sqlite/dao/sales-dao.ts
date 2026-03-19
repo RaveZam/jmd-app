@@ -8,24 +8,23 @@ const SalesDao = {
     const rows = db.getAllSync<{
       id: string;
       product_id: string;
-      product_name: string;
+      snapshot_name: string;
       snapshot_price: number;
       quantity_sold: number;
       quantity_bo: number;
       bo_reason: string | null;
     }>(
-      `SELECT s.id, s.product_id, p.name AS product_name, s.snapshot_price,
-              s.quantity_sold, s.quantity_bo, s.bo_reason
-       FROM sales s
-       JOIN products p ON s.product_id = p.id
-       WHERE s.session_store_id = ?
-       ORDER BY s.created_at ASC`,
+      `SELECT id, product_id, snapshot_name, snapshot_price,
+              quantity_sold, quantity_bo, bo_reason
+       FROM sales
+       WHERE session_store_id = ?
+       ORDER BY created_at ASC`,
       [sessionStoreId],
     );
     return rows.map((r) => ({
       saleId: r.id,
       productId: r.product_id,
-      productName: r.product_name,
+      productName: r.snapshot_name,
       price: r.snapshot_price,
       qty: r.quantity_sold,
       boQty: r.quantity_bo,
@@ -36,6 +35,7 @@ const SalesDao = {
   insertSale(
     sessionStoreId: string,
     productId: string,
+    snapshotName: string,
     snapshotPrice: number,
     quantitySold: number,
     quantityBo: number,
@@ -43,11 +43,12 @@ const SalesDao = {
   ) {
     const id = uuidv4();
     db.runSync(
-      `INSERT INTO sales (id, session_store_id, product_id, snapshot_price, quantity_sold, quantity_bo, bo_reason) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO sales (id, session_store_id, product_id, snapshot_name, snapshot_price, quantity_sold, quantity_bo, bo_reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id,
         sessionStoreId,
         productId,
+        snapshotName,
         snapshotPrice,
         quantitySold,
         quantityBo,
@@ -60,14 +61,15 @@ const SalesDao = {
   updateSale(
     saleId: string,
     productId: string,
+    snapshotName: string,
     snapshotPrice: number,
     quantitySold: number,
     quantityBo: number,
     boReason: string,
   ) {
     db.runSync(
-      `UPDATE sales SET product_id = ?, snapshot_price = ?, quantity_sold = ?, quantity_bo = ?, bo_reason = ? WHERE id = ?`,
-      [productId, snapshotPrice, quantitySold, quantityBo, boReason, saleId],
+      `UPDATE sales SET product_id = ?, snapshot_name = ?, snapshot_price = ?, quantity_sold = ?, quantity_bo = ?, bo_reason = ? WHERE id = ?`,
+      [productId, snapshotName, snapshotPrice, quantitySold, quantityBo, boReason, saleId],
     );
   },
 

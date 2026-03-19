@@ -13,6 +13,8 @@ export type NewProduct = { name: string; price: number };
 type AddProductModalProps = {
   onClose: () => void;
   onAdd: (product: NewProduct) => void;
+  initialValues?: NewProduct;
+  title?: string;
 };
 
 function ModalOverlay({ onClose }: { onClose: () => void }): ReactElement {
@@ -36,20 +38,19 @@ function ModalPanel({ children }: { children: ReactNode }): ReactElement {
 
 function ModalHeader({
   titleId,
+  title,
   onClose,
 }: {
   titleId: string;
+  title: string;
   onClose: () => void;
 }): ReactElement {
   return (
     <div className="flex items-center justify-between gap-3 border-b px-5 py-4">
       <div>
         <h2 id={titleId} className="text-base font-semibold">
-          Add New Product
+          {title}
         </h2>
-        <p className="mt-0.5 text-sm text-muted-foreground">
-          Stored temporarily (will reset on reload).
-        </p>
       </div>
       <Button
         type="button"
@@ -119,14 +120,25 @@ function PriceField({
   );
 }
 
-function FormActions({ onClose }: { onClose: () => void }): ReactElement {
+function FormActions({
+  onClose,
+  submitLabel,
+}: {
+  onClose: () => void;
+  submitLabel: string;
+}): ReactElement {
   return (
     <div className="flex items-center justify-end gap-2 pt-1">
-      <Button type="button" variant="outline" className="rounded-2xl" onClick={onClose}>
+      <Button
+        type="button"
+        variant="outline"
+        className="rounded-2xl"
+        onClick={onClose}
+      >
         Cancel
       </Button>
       <Button type="submit" className="rounded-2xl">
-        Add Product
+        {submitLabel}
       </Button>
     </div>
   );
@@ -138,15 +150,19 @@ function AddProductForm({
   nameRef,
   onClose,
   onAdd,
+  initialValues,
 }: {
   nameId: string;
   priceId: string;
   nameRef: React.RefObject<HTMLInputElement | null>;
   onClose: () => void;
   onAdd: (product: NewProduct) => void;
+  initialValues?: NewProduct;
 }): ReactElement {
-  const [name, setName] = useState("");
-  const [price, setPrice] = useState("");
+  const [name, setName] = useState(initialValues?.name ?? "");
+  const [price, setPrice] = useState(
+    initialValues ? String(initialValues.price) : "",
+  );
 
   function submit(e: FormEvent<HTMLFormElement>): void {
     e.preventDefault();
@@ -160,43 +176,72 @@ function AddProductForm({
 
   return (
     <form onSubmit={submit} className="space-y-4 px-5 py-4">
-      <NameField id={nameId} value={name} onChange={setName} inputRef={nameRef} />
+      <NameField
+        id={nameId}
+        value={name}
+        onChange={setName}
+        inputRef={nameRef}
+      />
       <PriceField id={priceId} value={price} onChange={setPrice} />
-      <FormActions onClose={onClose} />
+      <FormActions
+        onClose={onClose}
+        submitLabel={initialValues ? "Save Changes" : "Add Product"}
+      />
     </form>
   );
 }
 
 function AddProductPortal({
   titleId,
+  title,
   nameId,
   priceId,
   nameRef,
   onClose,
   onAdd,
+  initialValues,
 }: {
   titleId: string;
+  title: string;
   nameId: string;
   priceId: string;
   nameRef: React.RefObject<HTMLInputElement | null>;
   onClose: () => void;
   onAdd: (product: NewProduct) => void;
+  initialValues?: NewProduct;
 }): ReactElement {
   return createPortal(
-    <div className="fixed inset-0 z-50" aria-labelledby={titleId} role="dialog" aria-modal="true">
+    <div
+      className="fixed inset-0 z-50"
+      aria-labelledby={titleId}
+      role="dialog"
+      aria-modal="true"
+    >
       <ModalOverlay onClose={onClose} />
       <div className="pointer-events-none relative flex h-full w-full items-start justify-center p-4 sm:p-8">
         <ModalPanel>
-          <ModalHeader titleId={titleId} onClose={onClose} />
-          <AddProductForm nameId={nameId} priceId={priceId} nameRef={nameRef} onClose={onClose} onAdd={onAdd} />
+          <ModalHeader titleId={titleId} title={title} onClose={onClose} />
+          <AddProductForm
+            nameId={nameId}
+            priceId={priceId}
+            nameRef={nameRef}
+            onClose={onClose}
+            onAdd={onAdd}
+            initialValues={initialValues}
+          />
         </ModalPanel>
       </div>
     </div>,
-    document.body
+    document.body,
   );
 }
 
-export function AddProductModal({ onClose, onAdd }: AddProductModalProps): ReactElement | null {
+export function AddProductModal({
+  onClose,
+  onAdd,
+  initialValues,
+  title,
+}: AddProductModalProps): ReactElement | null {
   const titleId = `${useId()}-title`;
   const nameId = useId();
   const priceId = useId();
@@ -220,12 +265,13 @@ export function AddProductModal({ onClose, onAdd }: AddProductModalProps): React
   return (
     <AddProductPortal
       titleId={titleId}
+      title={title ?? "Add New Product"}
       nameId={nameId}
       priceId={priceId}
       nameRef={nameRef}
       onClose={onClose}
       onAdd={onAdd}
+      initialValues={initialValues}
     />
   );
 }
-

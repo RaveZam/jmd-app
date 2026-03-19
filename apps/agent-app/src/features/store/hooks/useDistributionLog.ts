@@ -30,6 +30,7 @@ export function useDistributionLog(
       const saleId = SalesDao.insertSale(
         sessionStoreId,
         product.id,
+        product.name,
         product.price,
         qty,
         boQty,
@@ -42,6 +43,7 @@ export function useDistributionLog(
           id: saleId,
           session_store_id: sessionStoreId,
           product_id: product.id,
+          snapshot_product_name: product.name,
           snapshot_price: product.price,
           quantity_sold: qty,
           quantity_bo: boQty,
@@ -81,12 +83,13 @@ export function useDistributionLog(
             4,
           );
         } else {
-          SalesDao.updateSale(item.saleId, item.productId, item.price, newQty, item.boQty, item.boReason ?? "");
+          SalesDao.updateSale(item.saleId, item.productId, item.productName, item.price, newQty, item.boQty, item.boReason ?? "");
           OutboxDao.insertOutbox(
             "SALE_UPDATED",
             JSON.stringify({
               id: item.saleId,
               product_id: item.productId,
+              snapshot_product_name: item.productName,
               snapshot_price: item.price,
               quantity_sold: newQty,
               quantity_bo: item.boQty,
@@ -138,12 +141,13 @@ export function useDistributionLog(
               4,
             );
           } else {
-            SalesDao.updateSale(item.saleId, product.id, product.price, qty, boQty, boReason ?? "");
+            SalesDao.updateSale(item.saleId, product.id, product.name, product.price, qty, boQty, boReason ?? "");
             OutboxDao.insertOutbox(
               "SALE_UPDATED",
               JSON.stringify({
                 id: item.saleId,
                 product_id: product.id,
+                snapshot_product_name: product.name,
                 snapshot_price: product.price,
                 quantity_sold: qty,
                 quantity_bo: boQty,

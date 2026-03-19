@@ -1,4 +1,6 @@
 import type { ReactElement } from "react";
+import { Pencil, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export type ProductRow = { id: string; name: string; price: number };
 
@@ -15,11 +17,18 @@ function TotalRow({ total }: { total: number }): ReactElement {
       <td className="px-3 py-3 text-right text-sm font-semibold tabular-nums">
         {formatCurrencyPHP(total)}
       </td>
+      <td />
     </tr>
   );
 }
 
-export function ProductsTable({ products }: { products: ProductRow[] }): ReactElement {
+type ProductsTableProps = {
+  products: ProductRow[];
+  onEdit: (product: ProductRow) => void;
+  onDelete: (id: string) => void;
+};
+
+export function ProductsTable({ products, onEdit, onDelete }: ProductsTableProps): ReactElement {
   const total = products.reduce((acc, p) => acc + p.price, 0);
 
   return (
@@ -29,6 +38,7 @@ export function ProductsTable({ products }: { products: ProductRow[] }): ReactEl
           <tr>
             <th className="px-3 py-3 text-left font-medium">Product Name</th>
             <th className="px-3 py-3 text-right font-medium">Price</th>
+            <th className="px-3 py-3" />
           </tr>
         </thead>
         <tbody>
@@ -39,11 +49,33 @@ export function ProductsTable({ products }: { products: ProductRow[] }): ReactEl
                 <td className="px-3 py-2 text-right tabular-nums">
                   {formatCurrencyPHP(p.price)}
                 </td>
+                <td className="px-3 py-2">
+                  <div className="flex items-center justify-end gap-1">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 rounded-lg"
+                      onClick={() => onEdit(p)}
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 rounded-lg text-destructive hover:text-destructive"
+                      onClick={() => onDelete(p.id)}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan={2} className="px-3 py-10 text-center text-muted-foreground">
+              <td colSpan={3} className="px-3 py-10 text-center text-muted-foreground">
                 No products yet.
               </td>
             </tr>

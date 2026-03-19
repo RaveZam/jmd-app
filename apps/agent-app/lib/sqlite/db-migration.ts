@@ -1,6 +1,6 @@
 import * as SQLite from "expo-sqlite";
 
-export const db = SQLite.openDatabaseSync("routeledger-v1.1.db");
+export const db = SQLite.openDatabaseSync("routeledger-v1.2.db");
 
 export function initDb() {
   db.execSync(`
@@ -56,6 +56,7 @@ CREATE TABLE IF NOT EXISTS sales (
   id TEXT PRIMARY KEY,
   session_store_id TEXT NOT NULL,
   product_id TEXT NOT NULL,
+  snapshot_name TEXT NOT NULL,
   snapshot_price REAL NOT NULL,
   quantity_sold INTEGER NOT NULL DEFAULT 0,
   quantity_bo INTEGER NOT NULL DEFAULT 0,
