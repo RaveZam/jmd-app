@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import type { Product } from "../mock/products";
+import type { Product } from "../types/store-types";
 
 export type LoggedItem = {
   productId: string;
@@ -18,7 +18,13 @@ export function useDistributionLog(products: Product[]) {
       if (!product || (qty === 0 && boQty === 0)) return;
       setLoggedItems((prev) => [
         ...prev,
-        { productId: product.id, productName: product.name, price: product.price, qty, boQty },
+        {
+          productId: product.id,
+          productName: product.name,
+          price: product.price,
+          qty,
+          boQty,
+        },
       ]);
     },
     [products],

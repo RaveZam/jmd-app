@@ -32,8 +32,7 @@ CREATE TABLE IF NOT EXISTS route_sessions (
     session_date TEXT NOT NULL,                 
     conducted_by TEXT NOT NULL,                
     status      TEXT NOT NULL DEFAULT 'ongoing' CHECK(status IN ('ongoing', 'completed')),
-    created_at  TEXT NOT NULL DEFAULT (datetime('now')),
-    FOREIGN KEY (route_id) REFERENCES routes(id)
+    created_at  TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
 CREATE TABLE IF NOT EXISTS session_stores (
@@ -50,6 +49,20 @@ CREATE TABLE IF NOT EXISTS products (
     name TEXT NOT NULL,
     price REAL NOT NULL
   );
+
+CREATE TABLE IF NOT EXISTS sales (
+  id TEXT PRIMARY KEY,
+  session_store_id TEXT NOT NULL,
+  product_id TEXT NOT NULL,
+  snapshot_price REAL NOT NULL,
+  quantity_sold INTEGER NOT NULL DEFAULT 0,
+  quantity_bo INTEGER NOT NULL DEFAULT 0,
+  bo_reason TEXT,
+  total REAL GENERATED ALWAYS AS (snapshot_price * quantity_sold) VIRTUAL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  FOREIGN KEY (session_store_id) REFERENCES session_stores(id),
+  FOREIGN KEY (product_id) REFERENCES products(id)
+);
 
 CREATE TABLE IF NOT EXISTS outbox (
   id TEXT PRIMARY KEY,
