@@ -12,7 +12,7 @@ export function BadOrderRow({ item, index, onDelete }: BadRowProps) {
         {item.productName}
       </Text>
       <View style={styles.damagedBadge}>
-        <Text style={styles.damagedBadgeText}>damaged</Text>
+        <Text style={styles.damagedBadgeText}>{item.boReason ?? "Bad order"}</Text>
       </View>
       <Text style={styles.boQtyText}>−{item.boQty}</Text>
       <TouchableOpacity

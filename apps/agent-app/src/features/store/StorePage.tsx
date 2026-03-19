@@ -12,9 +12,8 @@ import {
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useStorePage } from "./hooks/useStorePage";
-import { AdderPanel } from "./components/AdderPanel";
+import { AdderModal } from "./components/AdderModal";
 import { SoldOrderRow } from "./components/SoldOrderRow";
-import { BadOrderRow } from "./components/BadOrderRow";
 import { SectionRow } from "./components/SectionRow";
 
 const HEADER_BG = "#0b4c29";
@@ -32,17 +31,14 @@ export default function StorePage() {
     updateItemQty,
     removeItem,
     soldItems,
-    badItems,
     summary,
     showSoldAdder,
     setShowSoldAdder,
-    showBadAdder,
-    setShowBadAdder,
   } = useStorePage();
 
   if (!storeName) return null;
 
-  const { grossSales, boDeduction, netTotal } = summary;
+  const { netTotal } = summary;
 
   return (
     <SafeAreaView
@@ -80,28 +76,23 @@ export default function StorePage() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* ── Sold Orders ── */}
+        {/* ── Orders ── */}
         <View style={styles.section}>
           <SectionRow
-            label="SOLD ORDERS"
-            buttonLabel="+ Add Sale"
-            onToggle={() => {
-              setShowSoldAdder((v) => !v);
-              setShowBadAdder(false);
-            }}
+            label="ORDERS"
+            buttonLabel="+ Add Order"
+            onToggle={() => setShowSoldAdder(true)}
           />
-          {showSoldAdder && (
-            <AdderPanel
-              products={products}
-              showPrice
-              onAdd={(productId, qty) => {
-                logItem(productId, qty, 0);
-                setShowSoldAdder(false);
-              }}
-            />
-          )}
           {soldItems.length > 0 ? (
-            <View style={styles.itemList}>
+            <View style={styles.table}>
+              {/* Column headers */}
+              <View style={styles.tableHeader}>
+                <Text style={[styles.colHead, styles.colHeadProduct]}>PRODUCT</Text>
+                <Text style={[styles.colHead, styles.colHeadSold]}>SOLD</Text>
+                <Text style={[styles.colHead, styles.colHeadBo]}>BO</Text>
+                <Text style={[styles.colHead, styles.colHeadTotal]}>TOTAL</Text>
+                <View style={styles.colHeadDelete} />
+              </View>
               {soldItems.map(({ item, idx }) => (
                 <SoldOrderRow
                   key={idx}
@@ -114,67 +105,26 @@ export default function StorePage() {
             </View>
           ) : (
             <View style={styles.emptyCard}>
-              <Text style={styles.emptyText}>No sold orders yet.</Text>
-            </View>
-          )}
-        </View>
-
-        {/* ── Bad Orders ── */}
-        <View style={styles.section}>
-          <SectionRow
-            label="BAD ORDERS"
-            buttonLabel="+ Add Bad Order"
-            onToggle={() => {
-              setShowBadAdder((v) => !v);
-              setShowSoldAdder(false);
-            }}
-          />
-          {showBadAdder && (
-            <AdderPanel
-              products={products}
-              showPrice={false}
-              onAdd={(productId, qty) => {
-                logItem(productId, 0, qty);
-                setShowBadAdder(false);
-              }}
-            />
-          )}
-          {badItems.length > 0 ? (
-            <View style={styles.itemList}>
-              {badItems.map(({ item, idx }) => (
-                <BadOrderRow
-                  key={idx}
-                  item={item}
-                  index={idx}
-                  onDelete={removeItem}
-                />
-              ))}
-            </View>
-          ) : (
-            <View style={styles.emptyCard}>
-              <Text style={styles.emptyText}>No bad orders.</Text>
+              <Text style={styles.emptyText}>No orders yet.</Text>
             </View>
           )}
         </View>
       </ScrollView>
 
+      {/* ── Modal ── */}
+      <AdderModal
+        visible={showSoldAdder}
+        title="Add Order"
+        products={products}
+        showPrice
+        onAdd={(productId, qty, boQty, boReason) =>
+          logItem(productId, qty, boQty, boReason)
+        }
+        onClose={() => setShowSoldAdder(false)}
+      />
+
       {/* ── Sticky footer: summary + confirm ── */}
       <View style={styles.footer}>
-        <View style={styles.summaryRow}>
-          <Text style={styles.summaryLabel}>Gross sales</Text>
-          <Text style={styles.summaryValue}>
-            ₱{grossSales.toLocaleString()}
-          </Text>
-        </View>
-        {boDeduction > 0 && (
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Bad orders deduction</Text>
-            <Text style={styles.summaryDeduction}>
-              −₱{boDeduction.toLocaleString()}
-            </Text>
-          </View>
-        )}
-        <View style={styles.summaryDivider} />
         <View style={styles.summaryRow}>
           <Text style={styles.summaryNetLabel}>Net total</Text>
           <Text style={styles.summaryNetValue}>
@@ -221,7 +171,33 @@ const styles = StyleSheet.create({
   scrollContent: { padding: 16, gap: 12, paddingBottom: 16 },
 
   section: { gap: 8 },
-  itemList: { gap: 6 },
+
+  table: {
+    backgroundColor: CARD_BG,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: BORDER,
+    overflow: "hidden",
+  },
+  tableHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F5F5F0",
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  colHead: {
+    fontSize: 10,
+    fontWeight: "700",
+    color: "#94A3B8",
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
+  },
+  colHeadProduct: { flex: 1 },
+  colHeadSold: { width: 72, textAlign: "center" },
+  colHeadBo: { width: 64, textAlign: "center" },
+  colHeadTotal: { width: 68, textAlign: "right" },
+  colHeadDelete: { width: 21 },
 
   emptyCard: {
     backgroundColor: CARD_BG,
@@ -248,10 +224,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  summaryLabel: { fontSize: 14, color: "#64748B" },
-  summaryValue: { fontSize: 14, color: "#64748B" },
-  summaryDeduction: { fontSize: 14, color: "#EF4444" },
-  summaryDivider: { height: 1, backgroundColor: BORDER },
   summaryNetLabel: { fontSize: 15, fontWeight: "700", color: "#0F172A" },
   summaryNetValue: { fontSize: 15, fontWeight: "700", color: "#0F172A" },
 

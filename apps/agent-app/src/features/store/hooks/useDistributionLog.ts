@@ -7,25 +7,31 @@ export type LoggedItem = {
   price: number;
   qty: number;
   boQty: number;
+  boReason?: string;
 };
 
 export function useDistributionLog(products: Product[]) {
   const [loggedItems, setLoggedItems] = useState<LoggedItem[]>([]);
 
   const logItem = useCallback(
-    (productId: string, qty: number, boQty: number) => {
+    (productId: string, qty: number, boQty: number, boReason?: string) => {
       const product = products.find((p) => p.id === productId);
       if (!product || (qty === 0 && boQty === 0)) return;
-      setLoggedItems((prev) => [
-        ...prev,
-        {
-          productId: product.id,
-          productName: product.name,
-          price: product.price,
-          qty,
-          boQty,
-        },
-      ]);
+      setLoggedItems((prev) => {
+        const next = [
+          ...prev,
+          {
+            productId: product.id,
+            productName: product.name,
+            price: product.price,
+            qty,
+            boQty,
+            boReason,
+          },
+        ];
+        console.log("[useDistributionLog] loggedItems:", next);
+        return next;
+      });
     },
     [products],
   );

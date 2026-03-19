@@ -4,7 +4,6 @@ import { ProductsDao } from "@/lib/sqlite/dao/products-dao";
 import { useDistributionLog } from "./useDistributionLog";
 import {
   getSoldItems,
-  getBadItems,
   computeSummary,
 } from "../helpers/distribution-helpers";
 
@@ -33,10 +32,8 @@ export function useStorePage() {
     useDistributionLog(products);
 
   const [showSoldAdder, setShowSoldAdder] = useState(false);
-  const [showBadAdder, setShowBadAdder] = useState(false);
 
   const soldItems = getSoldItems(loggedItems);
-  const badItems = getBadItems(loggedItems);
   const summary = computeSummary(loggedItems);
 
   return {
@@ -48,11 +45,8 @@ export function useStorePage() {
     updateItemQty,
     removeItem,
     soldItems,
-    badItems,
     summary,
     showSoldAdder,
     setShowSoldAdder,
-    showBadAdder,
-    setShowBadAdder,
   };
 }

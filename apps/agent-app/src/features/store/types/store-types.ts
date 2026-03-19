@@ -17,7 +17,7 @@ export type PickerModalProps = {
 export type AdderPanelProps = {
   products: Product[];
   showPrice: boolean;
-  onAdd: (productId: string, qty: number) => void;
+  onAdd: (productId: string, qty: number, boQty: number, boReason?: string) => void;
 };
 
 export type SoldRowProps = {
