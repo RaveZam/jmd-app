@@ -4,37 +4,13 @@ import type { FormEvent, ReactElement, ReactNode } from "react";
 import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { AddProductModalProps } from "../types/product-types";
+import { ModalPanel } from "./ModalPane";
+import { ModalOverlay } from "./ModalOverlay";
 
 export type NewProduct = { name: string; price: number };
-
-type AddProductModalProps = {
-  onClose: () => void;
-  onAdd: (product: NewProduct) => void;
-  initialValues?: NewProduct;
-  title?: string;
-};
-
-function ModalOverlay({ onClose }: { onClose: () => void }): ReactElement {
-  return (
-    <button
-      type="button"
-      className="absolute inset-0 bg-black/40"
-      aria-label="Close"
-      onClick={onClose}
-    />
-  );
-}
-
-function ModalPanel({ children }: { children: ReactNode }): ReactElement {
-  return (
-    <div className="pointer-events-auto w-full max-w-lg rounded-2xl border bg-background shadow-xl">
-      {children}
-    </div>
-  );
-}
 
 function ModalHeader({
   titleId,

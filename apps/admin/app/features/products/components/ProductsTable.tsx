@@ -1,34 +1,17 @@
 import type { ReactElement } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ProductsTableProps } from "../types/product-types";
+import { formatCurrencyPHP } from "../helpers/getPhpCurrency";
+import { TotalRow } from "./TotalRow";
 
 export type ProductRow = { id: string; name: string; price: number };
 
-function formatCurrencyPHP(value: number): string {
-  const abs = Math.abs(value);
-  const sign = value < 0 ? "-" : "";
-  return `${sign}₱${abs.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
-}
-
-function TotalRow({ total }: { total: number }): ReactElement {
-  return (
-    <tr className="border-t bg-muted/30">
-      <td className="px-3 py-3 text-xs font-medium text-muted-foreground">Total</td>
-      <td className="px-3 py-3 text-right text-sm font-semibold tabular-nums">
-        {formatCurrencyPHP(total)}
-      </td>
-      <td />
-    </tr>
-  );
-}
-
-type ProductsTableProps = {
-  products: ProductRow[];
-  onEdit: (product: ProductRow) => void;
-  onDelete: (id: string) => void;
-};
-
-export function ProductsTable({ products, onEdit, onDelete }: ProductsTableProps): ReactElement {
+export function ProductsTable({
+  products,
+  onEdit,
+  onDelete,
+}: ProductsTableProps): ReactElement {
   const total = products.reduce((acc, p) => acc + p.price, 0);
 
   return (
@@ -75,7 +58,10 @@ export function ProductsTable({ products, onEdit, onDelete }: ProductsTableProps
             ))
           ) : (
             <tr>
-              <td colSpan={3} className="px-3 py-10 text-center text-muted-foreground">
+              <td
+                colSpan={3}
+                className="px-3 py-10 text-center text-muted-foreground"
+              >
                 No products yet.
               </td>
             </tr>
@@ -88,4 +74,3 @@ export function ProductsTable({ products, onEdit, onDelete }: ProductsTableProps
     </div>
   );
 }
-
