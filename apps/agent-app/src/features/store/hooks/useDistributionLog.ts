@@ -1,7 +1,9 @@
 import { useState, useCallback } from "react";
 import type { Product } from "../types/store-types";
+import SalesDao from "@/lib/sqlite/dao/sales-dao";
 
 export type LoggedItem = {
+  saleId: string;
   productId: string;
   productName: string;
   price: number;
@@ -10,46 +12,108 @@ export type LoggedItem = {
   boReason?: string;
 };
 
-export function useDistributionLog(products: Product[]) {
-  const [loggedItems, setLoggedItems] = useState<LoggedItem[]>([]);
+export function useDistributionLog(
+  products: Product[],
+  sessionStoreId: string | null,
+) {
+  const [loggedItems, setLoggedItems] = useState<LoggedItem[]>(() =>
+    sessionStoreId ? SalesDao.getBySessionStoreId(sessionStoreId) : [],
+  );
 
   const logItem = useCallback(
     (productId: string, qty: number, boQty: number, boReason?: string) => {
       const product = products.find((p) => p.id === productId);
-      if (!product || (qty === 0 && boQty === 0)) return;
-      setLoggedItems((prev) => {
-        const next = [
-          ...prev,
-          {
-            productId: product.id,
-            productName: product.name,
-            price: product.price,
-            qty,
-            boQty,
-            boReason,
-          },
-        ];
-        console.log("[useDistributionLog] loggedItems:", next);
-        return next;
-      });
+      if (!product || (qty === 0 && boQty === 0) || !sessionStoreId) return;
+
+      const saleId = SalesDao.insertSale(
+        sessionStoreId,
+        product.id,
+        product.price,
+        qty,
+        boQty,
+        boReason ?? "",
+      );
+
+      setLoggedItems((prev) => [
+        ...prev,
+        {
+          saleId,
+          productId: product.id,
+          productName: product.name,
+          price: product.price,
+          qty,
+          boQty,
+          boReason,
+        },
+      ]);
     },
-    [products],
+    [products, sessionStoreId],
   );
 
   const updateItemQty = useCallback((index: number, delta: number) => {
-    setLoggedItems((prev) =>
-      prev
-        .map((item, i) => {
-          if (i !== index) return item;
-          return { ...item, qty: Math.max(0, item.qty + delta) };
-        })
-        .filter((item) => item.qty > 0 || item.boQty > 0),
-    );
-  }, []);
+    setLoggedItems((prev) => {
+      const item = prev[index];
+      if (!item) return prev;
+      const newQty = Math.max(0, item.qty + delta);
+      if (sessionStoreId) {
+        if (newQty === 0 && item.boQty === 0) {
+          SalesDao.deleteSale(item.saleId);
+        } else {
+          SalesDao.updateSale(item.saleId, item.productId, item.price, newQty, item.boQty, item.boReason ?? "");
+        }
+      }
+      return prev
+        .map((it, i) => (i !== index ? it : { ...it, qty: newQty }))
+        .filter((it) => it.qty > 0 || it.boQty > 0);
+    });
+  }, [sessionStoreId]);
 
   const removeItem = useCallback((index: number) => {
-    setLoggedItems((prev) => prev.filter((_, i) => i !== index));
-  }, []);
+    setLoggedItems((prev) => {
+      const item = prev[index];
+      if (item && sessionStoreId) SalesDao.deleteSale(item.saleId);
+      return prev.filter((_, i) => i !== index);
+    });
+  }, [sessionStoreId]);
 
-  return { loggedItems, logItem, updateItemQty, removeItem };
+  const editItem = useCallback(
+    (
+      index: number,
+      productId: string,
+      qty: number,
+      boQty: number,
+      boReason?: string,
+    ) => {
+      const product = products.find((p) => p.id === productId);
+      if (!product) return;
+      setLoggedItems((prev) => {
+        const item = prev[index];
+        if (item && sessionStoreId) {
+          if (qty === 0 && boQty === 0) {
+            SalesDao.deleteSale(item.saleId);
+          } else {
+            SalesDao.updateSale(item.saleId, product.id, product.price, qty, boQty, boReason ?? "");
+          }
+        }
+        return prev
+          .map((it, i) =>
+            i !== index
+              ? it
+              : {
+                  saleId: it.saleId,
+                  productId: product.id,
+                  productName: product.name,
+                  price: product.price,
+                  qty,
+                  boQty,
+                  boReason,
+                },
+          )
+          .filter((it) => it.qty > 0 || it.boQty > 0);
+      });
+    },
+    [products, sessionStoreId],
+  );
+
+  return { loggedItems, logItem, updateItemQty, removeItem, editItem };
 }

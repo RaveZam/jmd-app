@@ -1,11 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useLocalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import { ProductsDao } from "@/lib/sqlite/dao/products-dao";
+import SessionStoresDao from "@/lib/sqlite/dao/session-stores-dao";
 import { useDistributionLog } from "./useDistributionLog";
-import {
-  getSoldItems,
-  computeSummary,
-} from "../helpers/distribution-helpers";
+import { computeSummary } from "../helpers/distribution-helpers";
 
 export function useStorePage() {
   const params = useLocalSearchParams<{
@@ -27,14 +26,23 @@ export function useStorePage() {
     ? `${provinceName}  •  ${storeAddress}`
     : storeAddress;
 
+  const sessionStoreId =
+    typeof params.sessionStoreId === "string" ? params.sessionStoreId : null;
+
   const products = useMemo(() => ProductsDao.getAllProducts(), []);
-  const { loggedItems, logItem, updateItemQty, removeItem } =
-    useDistributionLog(products);
+  const { loggedItems, logItem, updateItemQty, removeItem, editItem } =
+    useDistributionLog(products, sessionStoreId);
 
   const [showSoldAdder, setShowSoldAdder] = useState(false);
 
-  const soldItems = getSoldItems(loggedItems);
+  const soldItems = loggedItems.map((item, idx) => ({ item, idx }));
   const summary = computeSummary(loggedItems);
+
+  const confirmVisit = useCallback(() => {
+    if (!sessionStoreId) return;
+    SessionStoresDao.markVisited(sessionStoreId);
+    router.back();
+  }, [sessionStoreId]);
 
   return {
     storeName,
@@ -44,9 +52,11 @@ export function useStorePage() {
     logItem,
     updateItemQty,
     removeItem,
+    editItem,
     soldItems,
     summary,
     showSoldAdder,
     setShowSoldAdder,
+    confirmVisit,
   };
 }

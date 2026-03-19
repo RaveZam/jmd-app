@@ -5,6 +5,7 @@ import {
   Text,
   TouchableOpacity,
 } from "react-native";
+import { useState } from "react";
 import {
   SafeAreaView,
   useSafeAreaInsets,
@@ -27,14 +28,29 @@ export default function StorePage() {
     storeName,
     location,
     products,
+    loggedItems,
     logItem,
-    updateItemQty,
     removeItem,
+    editItem,
     soldItems,
     summary,
     showSoldAdder,
     setShowSoldAdder,
+    confirmVisit,
   } = useStorePage();
+
+  const [editIndex, setEditIndex] = useState<number | null>(null);
+
+  const modalVisible = showSoldAdder || editIndex !== null;
+  const editData =
+    editIndex !== null
+      ? {
+          productId: loggedItems[editIndex].productId,
+          qty: loggedItems[editIndex].qty,
+          boQty: loggedItems[editIndex].boQty,
+          boReason: loggedItems[editIndex].boReason,
+        }
+      : undefined;
 
   if (!storeName) return null;
 
@@ -87,7 +103,9 @@ export default function StorePage() {
             <View style={styles.table}>
               {/* Column headers */}
               <View style={styles.tableHeader}>
-                <Text style={[styles.colHead, styles.colHeadProduct]}>PRODUCT</Text>
+                <Text style={[styles.colHead, styles.colHeadProduct]}>
+                  PRODUCT
+                </Text>
                 <Text style={[styles.colHead, styles.colHeadSold]}>SOLD</Text>
                 <Text style={[styles.colHead, styles.colHeadBo]}>BO</Text>
                 <Text style={[styles.colHead, styles.colHeadTotal]}>TOTAL</Text>
@@ -98,7 +116,7 @@ export default function StorePage() {
                   key={idx}
                   item={item}
                   index={idx}
-                  onUpdateQty={updateItemQty}
+                  onPress={() => setEditIndex(idx)}
                   onDelete={removeItem}
                 />
               ))}
@@ -111,16 +129,27 @@ export default function StorePage() {
         </View>
       </ScrollView>
 
-      {/* ── Modal ── */}
+      {/* ── Modal (add + edit) ── */}
       <AdderModal
-        visible={showSoldAdder}
-        title="Add Order"
+        key={editIndex !== null ? `edit-${editIndex}` : "add"}
+        visible={modalVisible}
+        title={editIndex !== null ? "Edit Order" : "Add Order"}
         products={products}
         showPrice
-        onAdd={(productId, qty, boQty, boReason) =>
-          logItem(productId, qty, boQty, boReason)
-        }
-        onClose={() => setShowSoldAdder(false)}
+        editData={editData}
+        onAdd={(productId, qty, boQty, boReason) => {
+          if (editIndex !== null) {
+            editItem(editIndex, productId, qty, boQty, boReason);
+            setEditIndex(null);
+          } else {
+            logItem(productId, qty, boQty, boReason);
+            setShowSoldAdder(false);
+          }
+        }}
+        onClose={() => {
+          setShowSoldAdder(false);
+          setEditIndex(null);
+        }}
       />
 
       {/* ── Sticky footer: summary + confirm ── */}
@@ -131,7 +160,7 @@ export default function StorePage() {
             ₱{netTotal.toLocaleString()}
           </Text>
         </View>
-        <TouchableOpacity style={styles.confirmBtn} activeOpacity={0.8}>
+        <TouchableOpacity style={styles.confirmBtn} activeOpacity={0.8} onPress={confirmVisit}>
           <Text style={styles.confirmBtnText}>Confirm visit</Text>
         </TouchableOpacity>
       </View>

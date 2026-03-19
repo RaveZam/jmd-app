@@ -26,6 +26,7 @@ export function AdderModal({
   onClose,
   products,
   showPrice,
+  editData,
   onAdd,
 }: AdderModalProps) {
   return (
@@ -72,6 +73,7 @@ export function AdderModal({
             <AdderPanel
               products={products}
               showPrice={showPrice}
+              editData={editData}
               onAdd={(productId, qty, boQty, boReason) => {
                 onAdd(productId, qty, boQty, boReason);
                 onClose();

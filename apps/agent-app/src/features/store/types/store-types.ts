@@ -6,6 +6,13 @@ export type Product = {
   price: number;
 };
 
+export type EditData = {
+  productId: string;
+  qty: number;
+  boQty: number;
+  boReason?: string;
+};
+
 export type PickerModalProps = {
   visible: boolean;
   products: Product[];
@@ -17,21 +24,17 @@ export type PickerModalProps = {
 export type AdderPanelProps = {
   products: Product[];
   showPrice: boolean;
+  editData?: EditData;
   onAdd: (productId: string, qty: number, boQty: number, boReason?: string) => void;
 };
 
 export type SoldRowProps = {
   item: LoggedItem;
   index: number;
-  onUpdateQty: (i: number, d: number) => void;
+  onPress: () => void;
   onDelete: (i: number) => void;
 };
 
-export type BadRowProps = {
-  item: LoggedItem;
-  index: number;
-  onDelete: (i: number) => void;
-};
 export type SectionRowProps = {
   label: string;
   buttonLabel: string;

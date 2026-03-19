@@ -5,6 +5,7 @@ import { initDb } from "@/lib/sqlite/db-migration";
 import { fetchAndSyncProducts } from "@/lib/sync/fetch-products";
 import RouteSessionsDao from "@/lib/sqlite/dao/route-sessions-dao";
 import SessionStoresDao from "@/lib/sqlite/dao/session-stores-dao";
+import SalesDao from "@/lib/sqlite/dao/sales-dao";
 
 export function useAuthGuard(setCheckingSession: (value: boolean) => void) {
   const segments = useSegments();
@@ -14,6 +15,7 @@ export function useAuthGuard(setCheckingSession: (value: boolean) => void) {
     initDb();
     RouteSessionsDao.logAll();
     SessionStoresDao.logAll();
+    SalesDao.logAll();
     let mounted = true;
     (async () => {
       try {

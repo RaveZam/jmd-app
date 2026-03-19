@@ -4,9 +4,9 @@ import type { SoldRowProps } from "../types/store-types";
 
 const BORDER = "#E2E8F0";
 
-export function SoldOrderRow({ item, index, onUpdateQty, onDelete }: SoldRowProps) {
+export function SoldOrderRow({ item, index, onPress, onDelete }: SoldRowProps) {
   return (
-    <View style={styles.row}>
+    <TouchableOpacity style={styles.row} onPress={onPress} activeOpacity={0.6}>
       {/* Product */}
       <View style={styles.colProduct}>
         <Text style={styles.productName} numberOfLines={1}>
@@ -15,34 +15,15 @@ export function SoldOrderRow({ item, index, onUpdateQty, onDelete }: SoldRowProp
         <Text style={styles.productPrice}>₱{item.price} / pack</Text>
       </View>
 
-      {/* Sold qty stepper */}
+      {/* Sold qty */}
       <View style={styles.colSold}>
-        <TouchableOpacity
-          style={styles.stepBtn}
-          onPress={() => onUpdateQty(index, -1)}
-          hitSlop={6}
-        >
-          <Text style={styles.stepBtnText}>−</Text>
-        </TouchableOpacity>
         <Text style={styles.soldQty}>{item.qty}</Text>
-        <TouchableOpacity
-          style={styles.stepBtn}
-          onPress={() => onUpdateQty(index, 1)}
-          hitSlop={6}
-        >
-          <Text style={styles.stepBtnText}>+</Text>
-        </TouchableOpacity>
       </View>
 
       {/* BO */}
       <View style={styles.colBo}>
         {item.boQty > 0 ? (
-          <>
-            <Text style={styles.boQty}>{item.boQty}</Text>
-            <Text style={styles.boReason} numberOfLines={1}>
-              {item.boReason ?? "bad order"}
-            </Text>
-          </>
+          <Text style={styles.boQty}>{item.boQty}</Text>
         ) : (
           <Text style={styles.dash}>—</Text>
         )}
@@ -59,7 +40,7 @@ export function SoldOrderRow({ item, index, onUpdateQty, onDelete }: SoldRowProp
       >
         <Ionicons name="close" size={13} color="#CBD5E1" />
       </TouchableOpacity>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -72,23 +53,16 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: BORDER,
   },
-  colProduct: { flex: 1, marginRight: 8 },
+  colProduct: { flex: 1, marginRight: 8, gap: 2 },
   productName: { fontSize: 13, fontWeight: "600", color: "#0F172A" },
-  productPrice: { fontSize: 11, color: "#94A3B8", marginTop: 2 },
+  productPrice: { fontSize: 11, color: "#94A3B8" },
 
   colSold: {
     width: 72,
-    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    gap: 4,
   },
-  stepBtn: { padding: 2 },
-  stepBtnText: { fontSize: 16, color: "#64748B", lineHeight: 20 },
   soldQty: {
-    width: 24,
-    textAlign: "center",
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: "700",
     color: "#0F172A",
   },
@@ -97,8 +71,7 @@ const styles = StyleSheet.create({
     width: 64,
     alignItems: "center",
   },
-  boQty: { fontSize: 14, fontWeight: "700", color: "#F97316" },
-  boReason: { fontSize: 10, color: "#94A3B8", marginTop: 1, textAlign: "center" },
+  boQty: { fontSize: 14, fontWeight: "700", color: "#EF4444" },
   dash: { fontSize: 14, color: "#CBD5E1" },
 
   colTotal: {
@@ -108,6 +81,5 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#0F172A",
   },
-
   deleteBtn: { marginLeft: 8 },
 });

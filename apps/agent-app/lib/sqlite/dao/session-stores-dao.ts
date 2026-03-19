@@ -34,6 +34,12 @@ const SessionStoresDao = {
     );
   },
 
+  markVisited(sessionStoreId: string) {
+    db.runSync(`UPDATE session_stores SET visited = 1 WHERE id = ?`, [
+      sessionStoreId,
+    ]);
+  },
+
   logAll() {
     const rows = db.getAllSync<{
       id: string;

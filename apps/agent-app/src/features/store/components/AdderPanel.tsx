@@ -108,13 +108,24 @@ const stepperStyles = StyleSheet.create({
   },
 });
 
-export function AdderPanel({ products, showPrice, onAdd }: AdderPanelProps) {
+export function AdderPanel({ products, showPrice, editData, onAdd }: AdderPanelProps) {
+  const initProduct = editData
+    ? (products.find((p) => p.id === editData.productId) ?? products[0])
+    : products[0];
+  const initReason = PRESET_REASONS.includes(editData?.boReason as PresetReason)
+    ? (editData!.boReason as PresetReason)
+    : editData?.boReason
+    ? "Custom"
+    : "Rotten";
+
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [selected, setSelected] = useState<Product>(products[0]);
-  const [qty, setQty] = useState(1);
-  const [boQty, setBoQty] = useState(0);
-  const [reason, setReason] = useState<PresetReason>("Rotten");
-  const [customReason, setCustomReason] = useState("");
+  const [selected, setSelected] = useState<Product>(initProduct);
+  const [qty, setQty] = useState(editData?.qty ?? 1);
+  const [boQty, setBoQty] = useState(editData?.boQty ?? 0);
+  const [reason, setReason] = useState<PresetReason>(initReason);
+  const [customReason, setCustomReason] = useState(
+    initReason === "Custom" ? (editData?.boReason ?? "") : ""
+  );
 
   function handleAdd() {
     if (!selected || (qty === 0 && boQty === 0)) return;
@@ -217,7 +228,7 @@ export function AdderPanel({ products, showPrice, onAdd }: AdderPanelProps) {
         onPress={handleAdd}
         disabled={!canAdd}
       >
-        <Text style={styles.addBtnText}>Add to Order</Text>
+        <Text style={styles.addBtnText}>{editData ? "Save Changes" : "Add to Order"}</Text>
         {selected && canAdd && (
           <Text style={styles.addBtnSub}>
             {selected.name}
