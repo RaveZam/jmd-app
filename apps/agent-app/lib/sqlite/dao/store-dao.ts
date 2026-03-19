@@ -5,7 +5,9 @@ import { logTable } from "@/lib/sqlite/log-table";
 type InsertStoreInput = {
   provinceId: string;
   name: string;
-  address?: string;
+  province?: string;
+  city?: string;
+  barangay?: string;
   contactName?: string;
   contactPhone?: string;
 };
@@ -16,7 +18,9 @@ const StoresDao = {
       id: string;
       name: string;
       province_id: string;
-      address: string;
+      province: string;
+      city: string;
+      barangay: string;
       contact_number: string;
       contact_name: string;
     }>(
@@ -32,7 +36,9 @@ const StoresDao = {
       id: string;
       name: string;
       province_id: string;
-      address: string;
+      province: string;
+      city: string;
+      barangay: string;
       contact_number: string;
       contact_name: string;
     }>(`SELECT * FROM stores WHERE province_id = ?`, [provinceId]);
@@ -44,10 +50,12 @@ const StoresDao = {
 
   updateStore(id: string, input: Omit<InsertStoreInput, "provinceId">) {
     db.runSync(
-      `UPDATE stores SET name = ?, address = ?, contact_number = ?, contact_name = ? WHERE id = ?`,
+      `UPDATE stores SET name = ?, province = ?, city = ?, barangay = ?, contact_number = ?, contact_name = ? WHERE id = ?`,
       [
         input.name,
-        input.address ?? "",
+        input.province ?? "",
+        input.city ?? "",
+        input.barangay ?? "",
         input.contactPhone ?? "",
         input.contactName ?? "",
         id,
@@ -60,7 +68,9 @@ const StoresDao = {
       id: string;
       name: string;
       province_id: string;
-      address: string;
+      province: string;
+      city: string;
+      barangay: string;
       contact_number: string;
       contact_name: string;
     }>(`SELECT * FROM stores`);
@@ -71,13 +81,15 @@ const StoresDao = {
     const id = uuidv4();
     db.runSync(
       `INSERT INTO stores
-       (id, province_id, name, address, contact_number, contact_name)
-       VALUES (?, ?, ?, ?, ?, ?)`,
+       (id, province_id, name, province, city, barangay, contact_number, contact_name)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id,
         input.provinceId,
         input.name,
-        input.address ?? "",
+        input.province ?? "",
+        input.city ?? "",
+        input.barangay ?? "",
         input.contactPhone ?? "",
         input.contactName ?? "",
       ],

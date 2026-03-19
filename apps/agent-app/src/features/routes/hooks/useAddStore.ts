@@ -5,14 +5,18 @@ import { supabase } from "@/lib/supabase";
 export async function useAddStore(
   provinceId: string,
   name: string,
-  address: string,
+  province: string,
+  city: string,
+  barangay: string,
   contactName: string,
   contactPhone: string,
 ) {
   const id = StoresDao.insertStore({
     provinceId,
     name: name.trim(),
-    address: address.trim(),
+    province: province.trim(),
+    city: city.trim(),
+    barangay: barangay.trim(),
     contactName: contactName.trim(),
     contactPhone: contactPhone.trim(),
   });
@@ -25,10 +29,11 @@ export async function useAddStore(
     JSON.stringify({
       id: id,
       store_name: name.trim(),
-      address: address.trim(),
+      province: province.trim(),
+      city: city.trim(),
+      barangay: barangay.trim(),
       contact_number: contactPhone.trim(),
       contact_name: contactName.trim(),
-      province_id: provinceId,
       tendered_by: session?.user?.id,
     }),
     1,

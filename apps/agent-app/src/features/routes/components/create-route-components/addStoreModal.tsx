@@ -19,7 +19,9 @@ import { useUpdateStore } from "../../hooks/useUpdateStore";
 type ExistingStore = {
   id: string;
   name: string;
-  address: string;
+  province: string;
+  city: string;
+  barangay: string;
   contact_name: string;
   contact_number: string;
 };
@@ -44,7 +46,9 @@ export function AddStoreModal({
   const isEditing = !!initialStore;
 
   const [name, setName] = useState(initialStore?.name ?? "");
-  const [address, setAddress] = useState(initialStore?.address ?? "");
+  const [province, setProvince] = useState(initialStore?.province ?? "");
+  const [city, setCity] = useState(initialStore?.city ?? "");
+  const [barangay, setBarangay] = useState(initialStore?.barangay ?? "");
   const [contactName, setContactName] = useState(
     initialStore?.contact_name ?? "",
   );
@@ -62,7 +66,9 @@ export function AddStoreModal({
       useUpdateStore(
         initialStore.id,
         name.trim(),
-        address.trim(),
+        province.trim(),
+        city.trim(),
+        barangay.trim(),
         contactName.trim(),
         contactPhone.trim(),
       );
@@ -71,7 +77,9 @@ export function AddStoreModal({
       useAddStore(
         provinceId,
         name.trim(),
-        address.trim(),
+        province.trim(),
+        city.trim(),
+        barangay.trim(),
         contactName.trim(),
         contactPhone.trim(),
       );
@@ -120,14 +128,37 @@ export function AddStoreModal({
                 </View>
 
                 <View style={styles.field}>
-                  <Text style={styles.label}>Address</Text>
+                  <Text style={styles.label}>Province</Text>
                   <TextInput
-                    value={address}
-                    onChangeText={setAddress}
-                    placeholder="e.g. Guadalupe Nuevo, Makati City"
+                    value={province}
+                    onChangeText={setProvince}
+                    placeholder="e.g. Metro Manila"
                     placeholderTextColor="#94A3B8"
                     style={styles.input}
                   />
+                </View>
+
+                <View style={styles.row}>
+                  <View style={styles.fieldHalf}>
+                    <Text style={styles.label}>City</Text>
+                    <TextInput
+                      value={city}
+                      onChangeText={setCity}
+                      placeholder="e.g. Makati City"
+                      placeholderTextColor="#94A3B8"
+                      style={styles.input}
+                    />
+                  </View>
+                  <View style={styles.fieldHalf}>
+                    <Text style={styles.label}>Barangay</Text>
+                    <TextInput
+                      value={barangay}
+                      onChangeText={setBarangay}
+                      placeholder="e.g. Guadalupe Nuevo"
+                      placeholderTextColor="#94A3B8"
+                      style={styles.input}
+                    />
+                  </View>
                 </View>
 
                 <View style={styles.row}>

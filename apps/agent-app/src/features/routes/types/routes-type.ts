@@ -6,7 +6,7 @@ export type Route = {
 export type StoreCard = {
   name: string;
   areaTag: string;
-  address: string;
+  location: string;
   status: string;
   contactName: string;
   contactNumber: string;
@@ -16,7 +16,7 @@ export type StoreCard = {
 export type TenderedCard = {
   routeName: string;
   areaTag: string;
-  address: string;
+  location: string;
   contactName: string;
   contactNumber: string;
 };

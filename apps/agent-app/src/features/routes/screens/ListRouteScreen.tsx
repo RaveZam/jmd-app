@@ -260,9 +260,9 @@ export default function ListRouteScreen() {
                                   <Text style={styles.storeName}>
                                     {store.name}
                                   </Text>
-                                  {store.address ? (
+                                  {(store.barangay || store.city) ? (
                                     <Text style={styles.storeAddress}>
-                                      {store.address}
+                                      {[store.barangay, store.city].filter(Boolean).join(", ")}
                                     </Text>
                                   ) : null}
                                 </View>

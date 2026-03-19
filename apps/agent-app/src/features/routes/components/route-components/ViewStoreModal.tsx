@@ -8,7 +8,15 @@ type Props = {
   onClose: () => void;
 };
 
+function formatLocation(store: StoreRow): string {
+  return [store.barangay, store.city, store.province]
+    .filter(Boolean)
+    .join(", ");
+}
+
 export function ViewStoreModal({ store, onClose }: Props) {
+  const location = store ? formatLocation(store) : "";
+
   return (
     <Modal
       visible={!!store}
@@ -25,10 +33,10 @@ export function ViewStoreModal({ store, onClose }: Props) {
           <Text style={m.title}>{store?.name}</Text>
 
           <View style={styles.fields}>
-            {store?.address ? (
+            {location ? (
               <View style={styles.row}>
                 <Ionicons name="location-outline" size={15} color="#64748B" />
-                <Text style={styles.fieldText}>{store.address}</Text>
+                <Text style={styles.fieldText}>{location}</Text>
               </View>
             ) : null}
             {store?.contact_name ? (
@@ -43,7 +51,7 @@ export function ViewStoreModal({ store, onClose }: Props) {
                 <Text style={styles.fieldText}>{store.contact_number}</Text>
               </View>
             ) : null}
-            {!store?.address && !store?.contact_name && !store?.contact_number && (
+            {!location && !store?.contact_name && !store?.contact_number && (
               <Text style={styles.emptyText}>No additional details.</Text>
             )}
           </View>

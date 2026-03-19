@@ -5,7 +5,7 @@ import { StoreCard, TenderedCard } from "../../types/routes-type";
 export function StoreCard({
   name,
   areaTag,
-  address,
+  location,
   status,
   contactName,
   contactNumber,
@@ -31,7 +31,7 @@ export function StoreCard({
         lightColor="#475569"
         darkColor="#475569"
       >
-        {address}
+        {location}
       </ThemedText>
       <ThemedText
         style={styles.cardMeta}
@@ -55,7 +55,7 @@ export function StoreCard({
 export function TenderedCard({
   routeName,
   areaTag,
-  address,
+  location,
   contactName,
   contactNumber,
 }: TenderedCard) {
@@ -79,7 +79,7 @@ export function TenderedCard({
           lightColor="#EAF7F3"
           darkColor="#EAF7F3"
         >
-          {address}
+          {location}
         </ThemedText>
       </View>
       <ThemedText

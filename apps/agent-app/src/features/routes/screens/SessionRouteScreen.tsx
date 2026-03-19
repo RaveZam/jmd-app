@@ -62,9 +62,9 @@ function SessionStoreItem({
         >
           {store.store_name}
         </Text>
-        {store.store_address || store.store_contact_name ? (
+        {(store.store_barangay || store.store_city) || store.store_contact_name ? (
           <View style={styles.storeMeta}>
-            {store.store_address ? (
+            {store.store_barangay || store.store_city ? (
               <View style={styles.storeMetaRow}>
                 <Ionicons
                   name="location-outline"
@@ -78,7 +78,7 @@ function SessionStoreItem({
                   ]}
                   numberOfLines={1}
                 >
-                  {store.store_address}
+                  {[store.store_barangay, store.store_city].filter(Boolean).join(", ")}
                 </Text>
               </View>
             ) : null}
@@ -236,7 +236,9 @@ export default function SessionRouteScreen() {
                   params: {
                     storeId: item.store_id,
                     storeName: item.store_name,
-                    storeAddress: item.store_address ?? "",
+                    storeProvince: item.store_province ?? "",
+                    storeCity: item.store_city ?? "",
+                    storeBarangay: item.store_barangay ?? "",
                     contactName: item.store_contact_name ?? "",
                     provinceName: item.province_name ?? "",
                     sessionStoreId: item.id,

@@ -11,7 +11,9 @@ export function useStorePage() {
   const params = useLocalSearchParams<{
     storeId?: string;
     storeName?: string;
-    storeAddress?: string;
+    storeProvince?: string;
+    storeCity?: string;
+    storeBarangay?: string;
     contactName?: string;
     provinceName?: string;
     sessionStoreId?: string;
@@ -19,13 +21,15 @@ export function useStorePage() {
 
   const storeName =
     typeof params.storeName === "string" ? params.storeName : null;
-  const storeAddress =
-    typeof params.storeAddress === "string" ? params.storeAddress : "";
+  const storeBarangay =
+    typeof params.storeBarangay === "string" ? params.storeBarangay : "";
+  const storeCity =
+    typeof params.storeCity === "string" ? params.storeCity : "";
   const provinceName =
     typeof params.provinceName === "string" ? params.provinceName : "";
-  const location = provinceName
-    ? `${provinceName}  •  ${storeAddress}`
-    : storeAddress;
+  const location = [storeBarangay, storeCity, provinceName]
+    .filter(Boolean)
+    .join(", ");
 
   const sessionStoreId =
     typeof params.sessionStoreId === "string" ? params.sessionStoreId : null;

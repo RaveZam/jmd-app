@@ -4,7 +4,9 @@ export type StoreRow = {
   id: string;
   name: string;
   province_id: string;
-  address: string;
+  province: string;
+  city: string;
+  barangay: string;
   contact_number: string;
   contact_name: string;
 };

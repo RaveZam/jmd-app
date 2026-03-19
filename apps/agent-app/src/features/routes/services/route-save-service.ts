@@ -34,9 +34,11 @@ export const routeSaveService = {
           StoresDao.insertStore({
             provinceId: provinceId,
             name: storeName,
-            address: store.address.trim(),
-            contactName: store.contactName.trim(),
-            contactPhone: store.contactPhone.trim(),
+            province: store.province?.trim() ?? "",
+            city: store.city?.trim() ?? "",
+            barangay: store.barangay?.trim() ?? "",
+            contactName: store.contactName?.trim() ?? "",
+            contactPhone: store.contactPhone?.trim() ?? "",
           });
         });
       });
