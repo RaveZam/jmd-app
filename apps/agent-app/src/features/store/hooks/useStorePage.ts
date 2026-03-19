@@ -3,6 +3,7 @@ import { useLocalSearchParams } from "expo-router";
 import { router } from "expo-router";
 import { ProductsDao } from "@/lib/sqlite/dao/products-dao";
 import SessionStoresDao from "@/lib/sqlite/dao/session-stores-dao";
+import OutboxDao from "@/lib/sqlite/dao/outbox-dao";
 import { useDistributionLog } from "./useDistributionLog";
 import { computeSummary } from "../helpers/distribution-helpers";
 
@@ -41,6 +42,11 @@ export function useStorePage() {
   const confirmVisit = useCallback(() => {
     if (!sessionStoreId) return;
     SessionStoresDao.markVisited(sessionStoreId);
+    OutboxDao.insertOutbox(
+      "SESSION_STORE_VISITED",
+      JSON.stringify({ id: sessionStoreId, visited: true }),
+      5,
+    );
     router.back();
   }, [sessionStoreId]);
 

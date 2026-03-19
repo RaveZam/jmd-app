@@ -9,6 +9,10 @@ const TABLE_MAP: Record<string, string> = {
   SESSION_PLAN_CREATED: "route_sessions",
   SESSION_PLAN_COMPLETED: "route_sessions",
   SESSION_STORE_ADDED: "session_stores",
+  SESSION_STORE_VISITED: "session_stores",
+  SALE_CREATED: "sales",
+  SALE_UPDATED: "sales",
+  SALE_DELETED: "sales",
 };
 
 export async function syncOutbox(): Promise<{
@@ -69,7 +73,20 @@ export async function syncOutbox(): Promise<{
         currentSession?.user?.id ?? "null",
       );
 
-      const { error } = await supabase.from(table).upsert(payload);
+      let error;
+      if (entry.type === "SALE_DELETED") {
+        ({ error } = await supabase.from(table).delete().eq("id", payload.id));
+      } else if (entry.type === "SESSION_STORE_VISITED") {
+        ({ error } = await supabase
+          .from(table)
+          .update({ visited: true })
+          .eq("id", payload.id));
+      } else if (entry.type === "SALE_UPDATED") {
+        const { id, ...fields } = payload;
+        ({ error } = await supabase.from(table).update(fields).eq("id", id));
+      } else {
+        ({ error } = await supabase.from(table).upsert(payload));
+      }
 
       if (error) throw error;
 

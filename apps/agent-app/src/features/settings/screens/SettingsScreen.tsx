@@ -28,15 +28,19 @@ export default function SettingsScreen() {
   const handleClearSessionData = () => {
     Alert.alert(
       "Clear Session Data",
-      "This will delete all route_sessions and session_stores records. Continue?",
+      "This will delete all sales, session_stores, route_sessions, and outbox records. Continue?",
       [
         { text: "Cancel", style: "cancel" },
         {
           text: "Clear",
           style: "destructive",
           onPress: () => {
-            db.runSync(`DELETE FROM session_stores`);
-            db.runSync(`DELETE FROM route_sessions`);
+            db.withTransactionSync(() => {
+              db.runSync(`DELETE FROM sales`);
+              db.runSync(`DELETE FROM session_stores`);
+              db.runSync(`DELETE FROM route_sessions`);
+              db.runSync(`DELETE FROM outbox`);
+            });
             Alert.alert("Done", "Session data cleared.");
           },
         },

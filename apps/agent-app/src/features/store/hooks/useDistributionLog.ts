@@ -1,6 +1,8 @@
 import { useState, useCallback } from "react";
 import type { Product } from "../types/store-types";
 import SalesDao from "@/lib/sqlite/dao/sales-dao";
+import OutboxDao from "@/lib/sqlite/dao/outbox-dao";
+import { getPhTime } from "@/helpers/getPhTime";
 
 export type LoggedItem = {
   saleId: string;
@@ -34,6 +36,21 @@ export function useDistributionLog(
         boReason ?? "",
       );
 
+      OutboxDao.insertOutbox(
+        "SALE_CREATED",
+        JSON.stringify({
+          id: saleId,
+          session_store_id: sessionStoreId,
+          product_id: product.id,
+          snapshot_price: product.price,
+          quantity_sold: qty,
+          quantity_bo: boQty,
+          bo_reason: boReason ?? "",
+          created_at: getPhTime().toISOString(),
+        }),
+        4,
+      );
+
       setLoggedItems((prev) => [
         ...prev,
         {
@@ -58,8 +75,25 @@ export function useDistributionLog(
       if (sessionStoreId) {
         if (newQty === 0 && item.boQty === 0) {
           SalesDao.deleteSale(item.saleId);
+          OutboxDao.insertOutbox(
+            "SALE_DELETED",
+            JSON.stringify({ id: item.saleId }),
+            4,
+          );
         } else {
           SalesDao.updateSale(item.saleId, item.productId, item.price, newQty, item.boQty, item.boReason ?? "");
+          OutboxDao.insertOutbox(
+            "SALE_UPDATED",
+            JSON.stringify({
+              id: item.saleId,
+              product_id: item.productId,
+              snapshot_price: item.price,
+              quantity_sold: newQty,
+              quantity_bo: item.boQty,
+              bo_reason: item.boReason ?? "",
+            }),
+            4,
+          );
         }
       }
       return prev
@@ -71,7 +105,14 @@ export function useDistributionLog(
   const removeItem = useCallback((index: number) => {
     setLoggedItems((prev) => {
       const item = prev[index];
-      if (item && sessionStoreId) SalesDao.deleteSale(item.saleId);
+      if (item && sessionStoreId) {
+        SalesDao.deleteSale(item.saleId);
+        OutboxDao.insertOutbox(
+          "SALE_DELETED",
+          JSON.stringify({ id: item.saleId }),
+          4,
+        );
+      }
       return prev.filter((_, i) => i !== index);
     });
   }, [sessionStoreId]);
@@ -91,8 +132,25 @@ export function useDistributionLog(
         if (item && sessionStoreId) {
           if (qty === 0 && boQty === 0) {
             SalesDao.deleteSale(item.saleId);
+            OutboxDao.insertOutbox(
+              "SALE_DELETED",
+              JSON.stringify({ id: item.saleId }),
+              4,
+            );
           } else {
             SalesDao.updateSale(item.saleId, product.id, product.price, qty, boQty, boReason ?? "");
+            OutboxDao.insertOutbox(
+              "SALE_UPDATED",
+              JSON.stringify({
+                id: item.saleId,
+                product_id: product.id,
+                snapshot_price: product.price,
+                quantity_sold: qty,
+                quantity_bo: boQty,
+                bo_reason: boReason ?? "",
+              }),
+              4,
+            );
           }
         }
         return prev

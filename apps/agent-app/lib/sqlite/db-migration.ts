@@ -1,6 +1,6 @@
 import * as SQLite from "expo-sqlite";
 
-export const db = SQLite.openDatabaseSync("routeledger-v1.db");
+export const db = SQLite.openDatabaseSync("routeledger-v1.1.db");
 
 export function initDb() {
   db.execSync(`
@@ -19,8 +19,9 @@ export function initDb() {
 CREATE TABLE IF NOT EXISTS stores (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
-  province_id TEXT NOT NULL,
-  address TEXT,
+  province TEXT NOT NULL,
+  city TEXT NOT NULL,
+  barangay TEXT NOT NULL,  
   contact_number TEXT,
   contact_name TEXT,
   FOREIGN KEY (province_id) REFERENCES provinces(id)
