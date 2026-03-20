@@ -1,16 +1,17 @@
 import type { ReactElement } from "react";
 import Link from "next/link";
 
-import { FiltersBar } from "@/components/admin/FiltersBar";
 import { RecordsToolbar } from "@/app/features/records/components/RecordsToolbar";
+import { RecordsFiltersBar } from "@/app/features/records/components/RecordsFiltersBar";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrencyPHP } from "@/lib/utils";
-import { ALL_AGENTS } from "@/lib/selectors/filters";
-import { fetchRecords } from "@/app/features/records/server/fetch-records";
+import { ALL_SESSIONS, parseRecordsFilters } from "@/lib/selectors/filters";
 import {
   buildRecordsPageUrl,
   getRecordsPageData,
 } from "@/app/features/records/server/records-page-data";
+import { fetchRecords } from "@/app/features/records/server/fetch-records";
+import { fetchSessions } from "@/app/features/records/server/fetch-sessions";
 
 export default async function RecordsPage({
   searchParams,
@@ -20,19 +21,26 @@ export default async function RecordsPage({
     | Record<string, string | string[] | undefined>;
 }): Promise<ReactElement> {
   const sp = await searchParams;
-  const records = await fetchRecords();
-  const data = getRecordsPageData(records, sp);
-  const {
-    agents,
-    filters,
-    pageRows,
-    totals,
-    page,
-    totalPages,
-    rowCount,
-    rawQuery,
-    sort,
-  } = data;
+
+  const [{ records, saleSessionMap }, sessions] = await Promise.all([
+    fetchRecords(),
+    fetchSessions(),
+  ]);
+
+  const filters = parseRecordsFilters(sp);
+
+  const sessionSaleIds =
+    filters.sessionId === ALL_SESSIONS
+      ? null
+      : new Set(
+          [...saleSessionMap.entries()]
+            .filter(([, sid]) => sid === filters.sessionId)
+            .map(([saleId]) => saleId),
+        );
+
+  const data = getRecordsPageData(records, filters, sessionSaleIds, sp);
+  const { agents, pageRows, totals, page, totalPages, rowCount, rawQuery, sort } =
+    data;
 
   return (
     <>
@@ -45,10 +53,10 @@ export default async function RecordsPage({
             </p>
           </div>
           <div className="space-y-4">
-            <FiltersBar
+            <RecordsFiltersBar
               agents={agents}
-              dateDefault={filters.date}
-              agentDefault={ALL_AGENTS}
+              sessions={sessions}
+              filtersDefault={filters}
             />
             <RecordsToolbar defaultQuery={rawQuery} defaultSort={sort} />
           </div>

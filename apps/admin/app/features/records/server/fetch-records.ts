@@ -11,6 +11,7 @@ type SaleRow = {
   session_stores: {
     stores: { store_name: string };
     route_sessions: {
+      id: string;
       session_date: string;
       conducted_by: string;
     };
@@ -18,7 +19,10 @@ type SaleRow = {
   products: { product_name: string };
 };
 
-export async function fetchRecords(): Promise<LedgerRecord[]> {
+export async function fetchRecords(): Promise<{
+  records: LedgerRecord[];
+  saleSessionMap: Map<string, string>; // saleId → routeSessionId
+}> {
   const supabase = await createClient();
   const supabaseAdmin = createSupabaseClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -34,6 +38,7 @@ export async function fetchRecords(): Promise<LedgerRecord[]> {
       session_stores!inner (
         stores!inner ( store_name ),
         route_sessions!inner (
+          id,
           session_date,
           conducted_by
         )
@@ -52,9 +57,12 @@ export async function fetchRecords(): Promise<LedgerRecord[]> {
     ]),
   );
 
-  return (salesResult.data as SaleRow[]).map((sale) => {
+  const records: LedgerRecord[] = [];
+  const saleSessionMap = new Map<string, string>();
+
+  for (const sale of salesResult.data as SaleRow[]) {
     const session = sale.session_stores.route_sessions;
-    return {
+    records.push({
       id: sale.id,
       date: session.session_date,
       agent: userMap.get(session.conducted_by) ?? "Unknown",
@@ -64,6 +72,9 @@ export async function fetchRecords(): Promise<LedgerRecord[]> {
       soldQty: sale.quantity_sold,
       boQty: sale.quantity_bo,
       unitPrice: sale.snapshot_price,
-    };
-  });
+    });
+    saleSessionMap.set(sale.id, session.id);
+  }
+
+  return { records, saleSessionMap };
 }
