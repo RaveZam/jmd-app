@@ -15,6 +15,45 @@ export function formatLocalISODate(d: Date): string {
 
 const DEFAULT_DATE = "2026-02-21";
 
+export const ALL_SESSIONS = "All" as const;
+
+export type RecordsFilters = {
+  dateFrom: string; // YYYY-MM-DD
+  dateTo: string;   // YYYY-MM-DD
+  agent: string | typeof ALL_AGENTS;
+  sessionId: string | typeof ALL_SESSIONS;
+};
+
+export function parseRecordsFilters(
+  searchParams: Record<string, string | string[] | undefined>,
+): RecordsFilters {
+  const first = (key: string) => {
+    const v = searchParams[key];
+    return Array.isArray(v) ? v[0] : v;
+  };
+
+  const dateFrom = first("dateFrom");
+  const dateTo = first("dateTo");
+  const agent = first("agent");
+  const sessionId = first("sessionId");
+
+  const today = new Date();
+  const sevenDaysAgo = new Date(today);
+  sevenDaysAgo.setDate(today.getDate() - 6);
+
+  const todayStr = formatLocalISODate(today);
+  const sevenDaysAgoStr = formatLocalISODate(sevenDaysAgo);
+
+  return {
+    dateFrom:
+      dateFrom && /^\d{4}-\d{2}-\d{2}$/.test(dateFrom) ? dateFrom : sevenDaysAgoStr,
+    dateTo:
+      dateTo && /^\d{4}-\d{2}-\d{2}$/.test(dateTo) ? dateTo : todayStr,
+    agent: agent && agent.trim() ? agent : ALL_AGENTS,
+    sessionId: sessionId && sessionId.trim() ? sessionId : ALL_SESSIONS,
+  };
+}
+
 export function parseAdminFilters(
   searchParams: Record<string, string | string[] | undefined>,
 ): AdminFilters {
