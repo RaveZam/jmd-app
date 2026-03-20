@@ -60,7 +60,7 @@ export async function fetchRecords(): Promise<{
   const records: LedgerRecord[] = [];
   const saleSessionMap = new Map<string, string>();
 
-  for (const sale of salesResult.data as SaleRow[]) {
+  for (const sale of salesResult.data as unknown as SaleRow[]) {
     const session = sale.session_stores.route_sessions;
     records.push({
       id: sale.id,
