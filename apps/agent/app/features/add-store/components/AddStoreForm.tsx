@@ -8,7 +8,7 @@ function AddStoreHeader(): ReactElement {
   return (
     <header className="sticky top-0 z-20">
       <div className="mx-auto w-full max-w-[720px]">
-        <div className="bg-[linear-gradient(to_bottom_right,#064e3b_0%,#065f46_50%,#047857_100%)] p-4 text-white shadow-soft">
+        <div className="bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-700 p-4 text-white shadow-soft dark:from-emerald-950 dark:via-emerald-900 dark:to-emerald-800">
           <div className="flex items-center gap-3">
             <Link
               href="/"
@@ -42,7 +42,7 @@ function AddStoreHeader(): ReactElement {
 }
 
 const inputClass =
-  "mt-1 w-full rounded-full border-b border-black/40 px-4 py-3 bg-white text-sm placeholder:text-muted-foreground";
+  "mt-1 w-full rounded-full border-b border-border px-4 py-3 bg-white text-sm placeholder:text-muted-foreground dark:bg-card dark:text-foreground";
 
 function LocationAndAddressFields(props: {
   province: string;
@@ -145,7 +145,7 @@ function ContactAndSubmitFields(props: {
       <div className="mt-4">
         <button
           type="submit"
-          className="w-full rounded-full bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-600 px-6 py-3 text-sm font-medium text-white shadow-lg"
+          className="w-full rounded-full bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-600 px-6 py-3 text-sm font-medium text-white shadow-lg dark:from-emerald-950 dark:via-emerald-900 dark:to-emerald-700"
         >
           Add Store
         </button>
@@ -172,7 +172,7 @@ function AddStoreFormBody(): ReactElement {
       <div className="mx-auto w-full max-w-[720px]">
         <form
           onSubmit={handleSubmit}
-          className="space-y-4 rounded-lg border border-emerald-100/60 p-4"
+          className="space-y-4 rounded-lg border border-border p-4"
         >
           <LocationAndAddressFields
             province={province}
@@ -200,7 +200,7 @@ function AddStoreFormBody(): ReactElement {
 
 export default function AddStoreForm(): ReactElement {
   return (
-    <div className="min-h-dvh bg-white dark:bg-black">
+    <div className="min-h-dvh bg-white dark:bg-background">
       <AddStoreHeader />
       <AddStoreFormBody />
     </div>

@@ -26,19 +26,19 @@ type AdderPanelProps = {
 };
 function AdderPanel({ products, productId, onProductChange, qty, onQtyChange, onAdd, showPrice }: AdderPanelProps): ReactElement {
   return (
-    <div className="mb-3 space-y-3 rounded-xl border border-[#E2E8F0] bg-white p-4">
-      <select value={productId} onChange={(e) => onProductChange(e.target.value)} className="w-full rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-sm text-[#0F172A]">
+    <div className="mb-3 space-y-3 rounded-xl border border-border bg-white p-4 dark:bg-card">
+      <select value={productId} onChange={(e) => onProductChange(e.target.value)} className="w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-foreground">
         {products.map((p) => (
           <option key={p.id} value={p.id}>{p.name}{showPrice ? ` — ₱${p.unitPrice}` : ""}</option>
         ))}
       </select>
       <div className="flex items-center gap-2">
-        <div className="flex items-center gap-2 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2">
-          <button type="button" onClick={() => onQtyChange(Math.max(1, qty - 1))} className="w-5 text-center text-sm font-bold text-slate-600">−</button>
-          <span className="w-8 text-center text-sm font-semibold text-[#0F172A]">{qty}</span>
-          <button type="button" onClick={() => onQtyChange(qty + 1)} className="w-5 text-center text-sm font-bold text-slate-600">+</button>
+        <div className="flex items-center gap-2 rounded-lg border border-border bg-muted px-3 py-2">
+          <button type="button" onClick={() => onQtyChange(Math.max(1, qty - 1))} className="w-5 text-center text-sm font-bold text-muted-foreground">−</button>
+          <span className="w-8 text-center text-sm font-semibold text-foreground">{qty}</span>
+          <button type="button" onClick={() => onQtyChange(qty + 1)} className="w-5 text-center text-sm font-bold text-muted-foreground">+</button>
         </div>
-        <button type="button" onClick={onAdd} className="flex-1 rounded-lg bg-[#0b4c29] px-4 py-2 text-sm font-semibold text-white hover:bg-[#065f46]">Add</button>
+        <button type="button" onClick={onAdd} className="flex-1 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90">Add</button>
       </div>
     </div>
   );
@@ -47,18 +47,18 @@ function AdderPanel({ products, productId, onProductChange, qty, onQtyChange, on
 type SoldRowProps = { item: LoggedItem; onUpdateQty: (id: string, d: number) => void; onDelete: (id: string) => void };
 function SoldOrderRow({ item, onUpdateQty, onDelete }: SoldRowProps): ReactElement {
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-[#E2E8F0] bg-white px-4 py-3">
+    <div className="flex items-center gap-3 rounded-xl border border-border bg-white px-4 py-3 dark:bg-card">
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold text-[#0F172A]">{item.productName}</p>
-        <p className="text-xs text-slate-400">₱{item.unitPrice} / pack</p>
+        <p className="truncate text-sm font-semibold text-foreground">{item.productName}</p>
+        <p className="text-xs text-muted-foreground">₱{item.unitPrice} / pack</p>
       </div>
       <div className="flex shrink-0 items-center gap-2">
         <div className="flex items-center gap-1">
-          <button type="button" onClick={() => onUpdateQty(item.id, -1)} className="flex h-7 w-7 items-center justify-center rounded-md border border-[#E2E8F0] bg-[#F8FAFC] text-sm font-bold text-slate-600 hover:bg-[#F1F5F9]">−</button>
-          <span className="w-8 text-center text-sm font-semibold text-[#0F172A]">{item.qty}</span>
-          <button type="button" onClick={() => onUpdateQty(item.id, 1)} className="flex h-7 w-7 items-center justify-center rounded-md border border-[#E2E8F0] bg-[#F8FAFC] text-sm font-bold text-slate-600 hover:bg-[#F1F5F9]">+</button>
+          <button type="button" onClick={() => onUpdateQty(item.id, -1)} className="flex h-7 w-7 items-center justify-center rounded-md border border-border bg-muted text-sm font-bold text-muted-foreground hover:bg-accent">−</button>
+          <span className="w-8 text-center text-sm font-semibold text-foreground">{item.qty}</span>
+          <button type="button" onClick={() => onUpdateQty(item.id, 1)} className="flex h-7 w-7 items-center justify-center rounded-md border border-border bg-muted text-sm font-bold text-muted-foreground hover:bg-accent">+</button>
         </div>
-        <span className="w-16 text-right text-sm font-semibold text-[#0F172A]">₱{(item.qty * item.unitPrice).toLocaleString()}</span>
+        <span className="w-16 text-right text-sm font-semibold text-foreground">₱{(item.qty * item.unitPrice).toLocaleString()}</span>
         <button type="button" onClick={() => onDelete(item.id)} aria-label={`Remove ${item.productName}`} className="ml-1 text-red-300 hover:text-red-500"><XIcon /></button>
       </div>
     </div>
@@ -68,10 +68,10 @@ function SoldOrderRow({ item, onUpdateQty, onDelete }: SoldRowProps): ReactEleme
 type BadRowProps = { item: LoggedItem; onDelete: (id: string) => void };
 function BadOrderRow({ item, onDelete }: BadRowProps): ReactElement {
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-[#E2E8F0] bg-white px-4 py-3">
-      <p className="min-w-0 flex-1 truncate text-sm font-semibold text-[#0F172A]">{item.productName}</p>
-      <span className="shrink-0 rounded-full border border-red-200 bg-red-50 px-2.5 py-0.5 text-xs font-semibold text-red-500">damaged</span>
-      <span className="shrink-0 text-sm font-semibold text-red-500">−{item.boQty}</span>
+    <div className="flex items-center gap-3 rounded-xl border border-border bg-white px-4 py-3 dark:bg-card">
+      <p className="min-w-0 flex-1 truncate text-sm font-semibold text-foreground">{item.productName}</p>
+      <span className="shrink-0 rounded-full border border-red-200 bg-red-50 px-2.5 py-0.5 text-xs font-semibold text-red-500 dark:border-red-900 dark:bg-red-950 dark:text-red-400">damaged</span>
+      <span className="shrink-0 text-sm font-semibold text-red-500 dark:text-red-400">−{item.boQty}</span>
       <button type="button" onClick={() => onDelete(item.id)} aria-label={`Remove bad order ${item.productName}`} className="ml-1 text-red-300 hover:text-red-500"><XIcon /></button>
     </div>
   );
@@ -81,36 +81,36 @@ type SectionHeaderProps = { label: string; buttonLabel: string; onToggle: () => 
 function SectionHeader({ label, buttonLabel, onToggle }: SectionHeaderProps): ReactElement {
   return (
     <div className="mb-3 flex items-center justify-between">
-      <span className="text-xs font-bold uppercase tracking-wider text-slate-500">{label}</span>
-      <button type="button" onClick={onToggle} className="rounded-lg border border-[#E2E8F0] bg-white px-3 py-1.5 text-xs font-semibold text-[#0b4c29] hover:bg-[#F0FDF4]">{buttonLabel}</button>
+      <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{label}</span>
+      <button type="button" onClick={onToggle} className="rounded-lg border border-border bg-white px-3 py-1.5 text-xs font-semibold text-primary hover:bg-accent dark:bg-card">{buttonLabel}</button>
     </div>
   );
 }
 
 const EmptyPlaceholder = ({ text }: { text: string }) => (
-  <div className="rounded-xl border border-dashed border-[#CBD5E1] p-6 text-center text-sm text-slate-400">{text}</div>
+  <div className="rounded-xl border border-dashed border-muted-foreground/30 p-6 text-center text-sm text-muted-foreground">{text}</div>
 );
 
 type SummaryProps = { totalPrice: number; totalBoPrice: number; netTotal: number };
 function SummaryPanel({ totalPrice, totalBoPrice, netTotal }: SummaryProps): ReactElement {
   return (
     <>
-      <div className="rounded-xl border border-[#E2E8F0] bg-white px-5 py-4">
+      <div className="rounded-xl border border-border bg-white px-5 py-4 dark:bg-card">
         <div className="space-y-2">
-          <div className="flex justify-between text-sm text-slate-500">
+          <div className="flex justify-between text-sm text-muted-foreground">
             <span>Gross sales</span><span>₱{totalPrice.toLocaleString()}</span>
           </div>
           {totalBoPrice > 0 && (
-            <div className="flex justify-between text-sm text-slate-500">
-              <span>Bad orders deduction</span><span className="text-red-500">−₱{totalBoPrice.toLocaleString()}</span>
+            <div className="flex justify-between text-sm text-muted-foreground">
+              <span>Bad orders deduction</span><span className="text-red-500 dark:text-red-400">−₱{totalBoPrice.toLocaleString()}</span>
             </div>
           )}
-          <div className="flex justify-between border-t border-[#E2E8F0] pt-2 text-sm font-bold text-[#0F172A]">
+          <div className="flex justify-between border-t border-border pt-2 text-sm font-bold text-foreground">
             <span>Net total</span><span>₱{netTotal.toLocaleString()}</span>
           </div>
         </div>
       </div>
-      <button type="button" className="w-full rounded-xl bg-[#0b4c29] py-3.5 text-sm font-semibold text-white hover:bg-[#065f46]">
+      <button type="button" className="w-full rounded-xl bg-primary py-3.5 text-sm font-semibold text-primary-foreground hover:opacity-90">
         Confirm visit
       </button>
     </>
@@ -130,8 +130,8 @@ export function StorePage(): ReactElement {
 
   if (!store) {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-[#F0F0EB]">
-        <p className="text-sm text-zinc-500">Store not found.</p>
+      <div className="flex min-h-dvh items-center justify-center bg-muted">
+        <p className="text-sm text-muted-foreground">Store not found.</p>
       </div>
     );
   }
@@ -141,7 +141,7 @@ export function StorePage(): ReactElement {
   const totalBoPrice = items.reduce((sum, i) => sum + i.boQty * i.unitPrice, 0);
 
   return (
-    <div className="min-h-dvh bg-[#F0F0EB]">
+    <div className="min-h-dvh bg-muted">
       <StoreHeader store={store} />
       <main className="mx-auto w-full max-w-[720px] space-y-4 px-5 py-5">
 

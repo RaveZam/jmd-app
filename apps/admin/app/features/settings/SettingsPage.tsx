@@ -1,7 +1,9 @@
 "use client";
 
 import type { ReactElement } from "react";
+import { useSyncExternalStore } from "react";
 import { Bell, Palette, User } from "lucide-react";
+import { useTheme } from "next-themes";
 
 import { cn } from "@/lib/utils";
 
@@ -66,12 +68,35 @@ function Toggle({
       <div
         className={cn(
           "h-5 w-9 rounded-full bg-muted transition-colors",
-          "peer-checked:bg-emerald-600",
+          "peer-checked:bg-primary",
           "after:absolute after:left-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-all after:content-['']",
           "peer-checked:after:translate-x-4",
         )}
       />
     </label>
+  );
+}
+
+const emptySubscribe = (): (() => void) => () => {};
+
+function ThemeSelect(): ReactElement {
+  const { theme, setTheme } = useTheme();
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
+
+  return (
+    <select
+      className="rounded-lg border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+      value={mounted ? theme : "light"}
+      onChange={(e) => setTheme(e.target.value)}
+    >
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+      <option value="system">System</option>
+    </select>
   );
 }
 
@@ -84,7 +109,7 @@ function Select({
 }): ReactElement {
   return (
     <select
-      className="rounded-lg border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600"
+      className="rounded-lg border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
       defaultValue={defaultValue}
     >
       {options.map((opt) => (
@@ -99,7 +124,7 @@ function Select({
 function SettingsPage(): ReactElement {
   return (
     <>
-      <header className="sticky top-0 z-20 border-b bg-slate-50/80 px-6 py-5 backdrop-blur">
+      <header className="sticky top-0 z-20 border-b bg-slate-50/80 px-6 py-5 backdrop-blur dark:bg-background/80">
         <div className="mx-auto w-full max-w-[1200px]">
           <div className="flex items-center gap-3">
             <div>
@@ -129,14 +154,14 @@ function SettingsPage(): ReactElement {
               <input
                 type="text"
                 defaultValue="Admin"
-                className="rounded-lg border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                className="rounded-lg border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </SettingsRow>
             <SettingsRow label="Email Address" description="Used for login and notifications.">
               <input
                 type="email"
                 defaultValue="admin@jmdbakery.com"
-                className="rounded-lg border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                className="rounded-lg border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </SettingsRow>
           </SettingsSection>
@@ -180,17 +205,11 @@ function SettingsPage(): ReactElement {
             description="Customize the look and feel of the dashboard."
           >
             <SettingsRow label="Theme" description="Choose your preferred color scheme.">
-              <Select options={["Light", "Dark", "System"]} defaultValue="Light" />
+              <ThemeSelect />
             </SettingsRow>
             <SettingsRow
               label="Compact Mode"
               description="Reduce spacing for a denser layout."
-            >
-              <Toggle />
-            </SettingsRow>
-            <SettingsRow
-              label="Dark Sidebar"
-              description="Use a dark background for the navigation sidebar."
             >
               <Toggle />
             </SettingsRow>

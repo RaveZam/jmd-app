@@ -11,7 +11,7 @@ function StoreItem({ store }: { store: SessionStoreRow }): ReactElement {
   return (
     <div className="flex items-center gap-3 rounded-xl border bg-background px-3 py-2.5">
       {store.visited ? (
-        <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
+        <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
       ) : (
         <Circle className="h-4 w-4 shrink-0 text-muted-foreground/40" />
       )}

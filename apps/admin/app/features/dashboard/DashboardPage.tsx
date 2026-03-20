@@ -52,7 +52,7 @@ export async function DashboardPage({
 
   return (
     <>
-      <header className="sticky top-0 z-20 border-b bg-slate-50/80 px-6 py-5 backdrop-blur">
+      <header className="sticky top-0 z-20 border-b bg-slate-50/80 px-6 py-5 backdrop-blur dark:bg-background/80">
         <div className="mx-auto w-full max-w-[1200px] space-y-4">
           <div>
             <h1 className="text-3xl font-semibold tracking-tight">Dashboard</h1>

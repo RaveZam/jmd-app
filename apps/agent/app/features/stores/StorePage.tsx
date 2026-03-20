@@ -27,8 +27,8 @@ export function StorePage(): ReactElement {
   const filtered = useMemo(() => filterStores(mockStoreLists, query), [query]);
 
   return (
-    <div className="min-h-dvh dark:bg-black">
-      <header className="sticky top-0 z-20 border-b border-emerald-100/80 bg-white/65 px-5 py-4 backdrop-blur dark:border-zinc-800/80 dark:bg-black/60">
+    <div className="min-h-dvh bg-white dark:bg-background">
+      <header className="sticky top-0 z-20 border-b border-emerald-100/80 bg-white/65 px-5 py-4 backdrop-blur dark:border-border dark:bg-background/60">
         <div className="mx-auto w-full max-w-[720px] space-y-1">
           <h1 className="text-2xl font-semibold tracking-tight text-emerald-950 dark:text-zinc-50">
             Store Distribution Logs
@@ -49,7 +49,7 @@ export function StorePage(): ReactElement {
         aria-label="Add store"
         className="fixed right-6 bottom-6 z-30 focus:outline-none"
       >
-        <div className="h-14 w-14 rounded-full bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-600 text-white flex items-center justify-center shadow-lg">
+        <div className="h-14 w-14 rounded-full bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-600 text-white flex items-center justify-center shadow-lg dark:from-emerald-950 dark:via-emerald-900 dark:to-emerald-700">
           <span className="text-2xl leading-none">+</span>
         </div>
       </Link>

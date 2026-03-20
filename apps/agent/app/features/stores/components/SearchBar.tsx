@@ -13,7 +13,7 @@ export function SearchBar({ value, onChange, placeholder = "Search Store...", on
   return (
     <div className="relative w-full">
       <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" className="h-4 w-4">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="h-4 w-4 text-black dark:text-zinc-400">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
         </svg>
       </span>
@@ -32,7 +32,7 @@ export function SearchBar({ value, onChange, placeholder = "Search Store...", on
         onClick={() => onFilterClick?.()}
         className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex items-center gap-2 rounded-full  bg-white/95 px-3 py-2 text-sm text-emerald-700  transition-colors dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:bg-zinc-800"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="black">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-black dark:text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5h18M7 12h10M10 19h4" />
         </svg>
         <span className="hidden sm:inline">Filters</span>
