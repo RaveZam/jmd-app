@@ -1,14 +1,12 @@
 import type { ReactElement } from "react";
-import { FiltersBar } from "@/components/admin/FiltersBar";
 import { HighBOAgentsList } from "@/app/features/dashboard/components/phase1/HighBOAgentsList";
 import { KpiStrip } from "@/app/features/dashboard/components/phase1/KpiStrip";
 import { TopProductsBOTable } from "@/app/features/dashboard/components/phase1/TopProductsBOTable";
 import { TopProductsSoldTable } from "@/app/features/dashboard/components/phase1/TopProductsSoldTable";
 import { VarianceAlertsList } from "@/app/features/dashboard/components/phase1/VarianceAlertsList";
 import { mockRecords } from "@/lib/mock/records";
-import { ALL_AGENTS, parseAdminFilters } from "@/lib/selectors/filters";
+import { parseAdminFilters } from "@/lib/selectors/filters";
 import {
-  selectAgents,
   selectDashboardKpis,
   selectHighBOAgents,
   selectTopProductsBO,
@@ -16,8 +14,8 @@ import {
   selectVarianceAlerts,
 } from "@/lib/selectors/metrics";
 import { ProjectAnalyticsChart } from "./components/ProjectAnalyticsChart";
-import { ProgressRing } from "./components/ProgressRing";
-import { StatsCard } from "./components/StatsCard";
+import { TodayAtGlance } from "./components/TodayAtGlance";
+import { getTodayGlance } from "./services/dashboardService";
 
 function formatCurrencyPHP(value: number): string {
   const abs = Math.abs(value);
@@ -38,13 +36,19 @@ export async function DashboardPage({
 }): Promise<ReactElement> {
   const sp = await searchParams;
   const filters = parseAdminFilters(sp);
-  const agents = selectAgents(mockRecords);
 
   const kpis = selectDashboardKpis(mockRecords, filters);
   const varianceAlerts = selectVarianceAlerts(mockRecords, filters);
   const highBOAgents = selectHighBOAgents(mockRecords, filters);
   const topSold = selectTopProductsSold(mockRecords, filters, 5);
   const topBO = selectTopProductsBO(mockRecords, filters, 5);
+
+  let todayData = null;
+  try {
+    todayData = await getTodayGlance();
+  } catch {
+    // Supabase may not have data yet — gracefully skip
+  }
 
   return (
     <>
@@ -61,6 +65,10 @@ export async function DashboardPage({
 
       <div className="flex-1 overflow-y-auto px-6 py-6">
         <div className="mx-auto w-full max-w-[1200px] space-y-6">
+          {todayData && (
+            <TodayAtGlance data={todayData} />
+          )}
+
           <KpiStrip
             items={[
               {
@@ -78,7 +86,6 @@ export async function DashboardPage({
                 title: "Total Delivered Today",
                 primary: `${kpis.totalDeliveredQty} pcs`,
               },
-
               {
                 title: "BO Rate",
                 primary: formatPercent(kpis.boRate),

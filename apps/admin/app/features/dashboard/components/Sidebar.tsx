@@ -4,9 +4,10 @@ import type { ComponentType, ReactElement, ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Download,
+  CalendarDays,
   FileText,
   LayoutGrid,
+  MapPin,
   Package,
   Sparkles,
   Users,
@@ -22,12 +23,34 @@ type NavItem = {
   badge?: ReactNode;
 };
 
-const menuItems: NavItem[] = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutGrid },
-  { href: "/Intelligence", label: "Forecast", icon: Sparkles },
-  { href: "/records", label: "Records", icon: FileText },
-  { href: "/products", label: "Products", icon: Package },
-  { href: "/agents", label: "Agents", icon: Users },
+type NavGroup = {
+  title: string;
+  items: NavItem[];
+};
+
+const navGroups: NavGroup[] = [
+  {
+    title: "OVERVIEW",
+    items: [
+      { href: "/dashboard", label: "Dashboard", icon: LayoutGrid },
+      { href: "/Intelligence", label: "Forecast", icon: Sparkles },
+      { href: "/records", label: "Records", icon: FileText },
+    ],
+  },
+  {
+    title: "FIELD OPERATIONS",
+    items: [
+      { href: "/sessions", label: "Sessions", icon: CalendarDays },
+      { href: "/stores", label: "Stores", icon: MapPin },
+    ],
+  },
+  {
+    title: "MANAGEMENT",
+    items: [
+      { href: "/products", label: "Products", icon: Package },
+      { href: "/agents", label: "Agents", icon: Users },
+    ],
+  },
 ];
 
 function SidebarNavItem({
@@ -104,7 +127,13 @@ export function Sidebar(): ReactElement {
       </div>
 
       <div className="flex-1 space-y-6 overflow-auto pb-2">
-        <SidebarNavSection title="MENU" items={menuItems} />
+        {navGroups.map((group) => (
+          <SidebarNavSection
+            key={group.title}
+            title={group.title}
+            items={group.items}
+          />
+        ))}
       </div>
 
       <div className="mt-4">

@@ -1,4 +1,5 @@
 import { ProductRow } from "../components/ProductsTable";
+import type { NewProduct } from "../components/AddProductModal";
 
 export type ProductsTableProps = {
   products: ProductRow[];

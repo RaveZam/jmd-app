@@ -1,20 +1,29 @@
 "use client";
 
 import type { ReactElement } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   RegisterAgentModal,
   type NewAgent,
 } from "./components/RegisterAgentModal";
+import { AgentGrid } from "./components/AgentGrid";
 import { createAgent } from "./services/createAgent";
+import { getAgents } from "./services/agentsService";
+import type { AgentRow } from "./types/agent-types";
 
 function AgentsPage(): ReactElement {
   const [modalOpen, setModalOpen] = useState(false);
-  const [agents] = useState<{ id: string; username: string }[]>([]);
+  const [agents, setAgents] = useState<AgentRow[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getAgents()
+      .then(setAgents)
+      .finally(() => setLoading(false));
+  }, []);
 
   function handleRegister(agent: NewAgent): void {
     createAgent({
@@ -22,6 +31,8 @@ function AgentsPage(): ReactElement {
       name: agent.name,
       password: agent.password,
       confirmPassword: agent.password,
+    }).then(() => {
+      getAgents().then(setAgents);
     });
   }
 
@@ -33,7 +44,7 @@ function AgentsPage(): ReactElement {
             <div>
               <h1 className="text-3xl font-semibold tracking-tight">Agents</h1>
               <p className="mt-1 text-sm text-muted-foreground">
-                Active agents (empty for now).
+                Agent profiles and field performance.
               </p>
             </div>
             <Button
@@ -49,29 +60,20 @@ function AgentsPage(): ReactElement {
       </header>
 
       <div className="flex-1 overflow-y-auto px-6 py-6">
-        <div className="mx-auto w-full max-w-[1200px] space-y-4">
-          <Card className="rounded-2xl border shadow-soft">
-            <CardHeader>
-              <CardTitle className="text-base">Active agents</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {agents.length === 0 ? (
-                <div className="flex flex-col items-center justify-center gap-2 py-10 text-center text-muted-foreground">
-                  <User className="h-10 w-10 opacity-50" />
-                  <p className="text-sm">No agents yet.</p>
-                  <p className="text-xs">Register an agent to get started.</p>
-                </div>
-              ) : (
-                <ul className="divide-y">
-                  {agents.map((a) => (
-                    <li key={a.id} className="py-2 text-sm">
-                      {a.username}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </CardContent>
-          </Card>
+        <div className="mx-auto w-full max-w-[1200px]">
+          {loading ? (
+            <p className="py-10 text-center text-sm text-muted-foreground">
+              Loading agents...
+            </p>
+          ) : agents.length === 0 ? (
+            <div className="flex flex-col items-center justify-center gap-2 py-10 text-center text-muted-foreground">
+              <User className="h-10 w-10 opacity-50" />
+              <p className="text-sm">No agents yet.</p>
+              <p className="text-xs">Register an agent to get started.</p>
+            </div>
+          ) : (
+            <AgentGrid agents={agents} />
+          )}
         </div>
       </div>
 
