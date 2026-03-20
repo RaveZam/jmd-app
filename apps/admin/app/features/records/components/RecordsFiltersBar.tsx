@@ -42,7 +42,7 @@ export function RecordsFiltersBar({
     params.delete("date"); // drop legacy param
     params.set("page", "1");
     for (const [k, v] of Object.entries(updates)) {
-      params.set(k, v);
+      params.set(k, v ?? "");
     }
     router.push(`/records?${params.toString()}`);
   }
@@ -53,7 +53,11 @@ export function RecordsFiltersBar({
 
   const today = formatLocalISODate(new Date());
   const yesterday = formatLocalISODate(
-    (() => { const d = new Date(); d.setDate(d.getDate() - 1); return d; })(),
+    (() => {
+      const d = new Date();
+      d.setDate(d.getDate() - 1);
+      return d;
+    })(),
   );
   const thisWeekStart = formatLocalISODate(getMonday(new Date()));
 
@@ -62,7 +66,9 @@ export function RecordsFiltersBar({
       {/* Date range */}
       <div className="flex items-end gap-2">
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-muted-foreground">From</label>
+          <label className="text-xs font-medium text-muted-foreground">
+            From
+          </label>
           <input
             type="date"
             value={dateFrom}
@@ -71,7 +77,9 @@ export function RecordsFiltersBar({
           />
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-muted-foreground">To</label>
+          <label className="text-xs font-medium text-muted-foreground">
+            To
+          </label>
           <input
             type="date"
             value={dateTo}
@@ -108,7 +116,9 @@ export function RecordsFiltersBar({
 
       {/* Agent */}
       <div className="flex flex-col gap-1">
-        <label className="text-xs font-medium text-muted-foreground">Agent</label>
+        <label className="text-xs font-medium text-muted-foreground">
+          Agent
+        </label>
         <select
           value={agent}
           onChange={(e) => push({ agent: e.target.value })}
@@ -116,14 +126,18 @@ export function RecordsFiltersBar({
         >
           <option value={ALL_AGENTS}>All agents</option>
           {agents.map((a) => (
-            <option key={a} value={a}>{a}</option>
+            <option key={a} value={a}>
+              {a}
+            </option>
           ))}
         </select>
       </div>
 
       {/* Session */}
       <div className="flex flex-col gap-1">
-        <label className="text-xs font-medium text-muted-foreground">Session</label>
+        <label className="text-xs font-medium text-muted-foreground">
+          Session
+        </label>
         <select
           value={sessionId}
           onChange={(e) => push({ sessionId: e.target.value })}
