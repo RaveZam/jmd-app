@@ -9,6 +9,7 @@ import {
   LayoutGrid,
   MapPin,
   Package,
+  Settings,
   Sparkles,
   Users,
 } from "lucide-react";
@@ -49,6 +50,7 @@ const navGroups: NavGroup[] = [
     items: [
       { href: "/products", label: "Products", icon: Package },
       { href: "/agents", label: "Agents", icon: Users },
+      { href: "/settings", label: "Settings", icon: Settings },
     ],
   },
 ];
