@@ -5,8 +5,8 @@ import { FiltersBar } from "@/components/admin/FiltersBar";
 import { RecordsToolbar } from "@/app/features/records/components/RecordsToolbar";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrencyPHP } from "@/lib/utils";
-import { mockRecords } from "@/lib/mock/records";
 import { ALL_AGENTS } from "@/lib/selectors/filters";
+import { fetchRecords } from "@/app/features/records/server/fetch-records";
 import {
   buildRecordsPageUrl,
   getRecordsPageData,
@@ -20,7 +20,8 @@ export default async function RecordsPage({
     | Record<string, string | string[] | undefined>;
 }): Promise<ReactElement> {
   const sp = await searchParams;
-  const data = getRecordsPageData(mockRecords, sp);
+  const records = await fetchRecords();
+  const data = getRecordsPageData(records, sp);
   const {
     agents,
     filters,
