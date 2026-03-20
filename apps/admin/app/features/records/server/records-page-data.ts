@@ -1,8 +1,11 @@
 import type { LedgerRecord } from "@/lib/mock/records";
-import { ALL_AGENTS, parseAdminFilters } from "@/lib/selectors/filters";
+import {
+  ALL_AGENTS,
+  ALL_SESSIONS,
+  type RecordsFilters,
+} from "@/lib/selectors/filters";
 import {
   deriveRecord,
-  filterRecords,
   selectAgents,
   type RecordDerived,
 } from "@/lib/selectors/metrics";
@@ -12,6 +15,19 @@ type SearchParams = Record<string, string | string[] | undefined>;
 function firstParam(sp: SearchParams, key: string): string | undefined {
   const v = sp[key];
   return Array.isArray(v) ? v[0] : v;
+}
+
+function filterRecordsForPage(
+  records: LedgerRecord[],
+  filters: RecordsFilters,
+  sessionSaleIds: Set<string> | null,
+): LedgerRecord[] {
+  return records.filter((r) => {
+    if (r.date < filters.dateFrom || r.date > filters.dateTo) return false;
+    if (filters.agent !== ALL_AGENTS && r.agent !== filters.agent) return false;
+    if (sessionSaleIds !== null && !sessionSaleIds.has(r.id)) return false;
+    return true;
+  });
 }
 
 export type RecordsPageRow = { record: LedgerRecord; derived: RecordDerived };
@@ -26,7 +42,7 @@ export type RecordsPageTotals = {
 
 export type RecordsPageData = {
   agents: string[];
-  filters: { date: string; agent: string };
+  filters: RecordsFilters;
   pageRows: RecordsPageRow[];
   totals: RecordsPageTotals;
   page: number;
@@ -38,10 +54,11 @@ export type RecordsPageData = {
 
 export function getRecordsPageData(
   records: LedgerRecord[],
+  filters: RecordsFilters,
+  sessionSaleIds: Set<string> | null,
   sp: SearchParams,
   pageSize = 25,
 ): RecordsPageData {
-  const filters = parseAdminFilters(sp);
   const agents = selectAgents(records);
   const rawQuery = (firstParam(sp, "q") ?? "").trim();
   const q = rawQuery.toLowerCase();
@@ -50,7 +67,7 @@ export function getRecordsPageData(
   const requestedPage =
     Number.isFinite(rawPage) && rawPage > 0 ? Math.floor(rawPage) : 1;
 
-  const base = filterRecords(records, filters);
+  const base = filterRecordsForPage(records, filters, sessionSaleIds);
   const searched = q
     ? base.filter(
         (r) =>
@@ -85,7 +102,7 @@ export function getRecordsPageData(
 
   return {
     agents,
-    filters: { date: filters.date, agent: filters.agent },
+    filters,
     pageRows,
     totals,
     page,
@@ -102,6 +119,7 @@ export function buildRecordsPageUrl(
 ): string {
   const params = new URLSearchParams();
   for (const [k, v] of Object.entries(sp)) {
+    if (k === "date") continue; // drop legacy single-date param
     const value = Array.isArray(v) ? v[0] : v;
     if (typeof value === "string" && value.length) params.set(k, value);
   }
@@ -111,3 +129,6 @@ export function buildRecordsPageUrl(
   }
   return `/records?${params.toString()}`;
 }
+
+// Re-export for convenience
+export { ALL_SESSIONS };
