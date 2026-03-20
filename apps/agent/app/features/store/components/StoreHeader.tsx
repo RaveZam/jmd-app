@@ -8,7 +8,7 @@ type Props = { store: StoreListItem };
 
 export default function StoreHeader({ store }: Props): ReactElement {
   return (
-    <header className="sticky top-0 z-20 bg-[#0b4c29]">
+    <header className="sticky top-0 z-20 bg-emerald-900 dark:bg-emerald-950">
       <div className="mx-auto w-full max-w-[720px] px-5 pb-5 pt-4">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-start gap-3">
@@ -23,12 +23,12 @@ export default function StoreHeader({ store }: Props): ReactElement {
             </Link>
             <div>
               <h1 className="text-lg font-bold leading-tight text-white">{store.name}</h1>
-              <p className="mt-0.5 text-sm text-[#86EFAC]">
+              <p className="mt-0.5 text-sm text-emerald-300">
                 {store.area} · {store.addressLine}
               </p>
             </div>
           </div>
-          <span className="mt-1 shrink-0 rounded-full border border-[#4ADE80]/40 bg-[#4ADE80]/15 px-3 py-1 text-xs font-semibold text-[#4ADE80]">
+          <span className="mt-1 shrink-0 rounded-full border border-emerald-400/40 bg-emerald-400/15 px-3 py-1 text-xs font-semibold text-emerald-400">
             In progress
           </span>
         </div>

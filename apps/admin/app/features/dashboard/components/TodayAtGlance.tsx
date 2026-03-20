@@ -13,7 +13,7 @@ function GlanceStat({
 }): ReactElement {
   return (
     <div className="flex items-center gap-3 rounded-xl border bg-background px-4 py-3">
-      <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-emerald-50 text-emerald-700">
+      <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400">
         <Icon className="h-4 w-4" />
       </div>
       <div>

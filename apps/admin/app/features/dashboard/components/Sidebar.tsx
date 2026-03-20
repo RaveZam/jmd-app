@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/theme-toggle";
 import AccountCard from "./AccountCard";
 
 type NavItem = {
@@ -70,7 +71,7 @@ function SidebarNavItem({
         className={cn(
           "flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors",
           isActive
-            ? "bg-emerald-50 text-emerald-900"
+            ? "bg-emerald-50 text-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-300"
             : "text-muted-foreground hover:bg-muted hover:text-foreground",
         )}
       >
@@ -78,7 +79,7 @@ function SidebarNavItem({
           <Icon
             className={cn(
               "h-4 w-4",
-              isActive ? "text-emerald-700" : "text-muted-foreground",
+              isActive ? "text-emerald-700 dark:text-emerald-400" : "text-muted-foreground",
             )}
           />
           {item.label}
@@ -138,8 +139,11 @@ export function Sidebar(): ReactElement {
         ))}
       </div>
 
-      <div className="mt-4">
-        <AccountCard />
+      <div className="mt-4 flex items-center gap-2">
+        <div className="flex-1">
+          <AccountCard />
+        </div>
+        <ThemeToggle />
       </div>
     </aside>
   );

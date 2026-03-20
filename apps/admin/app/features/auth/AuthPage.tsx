@@ -187,7 +187,7 @@ function AuthPage(): ReactElement {
   const [mode, setMode] = useState<"login" | "register">("login");
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-4 dark:bg-background">
       <Card className="w-full max-w-sm rounded-2xl border shadow-soft">
         <CardHeader>
           <CardTitle className="text-xl">

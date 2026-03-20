@@ -93,6 +93,7 @@ lib/
 Database: `routeledger.db` opened via `expo-sqlite`. Initialized in `app/_layout.tsx` via `initDb()`.
 
 **Schema:**
+
 ```sql
 routes     (id TEXT PK, name TEXT NOT NULL)
 provinces  (id TEXT PK, name TEXT NOT NULL, route_id FK)
@@ -100,6 +101,7 @@ stores     (id TEXT PK, name, province_id FK, address, contact_number, contact_n
 ```
 
 **Patterns:**
+
 - All DAOs use **synchronous** API: `db.runSync()`, `db.getAllSync()`
 - IDs are UUIDs generated via `uuid` v4 package (`uuidv4()`)
 - Multi-table inserts wrapped in `db.withTransactionSync()` (see `routeSaveService`)
@@ -108,6 +110,7 @@ stores     (id TEXT PK, name, province_id FK, address, contact_number, contact_n
 ### Navigation (Expo Router)
 
 File-based routing under `app/`. Key routes:
+
 - `app/index.tsx` → re-exports `/main/routes/index` (home)
 - `app/auth/sign-in.tsx` → sign-in screen
 - `app/main/routes/index.tsx` → SelectRouteScreen
@@ -116,6 +119,7 @@ File-based routing under `app/`. Key routes:
 - `app/main/settings/index.tsx` → settings
 
 **Navigation patterns:**
+
 ```typescript
 // Typed params
 const params = useLocalSearchParams<{ routeId?: string; routeName?: string }>();
