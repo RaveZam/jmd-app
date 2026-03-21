@@ -1,3 +1,5 @@
+export type StoreItem = { productName: string; sold: number };
+
 export type StoreRow = {
   id: string;
   storeName: string;
@@ -11,4 +13,5 @@ export type StoreRow = {
   totalBO: number;
   totalRevenue: number;
   visitCount: number;
+  topItems: StoreItem[];
 };

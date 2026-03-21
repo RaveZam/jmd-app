@@ -1,13 +1,47 @@
-import type { ReactElement } from "react";
+import { useState, type ReactElement } from "react";
+import {
+  ChevronsUpDown,
+  ChevronUp,
+  ChevronDown,
+} from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { formatCurrencyPHP } from "@/lib/utils";
 import type { StoreRow } from "../types/store-types";
 import { formatAddress } from "../helpers/storeHelpers";
+import { StoreDetailModal } from "./StoreDetailModal";
 
-function StoreTableRow({ store }: { store: StoreRow }): ReactElement {
+type SortKey = "totalRevenue" | "visitCount" | "totalSales" | "totalBO";
+type SortDir = "asc" | "desc" | null;
+
+function SortIcon({
+  column,
+  sortKey,
+  sortDir,
+}: {
+  column: SortKey;
+  sortKey: SortKey | null;
+  sortDir: SortDir;
+}): ReactElement {
+  if (sortKey !== column)
+    return <ChevronsUpDown className="ml-1 inline h-3.5 w-3.5 opacity-40" />;
+  if (sortDir === "asc")
+    return <ChevronUp className="ml-1 inline h-3.5 w-3.5" />;
+  return <ChevronDown className="ml-1 inline h-3.5 w-3.5" />;
+}
+
+function StoreTableRow({
+  store,
+  onClick,
+}: {
+  store: StoreRow;
+  onClick: (store: StoreRow) => void;
+}): ReactElement {
   return (
-    <tr className="border-t">
+    <tr
+      className="border-t cursor-pointer hover:bg-muted/50 transition-colors"
+      onClick={() => onClick(store)}
+    >
       <td className="px-3 py-2.5">
         <p className="text-sm font-medium">{store.storeName}</p>
         <p className="text-xs text-muted-foreground">
@@ -75,42 +109,111 @@ export function StoresTable({
 }: {
   stores: StoreRow[];
 }): ReactElement {
+  const [sortKey, setSortKey] = useState<SortKey | null>(null);
+  const [sortDir, setSortDir] = useState<SortDir>(null);
+  const [selectedStore, setSelectedStore] = useState<StoreRow | null>(null);
+
+  function handleSort(key: SortKey): void {
+    if (sortKey !== key) {
+      setSortKey(key);
+      setSortDir("desc");
+    } else if (sortDir === "desc") {
+      setSortDir("asc");
+    } else {
+      setSortKey(null);
+      setSortDir(null);
+    }
+  }
+
+  const sorted = [...stores].sort((a, b) => {
+    if (!sortKey || !sortDir) return 0;
+    const mult = sortDir === "asc" ? 1 : -1;
+    return mult * (a[sortKey] - b[sortKey]);
+  });
+
   return (
-    <div className="overflow-auto rounded-2xl border bg-card shadow-soft">
-      <table className="w-full min-w-[800px] text-sm">
-        <thead className="sticky top-0 z-10 bg-muted/60 text-xs text-muted-foreground backdrop-blur">
-          <tr>
-            <th className="px-3 py-3 text-left font-medium">Store</th>
-            <th className="px-3 py-3 text-left font-medium">Contact</th>
-            <th className="px-3 py-3 text-left font-medium">Phone</th>
-            <th className="px-3 py-3 text-right font-medium">Sold</th>
-            <th className="px-3 py-3 text-right font-medium">BO</th>
-            <th className="px-3 py-3 text-right font-medium">Revenue</th>
-            <th className="px-3 py-3 text-center font-medium">Visits</th>
-          </tr>
-        </thead>
-        <tbody>
-          {stores.length === 0 ? (
+    <>
+      <div className="overflow-auto rounded-2xl border bg-card shadow-soft">
+        <table className="w-full min-w-[800px] text-sm">
+          <thead className="sticky top-0 z-10 bg-muted/60 text-xs text-muted-foreground backdrop-blur">
             <tr>
-              <td
-                colSpan={7}
-                className="px-3 py-10 text-center text-muted-foreground"
-              >
-                No stores found.
-              </td>
+              <th className="px-3 py-3 text-left font-medium">Store</th>
+              <th className="px-3 py-3 text-left font-medium">Contact</th>
+              <th className="px-3 py-3 text-left font-medium">Phone</th>
+              <th className="px-3 py-3 text-right font-medium">
+                <button
+                  type="button"
+                  className="ml-auto flex items-center hover:text-foreground transition-colors"
+                  onClick={() => handleSort("totalSales")}
+                >
+                  Sold
+                  <SortIcon column="totalSales" sortKey={sortKey} sortDir={sortDir} />
+                </button>
+              </th>
+              <th className="px-3 py-3 text-right font-medium">
+                <button
+                  type="button"
+                  className="ml-auto flex items-center hover:text-foreground transition-colors"
+                  onClick={() => handleSort("totalBO")}
+                >
+                  BO
+                  <SortIcon column="totalBO" sortKey={sortKey} sortDir={sortDir} />
+                </button>
+              </th>
+              <th className="px-3 py-3 text-right font-medium">
+                <button
+                  type="button"
+                  className="ml-auto flex items-center hover:text-foreground transition-colors"
+                  onClick={() => handleSort("totalRevenue")}
+                >
+                  Revenue
+                  <SortIcon column="totalRevenue" sortKey={sortKey} sortDir={sortDir} />
+                </button>
+              </th>
+              <th className="px-3 py-3 text-center font-medium">
+                <button
+                  type="button"
+                  className="mx-auto flex items-center hover:text-foreground transition-colors"
+                  onClick={() => handleSort("visitCount")}
+                >
+                  Visits
+                  <SortIcon column="visitCount" sortKey={sortKey} sortDir={sortDir} />
+                </button>
+              </th>
             </tr>
-          ) : (
-            stores.map((store) => (
-              <StoreTableRow key={store.id} store={store} />
-            ))
+          </thead>
+          <tbody>
+            {sorted.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={7}
+                  className="px-3 py-10 text-center text-muted-foreground"
+                >
+                  No stores found.
+                </td>
+              </tr>
+            ) : (
+              sorted.map((store) => (
+                <StoreTableRow
+                  key={store.id}
+                  store={store}
+                  onClick={setSelectedStore}
+                />
+              ))
+            )}
+          </tbody>
+          {sorted.length > 0 && (
+            <tfoot>
+              <StoreTotalsRow stores={stores} />
+            </tfoot>
           )}
-        </tbody>
-        {stores.length > 0 && (
-          <tfoot>
-            <StoreTotalsRow stores={stores} />
-          </tfoot>
-        )}
-      </table>
-    </div>
+        </table>
+      </div>
+
+      <StoreDetailModal
+        store={selectedStore}
+        onClose={() => setSelectedStore(null)}
+      />
+    </>
   );
 }

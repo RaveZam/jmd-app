@@ -16,7 +16,7 @@ export async function getStores(): Promise<StoreRow[]> {
     supabase.from("session_stores").select("id, store_id, visited"),
     supabase
       .from("sales")
-      .select("session_store_id, quantity_sold, quantity_bo, total"),
+      .select("session_store_id, quantity_sold, quantity_bo, total, products(product_name)"),
   ]);
 
   if (storeResult.error) throw new Error(storeResult.error.message);
@@ -39,21 +39,26 @@ export async function getStores(): Promise<StoreRow[]> {
   // Aggregate sales by store
   const salesByStore = new Map<
     string,
-    { sold: number; bo: number; revenue: number }
+    { sold: number; bo: number; revenue: number; products: Map<string, number> }
   >();
   for (const sale of salesResult.data ?? []) {
     const storeId = ssToStore.get(sale.session_store_id);
     if (!storeId) continue;
+    const productName =
+      (sale.products as { product_name: string } | null)?.product_name ?? "Unknown";
+    const qty = sale.quantity_sold ?? 0;
     const existing = salesByStore.get(storeId);
     if (existing) {
-      existing.sold += sale.quantity_sold ?? 0;
+      existing.sold += qty;
       existing.bo += sale.quantity_bo ?? 0;
       existing.revenue += Number(sale.total ?? 0);
+      existing.products.set(productName, (existing.products.get(productName) ?? 0) + qty);
     } else {
       salesByStore.set(storeId, {
-        sold: sale.quantity_sold ?? 0,
+        sold: qty,
         bo: sale.quantity_bo ?? 0,
         revenue: Number(sale.total ?? 0),
+        products: new Map([[productName, qty]]),
       });
     }
   }
@@ -63,7 +68,11 @@ export async function getStores(): Promise<StoreRow[]> {
       sold: 0,
       bo: 0,
       revenue: 0,
+      products: new Map<string, number>(),
     };
+    const topItems = Array.from(sales.products.entries())
+      .map(([productName, sold]) => ({ productName, sold }))
+      .sort((a, b) => b.sold - a.sold);
     return {
       id: s.id,
       storeName: s.store_name,
@@ -77,6 +86,7 @@ export async function getStores(): Promise<StoreRow[]> {
       totalBO: sales.bo,
       totalRevenue: sales.revenue,
       visitCount: visitsByStore.get(s.id) ?? 0,
+      topItems,
     };
   });
 }
