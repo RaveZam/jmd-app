@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { AddProductModal, type NewProduct } from "./components/AddProductModal";
 import { ProductsHeader } from "./components/ProductsHeader";
 import { ProductsTable, type ProductRow } from "./components/ProductsTable";
+import { ProductsTableSkeleton } from "./components/ProductsTableSkeleton";
 import {
   addProduct,
   deleteProduct,
@@ -48,17 +49,21 @@ export function ProductPage(): ReactElement {
 
   return (
     <>
-      <ProductsHeader onAddClick={() => setAddOpen(true)} />
+      <ProductsHeader
+        onAddClick={() => setAddOpen(true)}
+        productCount={products.length}
+      />
 
       <div className="flex-1 overflow-y-auto px-6 py-6">
         <div className="mx-auto w-full max-w-[1200px] space-y-4">
           {loading ? (
-            <p className="py-10 text-center text-sm text-muted-foreground">Loading products…</p>
+            <ProductsTableSkeleton />
           ) : (
             <ProductsTable
               products={products}
               onEdit={setEditingProduct}
               onDelete={handleDelete}
+              onAddClick={() => setAddOpen(true)}
             />
           )}
         </div>

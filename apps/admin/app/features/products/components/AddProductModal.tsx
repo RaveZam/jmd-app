@@ -47,11 +47,13 @@ function NameField({
   value,
   onChange,
   inputRef,
+  error,
 }: {
   id: string;
   value: string;
   onChange: (value: string) => void;
   inputRef: React.RefObject<HTMLInputElement | null>;
+  error?: string;
 }): ReactElement {
   return (
     <div className="space-y-2">
@@ -64,8 +66,9 @@ function NameField({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="e.g. Ensaymada"
-        className="rounded-2xl"
+        className={`rounded-2xl ${error ? "border-destructive focus-visible:ring-destructive" : ""}`}
       />
+      {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
   );
 }
@@ -74,24 +77,32 @@ function PriceField({
   id,
   value,
   onChange,
+  error,
 }: {
   id: string;
   value: string;
   onChange: (value: string) => void;
+  error?: string;
 }): ReactElement {
   return (
     <div className="space-y-2">
       <label htmlFor={id} className="text-sm font-medium">
         Price
       </label>
-      <Input
-        id={id}
-        inputMode="decimal"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder="e.g. 25"
-        className="rounded-2xl"
-      />
+      <div className="relative">
+        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+          ₱
+        </span>
+        <Input
+          id={id}
+          inputMode="decimal"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="0.00"
+          className={`rounded-2xl pl-7 ${error ? "border-destructive focus-visible:ring-destructive" : ""}`}
+        />
+      </div>
+      {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
   );
 }
@@ -139,13 +150,30 @@ function AddProductForm({
   const [price, setPrice] = useState(
     initialValues ? String(initialValues.price) : "",
   );
+  const [nameError, setNameError] = useState("");
+  const [priceError, setPriceError] = useState("");
 
   function submit(e: FormEvent<HTMLFormElement>): void {
     e.preventDefault();
     const trimmed = name.trim();
     const numeric = Number(price);
-    if (!trimmed) return;
-    if (!Number.isFinite(numeric) || numeric < 0) return;
+    let valid = true;
+
+    if (!trimmed) {
+      setNameError("Product name is required.");
+      valid = false;
+    } else {
+      setNameError("");
+    }
+
+    if (price === "" || !Number.isFinite(numeric) || numeric < 0) {
+      setPriceError("Enter a valid price (0 or more).");
+      valid = false;
+    } else {
+      setPriceError("");
+    }
+
+    if (!valid) return;
     onAdd({ name: trimmed, price: numeric });
     onClose();
   }
@@ -155,10 +183,16 @@ function AddProductForm({
       <NameField
         id={nameId}
         value={name}
-        onChange={setName}
+        onChange={(v) => { setName(v); if (v.trim()) setNameError(""); }}
         inputRef={nameRef}
+        error={nameError}
       />
-      <PriceField id={priceId} value={price} onChange={setPrice} />
+      <PriceField
+        id={priceId}
+        value={price}
+        onChange={(v) => { setPrice(v); if (v) setPriceError(""); }}
+        error={priceError}
+      />
       <FormActions
         onClose={onClose}
         submitLabel={initialValues ? "Save Changes" : "Add Product"}
@@ -194,7 +228,7 @@ function AddProductPortal({
       aria-modal="true"
     >
       <ModalOverlay onClose={onClose} />
-      <div className="pointer-events-none relative flex h-full w-full items-start justify-center p-4 sm:p-8">
+      <div className="pointer-events-none relative flex h-full w-full items-center justify-center p-4 sm:p-8">
         <ModalPanel>
           <ModalHeader titleId={titleId} title={title} onClose={onClose} />
           <AddProductForm
