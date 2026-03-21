@@ -73,7 +73,7 @@ A Next.js admin panel connected to Supabase for real-time data management.
 
 **Architecture:**
 
-```
+```g
 app/
 ├── (auth)/           # Login route group
 ├── (dashboard)/      # Protected dashboard routes

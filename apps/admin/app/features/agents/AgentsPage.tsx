@@ -61,18 +61,14 @@ function AgentsPage(): ReactElement {
 
       <div className="flex-1 overflow-y-auto px-6 py-6">
         <div className="mx-auto w-full max-w-[1200px]">
-          {loading ? (
-            <p className="py-10 text-center text-sm text-muted-foreground">
-              Loading agents...
-            </p>
-          ) : agents.length === 0 ? (
+          {!loading && agents.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-2 py-10 text-center text-muted-foreground">
               <User className="h-10 w-10 opacity-50" />
               <p className="text-sm">No agents yet.</p>
               <p className="text-xs">Register an agent to get started.</p>
             </div>
           ) : (
-            <AgentGrid agents={agents} />
+            <AgentGrid agents={agents} loading={loading} />
           )}
         </div>
       </div>

@@ -1,9 +1,32 @@
 import type { ReactElement } from "react";
-import { MapPin, Route } from "lucide-react";
+import { CalendarDays, Store, TrendingUp } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { AgentRow } from "../types/agent-types";
+
+const AVATAR_COLORS = [
+  "bg-blue-200 text-blue-800",
+  "bg-violet-200 text-violet-800",
+  "bg-rose-200 text-rose-800",
+  "bg-amber-200 text-amber-800",
+  "bg-emerald-200 text-emerald-800",
+  "bg-cyan-200 text-cyan-800",
+  "bg-pink-200 text-pink-800",
+  "bg-orange-200 text-orange-800",
+];
+
+function avatarColor(name: string): string {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+}
+
+function initials(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
 
 function visitRate(visited: number, planned: number): string {
   if (planned === 0) return "0%";
@@ -16,56 +39,69 @@ export function AgentCard({
   agent: AgentRow;
 }): ReactElement {
   const rate = visitRate(agent.totalStoresVisited, agent.totalStoresPlanned);
+  const isActive = agent.totalSessions > 0;
 
   return (
     <Card className="shadow-soft">
       <CardContent className="p-5">
         <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <p className="text-sm font-semibold">{agent.name}</p>
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              {agent.email}
-            </p>
+          <div className="flex items-center gap-3 min-w-0">
+            <div
+              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold ${avatarColor(agent.name)}`}
+            >
+              {initials(agent.name)}
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold">{agent.name}</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                {agent.email}
+              </p>
+            </div>
           </div>
-          <Badge
-            variant={
-              agent.completedSessions > 0 ? "success" : "pending"
-            }
-          >
-            {agent.completedSessions}/{agent.totalSessions}
+          <Badge variant={isActive ? "success" : "pending"}>
+            {isActive ? "Active" : "Inactive"}
           </Badge>
         </div>
 
         <div className="mt-4 grid grid-cols-3 gap-3">
           <div>
-            <p className="text-xs text-muted-foreground">Sessions</p>
+            <p className="flex items-center gap-1 text-xs text-muted-foreground">
+              <CalendarDays className="h-3 w-3" />
+              Sessions
+            </p>
             <p className="mt-0.5 text-lg font-semibold tabular-nums">
               {agent.totalSessions}
             </p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">Stores</p>
+            <p className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Store className="h-3 w-3" />
+              Stores
+            </p>
             <p className="mt-0.5 text-lg font-semibold tabular-nums">
               {agent.totalStoresVisited}
             </p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">Visit Rate</p>
+            <p className="flex items-center gap-1 text-xs text-muted-foreground">
+              <TrendingUp className="h-3 w-3" />
+              Visit Rate
+            </p>
             <p className="mt-0.5 text-lg font-semibold tabular-nums">
               {rate}
             </p>
           </div>
         </div>
 
-        <div className="mt-3 flex items-center gap-3 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1">
-            <Route className="h-3 w-3" />
-            {agent.completedSessions} completed
-          </span>
-          <span className="flex items-center gap-1">
-            <MapPin className="h-3 w-3" />
-            {agent.totalStoresPlanned} planned
-          </span>
+        {/* BO Rate — to be implemented */}
+        <div className="mt-3 flex items-center justify-between rounded-md bg-muted/50 px-3 py-2">
+          <p className="text-xs text-muted-foreground">BO Rate</p>
+          <div className="flex items-center gap-1.5">
+            <p className="text-sm font-semibold tabular-nums">0%</p>
+            <span className="text-[10px] text-muted-foreground italic">
+              (coming soon)
+            </span>
+          </div>
         </div>
       </CardContent>
     </Card>

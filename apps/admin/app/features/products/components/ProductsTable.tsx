@@ -1,20 +1,36 @@
 import type { ReactElement } from "react";
 import { useState } from "react";
-import { Pencil, Trash2, Package, ChevronsUpDown, ChevronUp, ChevronDown } from "lucide-react";
+import {
+  Pencil,
+  Trash2,
+  Package,
+  ChevronsUpDown,
+  ChevronUp,
+  ChevronDown,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ProductsTableProps } from "../types/product-types";
 import { formatCurrencyPHP } from "../helpers/getPhpCurrency";
-import { TotalRow } from "./TotalRow";
 
 export type ProductRow = { id: string; name: string; price: number };
 
 type SortKey = "name" | "price";
 type SortDir = "asc" | "desc" | null;
 
-function SortIcon({ column, sortKey, sortDir }: { column: SortKey; sortKey: SortKey | null; sortDir: SortDir }): ReactElement {
-  if (sortKey !== column) return <ChevronsUpDown className="ml-1 inline h-3.5 w-3.5 opacity-40" />;
-  if (sortDir === "asc") return <ChevronUp className="ml-1 inline h-3.5 w-3.5" />;
+function SortIcon({
+  column,
+  sortKey,
+  sortDir,
+}: {
+  column: SortKey;
+  sortKey: SortKey | null;
+  sortDir: SortDir;
+}): ReactElement {
+  if (sortKey !== column)
+    return <ChevronsUpDown className="ml-1 inline h-3.5 w-3.5 opacity-40" />;
+  if (sortDir === "asc")
+    return <ChevronUp className="ml-1 inline h-3.5 w-3.5" />;
   return <ChevronDown className="ml-1 inline h-3.5 w-3.5" />;
 }
 
@@ -83,7 +99,11 @@ export function ProductsTable({
                   onClick={() => handleSort("price")}
                 >
                   Price
-                  <SortIcon column="price" sortKey={sortKey} sortDir={sortDir} />
+                  <SortIcon
+                    column="price"
+                    sortKey={sortKey}
+                    sortDir={sortDir}
+                  />
                 </button>
               </th>
               <th className="px-3 py-3" />
@@ -92,7 +112,10 @@ export function ProductsTable({
           <tbody>
             {sorted.length ? (
               sorted.map((p) => (
-                <tr key={p.id} className="border-t hover:bg-muted/40 transition-colors">
+                <tr
+                  key={p.id}
+                  className="border-t hover:bg-muted/40 transition-colors"
+                >
                   <td className="px-3 py-2">{p.name}</td>
                   <td className="px-3 py-2 text-right tabular-nums">
                     {formatCurrencyPHP(p.price)}
@@ -100,13 +123,18 @@ export function ProductsTable({
                   <td className="px-3 py-2">
                     {confirmDeleteId === p.id ? (
                       <div className="flex items-center justify-end gap-2">
-                        <span className="text-xs text-muted-foreground">Delete?</span>
+                        <span className="text-xs text-muted-foreground">
+                          Delete?
+                        </span>
                         <Button
                           type="button"
-                          variant="destructive"
+                          variant="default"
                           size="sm"
                           className="h-6 rounded-lg px-2 text-xs"
-                          onClick={() => { onDelete(p.id); setConfirmDeleteId(null); }}
+                          onClick={() => {
+                            onDelete(p.id);
+                            setConfirmDeleteId(null);
+                          }}
                         >
                           Yes
                         </Button>
@@ -151,7 +179,9 @@ export function ProductsTable({
                   <div className="flex flex-col items-center gap-3 text-muted-foreground">
                     <Package className="h-10 w-10 opacity-30" />
                     <p className="text-sm">
-                      {search ? `No products match "${search}".` : "No products yet."}
+                      {search
+                        ? `No products match "${search}".`
+                        : "No products yet."}
                     </p>
                     {!search && onAddClick && (
                       <Button
@@ -169,9 +199,6 @@ export function ProductsTable({
               </tr>
             )}
           </tbody>
-          <tfoot>
-            <TotalRow total={total} />
-          </tfoot>
         </table>
       </div>
     </div>
