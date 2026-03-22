@@ -4,7 +4,11 @@
       "Bash(find:*)",
       "Bash(cd:*)",
       "Bash(ls:*)",
-      "Bash(pnpm run:*)"
+      "Bash(pnpm run:*)",
+      "Bash(git add:*)",
+      "Bash(grep:*)",
+      "Bash(wc:*)",
+      "WebSearch"
     ]
   }
 }

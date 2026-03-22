@@ -16,7 +16,9 @@ export async function getStores(): Promise<StoreRow[]> {
     supabase.from("session_stores").select("id, store_id, visited"),
     supabase
       .from("sales")
-      .select("session_store_id, quantity_sold, quantity_bo, total, products(product_name)"),
+      .select(
+        "session_store_id, quantity_sold, quantity_bo, total, products(product_name)",
+      ),
   ]);
 
   if (storeResult.error) throw new Error(storeResult.error.message);
@@ -29,10 +31,7 @@ export async function getStores(): Promise<StoreRow[]> {
   for (const ss of ssResult.data ?? []) {
     ssToStore.set(ss.id, ss.store_id);
     if (ss.visited) {
-      visitsByStore.set(
-        ss.store_id,
-        (visitsByStore.get(ss.store_id) ?? 0) + 1,
-      );
+      visitsByStore.set(ss.store_id, (visitsByStore.get(ss.store_id) ?? 0) + 1);
     }
   }
 
@@ -45,14 +44,18 @@ export async function getStores(): Promise<StoreRow[]> {
     const storeId = ssToStore.get(sale.session_store_id);
     if (!storeId) continue;
     const productName =
-      (sale.products as { product_name: string } | null)?.product_name ?? "Unknown";
+      (sale.products as unknown as { product_name: string } | null)
+        ?.product_name ?? "Unknown";
     const qty = sale.quantity_sold ?? 0;
     const existing = salesByStore.get(storeId);
     if (existing) {
       existing.sold += qty;
       existing.bo += sale.quantity_bo ?? 0;
       existing.revenue += Number(sale.total ?? 0);
-      existing.products.set(productName, (existing.products.get(productName) ?? 0) + qty);
+      existing.products.set(
+        productName,
+        (existing.products.get(productName) ?? 0) + qty,
+      );
     } else {
       salesByStore.set(storeId, {
         sold: qty,

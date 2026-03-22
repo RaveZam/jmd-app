@@ -18,7 +18,8 @@ const AVATAR_COLORS = [
 
 function avatarColor(name: string): string {
   let hash = 0;
-  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  for (let i = 0; i < name.length; i++)
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
   return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 }
 
@@ -33,11 +34,7 @@ function visitRate(visited: number, planned: number): string {
   return `${Math.round((visited / planned) * 100)}%`;
 }
 
-export function AgentCard({
-  agent,
-}: {
-  agent: AgentRow;
-}): ReactElement {
+export function AgentCard({ agent }: { agent: AgentRow }): ReactElement {
   const rate = visitRate(agent.totalStoresVisited, agent.totalStoresPlanned);
   const isActive = agent.totalSessions > 0;
 
@@ -87,9 +84,7 @@ export function AgentCard({
               <TrendingUp className="h-3 w-3" />
               Visit Rate
             </p>
-            <p className="mt-0.5 text-lg font-semibold tabular-nums">
-              {rate}
-            </p>
+            <p className="mt-0.5 text-lg font-semibold tabular-nums">{rate}</p>
           </div>
         </div>
 
