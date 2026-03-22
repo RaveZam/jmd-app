@@ -19,3 +19,13 @@ export type SessionStoreRow = {
   barangay: string | null;
   visited: boolean;
 };
+
+export type SessionStoreSaleRow = {
+  id: string;
+  productName: string;
+  snapshotPrice: number;
+  quantitySold: number;
+  quantityBO: number;
+  boReason: string | null;
+  total: number;
+};

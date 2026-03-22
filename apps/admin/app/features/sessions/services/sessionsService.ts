@@ -2,7 +2,7 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
-import type { SessionRow, SessionStoreRow } from "../types/session-types";
+import type { SessionRow, SessionStoreSaleRow, SessionStoreRow } from "../types/session-types";
 
 async function resolveAgentNames(
   uuids: string[],
@@ -76,5 +76,29 @@ export async function getSessionStores(
     city: ss.stores?.city ?? null,
     barangay: ss.stores?.barangay ?? null,
     visited: Boolean(ss.visited),
+  }));
+}
+
+export async function getStoreSales(
+  sessionStoreId: string,
+): Promise<SessionStoreSaleRow[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("sales")
+    .select(
+      "id, snapshot_price, quantity_sold, quantity_bo, bo_reason, total, products(product_name)",
+    )
+    .eq("session_store_id", sessionStoreId);
+
+  if (error || !data) return [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return data.map((s: any) => ({
+    id: s.id,
+    productName: s.products?.product_name ?? "Unknown",
+    snapshotPrice: s.snapshot_price,
+    quantitySold: s.quantity_sold,
+    quantityBO: s.quantity_bo,
+    boReason: s.bo_reason,
+    total: s.total,
   }));
 }

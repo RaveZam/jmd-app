@@ -1,29 +1,107 @@
+"use client";
+
+import { useState } from "react";
 import type { ReactElement } from "react";
-import { CheckCircle2, Circle } from "lucide-react";
+import { CheckCircle2, ChevronDown, ChevronRight, Circle, Loader2 } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import type { SessionRow, SessionStoreRow } from "../types/session-types";
-import { formatSessionDate, visitRate } from "../helpers/sessionHelpers";
+import type { SessionRow, SessionStoreSaleRow, SessionStoreRow } from "../types/session-types";
+import { formatSessionDate, groupStoresByProvince, visitRate } from "../helpers/sessionHelpers";
+import { getStoreSales } from "../services/sessionsService";
 import { formatAddress } from "@/app/features/stores/helpers/storeHelpers";
 
-function StoreItem({ store }: { store: SessionStoreRow }): ReactElement {
-  return (
-    <div className="flex items-center gap-3 rounded-xl border bg-background px-3 py-2.5">
-      {store.visited ? (
-        <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
-      ) : (
-        <Circle className="h-4 w-4 shrink-0 text-muted-foreground/40" />
-      )}
-      <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium">{store.storeName}</p>
-        <p className="text-xs text-muted-foreground">
-          {formatAddress(store.barangay, store.city, store.province)}
-        </p>
+function SalesTable({
+  sales,
+  loading,
+}: {
+  sales: SessionStoreSaleRow[];
+  loading: boolean;
+}): ReactElement {
+  if (loading) {
+    return (
+      <div className="flex items-center gap-2 px-2 py-3 text-xs text-muted-foreground">
+        <Loader2 className="h-3 w-3 animate-spin" />
+        Loading sales...
       </div>
-      <Badge variant={store.visited ? "success" : "pending"}>
-        {store.visited ? "Visited" : "Pending"}
-      </Badge>
+    );
+  }
+  if (sales.length === 0) {
+    return (
+      <p className="px-2 py-3 text-xs text-muted-foreground">
+        No sales recorded for this store.
+      </p>
+    );
+  }
+  return (
+    <table className="w-full text-xs">
+      <thead>
+        <tr className="text-muted-foreground">
+          <th className="pb-1 text-left font-medium">Product</th>
+          <th className="pb-1 text-right font-medium">Qty</th>
+          <th className="pb-1 text-right font-medium">B.O.</th>
+          <th className="pb-1 text-right font-medium">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {sales.map((s) => (
+          <tr key={s.id} className="border-t border-border/50">
+            <td className="py-1 pr-2">{s.productName}</td>
+            <td className="py-1 text-right">{s.quantitySold}</td>
+            <td className="py-1 text-right">{s.quantityBO}</td>
+            <td className="py-1 text-right">₱{s.total.toFixed(2)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
+function StoreItem({
+  store,
+  expanded,
+  sales,
+  salesLoading,
+  onClick,
+}: {
+  store: SessionStoreRow;
+  expanded: boolean;
+  sales: SessionStoreSaleRow[];
+  salesLoading: boolean;
+  onClick: () => void;
+}): ReactElement {
+  return (
+    <div className="rounded-xl border bg-background">
+      <button
+        type="button"
+        onClick={onClick}
+        className="flex w-full items-center gap-3 px-3 py-2.5 text-left"
+      >
+        {store.visited ? (
+          <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+        ) : (
+          <Circle className="h-4 w-4 shrink-0 text-muted-foreground/40" />
+        )}
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium">{store.storeName}</p>
+          <p className="text-xs text-muted-foreground">
+            {formatAddress(store.barangay, store.city, store.province)}
+          </p>
+        </div>
+        <Badge variant={store.visited ? "success" : "pending"}>
+          {store.visited ? "Visited" : "Pending"}
+        </Badge>
+        {expanded ? (
+          <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
+        ) : (
+          <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+        )}
+      </button>
+      {expanded && (
+        <div className="border-t border-border/50 px-3 py-2">
+          <SalesTable sales={sales} loading={salesLoading} />
+        </div>
+      )}
     </div>
   );
 }
@@ -37,7 +115,24 @@ export function SessionStoreList({
   stores: SessionStoreRow[];
   loading: boolean;
 }): ReactElement {
+  const [expandedStoreId, setExpandedStoreId] = useState<string | null>(null);
+  const [sales, setSales] = useState<SessionStoreSaleRow[]>([]);
+  const [salesLoading, setSalesLoading] = useState(false);
+
+  async function handleStoreClick(store: SessionStoreRow) {
+    if (expandedStoreId === store.id) {
+      setExpandedStoreId(null);
+      return;
+    }
+    setExpandedStoreId(store.id);
+    setSalesLoading(true);
+    const result = await getStoreSales(store.id);
+    setSales(result);
+    setSalesLoading(false);
+  }
+
   const rate = visitRate(session.visitedStores, session.totalStores);
+  const provinceGroups = groupStoresByProvince(stores);
 
   return (
     <Card className="shadow-soft">
@@ -49,7 +144,7 @@ export function SessionStoreList({
           <span className="font-medium text-foreground">{rate}</span> visit rate
         </p>
       </CardHeader>
-      <CardContent className="space-y-2">
+      <CardContent className="space-y-4">
         {loading ? (
           <p className="py-6 text-center text-sm text-muted-foreground">
             Loading stores...
@@ -59,7 +154,25 @@ export function SessionStoreList({
             No stores in this session.
           </p>
         ) : (
-          stores.map((store) => <StoreItem key={store.id} store={store} />)
+          provinceGroups.map((group) => (
+            <div key={group.key}>
+              <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                {group.displayName}
+              </p>
+              <div className="space-y-2">
+                {group.stores.map((store) => (
+                  <StoreItem
+                    key={store.id}
+                    store={store}
+                    expanded={expandedStoreId === store.id}
+                    sales={expandedStoreId === store.id ? sales : []}
+                    salesLoading={expandedStoreId === store.id && salesLoading}
+                    onClick={() => handleStoreClick(store)}
+                  />
+                ))}
+              </div>
+            </div>
+          ))
         )}
       </CardContent>
     </Card>
