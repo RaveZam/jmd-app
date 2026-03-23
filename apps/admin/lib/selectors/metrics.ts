@@ -18,6 +18,7 @@ export type DashboardKpis = {
   varianceQty: number;
   varianceValue: number;
   boRate: number; // 0..1
+  avgSalesPerStore: number;
 };
 
 export type VarianceAlert = {
@@ -89,6 +90,8 @@ export function selectDashboardKpis(records: LedgerRecord[], filters: AdminFilte
 
   const denom = totalSoldQty + totalBOQty;
   const boRate = denom <= 0 ? 0 : totalBOQty / denom;
+  const storeCount = new Set(filtered.map((r) => r.store)).size;
+  const avgSalesPerStore = storeCount <= 0 ? 0 : totalSales / storeCount;
 
   return {
     totalSales,
@@ -99,6 +102,7 @@ export function selectDashboardKpis(records: LedgerRecord[], filters: AdminFilte
     varianceQty,
     varianceValue,
     boRate,
+    avgSalesPerStore,
   };
 }
 
