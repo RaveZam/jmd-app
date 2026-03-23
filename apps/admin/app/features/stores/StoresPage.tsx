@@ -1,22 +1,11 @@
-"use client";
-
 import type { ReactElement } from "react";
-import { useEffect, useState } from "react";
 import { Store } from "lucide-react";
 
-import type { StoreRow } from "./types/store-types";
 import { getStores } from "./services/storesService";
 import { StoresTable } from "./components/StoresTable";
 
-export function StoresPage(): ReactElement {
-  const [stores, setStores] = useState<StoreRow[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    getStores()
-      .then(setStores)
-      .finally(() => setLoading(false));
-  }, []);
+export async function StoresPage(): Promise<ReactElement> {
+  const stores = await getStores();
 
   return (
     <>
@@ -33,11 +22,7 @@ export function StoresPage(): ReactElement {
 
       <div className="flex-1 overflow-y-auto px-6 py-6">
         <div className="mx-auto w-full max-w-[1200px] space-y-4">
-          {loading ? (
-            <p className="py-10 text-center text-sm text-muted-foreground">
-              Loading stores...
-            </p>
-          ) : stores.length === 0 ? (
+          {stores.length === 0 ? (
             <div className="flex flex-col items-center gap-2 py-10 text-muted-foreground">
               <Store className="h-10 w-10 opacity-50" />
               <p className="text-sm">No stores found.</p>
