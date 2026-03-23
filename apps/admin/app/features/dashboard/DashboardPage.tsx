@@ -13,6 +13,7 @@ import {
 } from "@/lib/selectors/metrics";
 import { DateRangeFilter } from "./components/DateRangeFilter";
 import { ProjectAnalyticsChart } from "./components/ProjectAnalyticsChart";
+import { SalesLineChart } from "./components/phase1/SalesLineChart";
 import { TodayAtGlance } from "./components/TodayAtGlance";
 
 function formatCurrencyPHP(value: number): string {
@@ -90,7 +91,7 @@ export async function DashboardPage({
           />
 
           <div className="grid gap-6 xl:grid-cols-[7fr_3fr]">
-            <ProjectAnalyticsChart />
+            <SalesLineChart />
             <TopProductsSoldTable products={topSold} />
           </div>
           <div className="grid gap-6 xl:grid-cols-2">
