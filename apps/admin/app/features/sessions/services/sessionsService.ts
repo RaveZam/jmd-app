@@ -2,7 +2,11 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
-import type { SessionRow, SessionStoreSaleRow, SessionStoreRow } from "../types/session-types";
+import type {
+  SessionRow,
+  SessionStoreSaleRow,
+  SessionStoreRow,
+} from "../types/session-types";
 
 async function resolveAgentNames(
   uuids: string[],
@@ -31,7 +35,9 @@ export async function getSessions(): Promise<SessionRow[]> {
 
   const { data, error } = await supabase
     .from("route_sessions")
-    .select("id, route_name, session_date, conducted_by, status, created_at")
+    .select(
+      "id, route_name, session_date, conducted_by, status, created_at, session_stores(visited)",
+    )
     .order("created_at", { ascending: false });
 
   if (error) throw new Error(error.message);
@@ -40,17 +46,21 @@ export async function getSessions(): Promise<SessionRow[]> {
   const uuids = [...new Set(sessions.map((s) => s.conducted_by))];
   const agentNames = await resolveAgentNames(uuids);
 
-  return sessions.map((s) => ({
-    id: s.id,
-    routeName: s.route_name,
-    sessionDate: s.session_date,
-    conductedBy: s.conducted_by,
-    conductedByName: agentNames[s.conducted_by] ?? s.conducted_by,
-    status: s.status as "ongoing" | "completed",
-    createdAt: s.created_at,
-    totalStores: 0,
-    visitedStores: 0,
-  }));
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return sessions.map((s: any) => {
+    const storeRows: { visited: boolean }[] = s.session_stores ?? [];
+    return {
+      id: s.id,
+      routeName: s.route_name,
+      sessionDate: s.session_date,
+      conductedBy: s.conducted_by,
+      conductedByName: agentNames[s.conducted_by] ?? s.conducted_by,
+      status: s.status as "ongoing" | "completed",
+      createdAt: s.created_at,
+      totalStores: storeRows.length,
+      visitedStores: storeRows.filter((r) => r.visited).length,
+    };
+  });
 }
 
 export async function getSessionStores(
@@ -67,7 +77,6 @@ export async function getSessionStores(
 
   if (error) throw new Error(error.message);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (data ?? []).map((ss: any) => ({
     id: ss.id,
     storeId: ss.store_id,
@@ -91,7 +100,7 @@ export async function getStoreSales(
     .eq("session_store_id", sessionStoreId);
 
   if (error || !data) return [];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   return data.map((s: any) => ({
     id: s.id,
     productName: s.products?.product_name ?? "Unknown",

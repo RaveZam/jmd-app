@@ -2,12 +2,26 @@
 
 import { useState } from "react";
 import type { ReactElement } from "react";
-import { CheckCircle2, ChevronDown, ChevronRight, Circle, Loader2 } from "lucide-react";
+import {
+  CheckCircle2,
+  ChevronDown,
+  ChevronRight,
+  Circle,
+  Loader2,
+} from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import type { SessionRow, SessionStoreSaleRow, SessionStoreRow } from "../types/session-types";
-import { formatSessionDate, groupStoresByProvince, visitRate } from "../helpers/sessionHelpers";
+import type {
+  SessionRow,
+  SessionStoreSaleRow,
+  SessionStoreRow,
+} from "../types/session-types";
+import {
+  formatSessionDate,
+  groupStoresByProvince,
+  visitRate,
+} from "../helpers/sessionHelpers";
 import { getStoreSales } from "../services/sessionsService";
 import { formatAddress } from "@/app/features/stores/helpers/storeHelpers";
 
@@ -53,6 +67,20 @@ function SalesTable({
           </tr>
         ))}
       </tbody>
+      <tfoot>
+        <tr>
+          <td className="py-1 text-right font-medium">Total</td>
+          <td className="py-1 text-right font-medium">
+            {sales.reduce((sum, s) => sum + s.quantitySold, 0)}
+          </td>
+          <td className="py-1 text-right font-medium">
+            {sales.reduce((sum, s) => sum + s.quantityBO, 0)}
+          </td>
+          <td className="py-1 text-right font-medium">
+            ₱{sales.reduce((sum, s) => sum + s.total, 0).toFixed(2)}
+          </td>
+        </tr>
+      </tfoot>
     </table>
   );
 }
@@ -131,7 +159,7 @@ export function SessionStoreList({
     setSalesLoading(false);
   }
 
-  const rate = visitRate(session.visitedStores, session.totalStores);
+  const rate = visitRate(stores.filter((s) => s.visited).length, stores.length);
   const provinceGroups = groupStoresByProvince(stores);
 
   return (

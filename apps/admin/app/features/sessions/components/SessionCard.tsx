@@ -22,7 +22,8 @@ export function SessionCard({
     <Card
       className={cn(
         "cursor-pointer transition-colors hover:border-emerald-300 dark:hover:border-emerald-800",
-        isSelected && "border-emerald-500 bg-emerald-50/40 dark:border-emerald-700 dark:bg-emerald-950/30",
+        isSelected &&
+          "border-emerald-500 bg-emerald-50/40 dark:border-emerald-700 dark:bg-emerald-950/30",
       )}
     >
       <CardContent className="p-4" onClick={onClick}>

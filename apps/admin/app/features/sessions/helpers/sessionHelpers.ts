@@ -23,7 +23,10 @@ export function normalizeProvince(province: string | null): string {
 export function groupStoresByProvince(
   stores: SessionStoreRow[],
 ): { key: string; displayName: string; stores: SessionStoreRow[] }[] {
-  const map = new Map<string, { displayName: string; stores: SessionStoreRow[] }>();
+  const map = new Map<
+    string,
+    { displayName: string; stores: SessionStoreRow[] }
+  >();
   for (const store of stores) {
     const key = normalizeProvince(store.province);
     const safeKey = key || "__unknown__";
