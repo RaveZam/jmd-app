@@ -1,11 +1,7 @@
 "use client";
 
 import { useState, type ReactElement } from "react";
-import {
-  ChevronsUpDown,
-  ChevronUp,
-  ChevronDown,
-} from "lucide-react";
+import { ChevronsUpDown, ChevronUp, ChevronDown } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { formatCurrencyPHP } from "@/lib/utils";
@@ -72,11 +68,7 @@ function StoreTableRow({
   );
 }
 
-function StoreTotalsRow({
-  stores,
-}: {
-  stores: StoreRow[];
-}): ReactElement {
+function StoreTotalsRow({ stores }: { stores: StoreRow[] }): ReactElement {
   const totalSales = stores.reduce((sum, s) => sum + s.totalSales, 0);
   const totalBO = stores.reduce((sum, s) => sum + s.totalBO, 0);
   const totalRevenue = stores.reduce((sum, s) => sum + s.totalRevenue, 0);
@@ -106,11 +98,7 @@ function StoreTotalsRow({
   );
 }
 
-export function StoresTable({
-  stores,
-}: {
-  stores: StoreRow[];
-}): ReactElement {
+export function StoresTable({ stores }: { stores: StoreRow[] }): ReactElement {
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>(null);
   const [selectedStore, setSelectedStore] = useState<StoreRow | null>(null);
@@ -149,7 +137,11 @@ export function StoresTable({
                   onClick={() => handleSort("totalSales")}
                 >
                   Sold
-                  <SortIcon column="totalSales" sortKey={sortKey} sortDir={sortDir} />
+                  <SortIcon
+                    column="totalSales"
+                    sortKey={sortKey}
+                    sortDir={sortDir}
+                  />
                 </button>
               </th>
               <th className="px-3 py-3 text-right font-medium">
@@ -159,7 +151,11 @@ export function StoresTable({
                   onClick={() => handleSort("totalBO")}
                 >
                   BO
-                  <SortIcon column="totalBO" sortKey={sortKey} sortDir={sortDir} />
+                  <SortIcon
+                    column="totalBO"
+                    sortKey={sortKey}
+                    sortDir={sortDir}
+                  />
                 </button>
               </th>
               <th className="px-3 py-3 text-right font-medium">
@@ -169,7 +165,11 @@ export function StoresTable({
                   onClick={() => handleSort("totalRevenue")}
                 >
                   Revenue
-                  <SortIcon column="totalRevenue" sortKey={sortKey} sortDir={sortDir} />
+                  <SortIcon
+                    column="totalRevenue"
+                    sortKey={sortKey}
+                    sortDir={sortDir}
+                  />
                 </button>
               </th>
               <th className="px-3 py-3 text-center font-medium">
@@ -179,7 +179,11 @@ export function StoresTable({
                   onClick={() => handleSort("visitCount")}
                 >
                   Visits
-                  <SortIcon column="visitCount" sortKey={sortKey} sortDir={sortDir} />
+                  <SortIcon
+                    column="visitCount"
+                    sortKey={sortKey}
+                    sortDir={sortDir}
+                  />
                 </button>
               </th>
             </tr>

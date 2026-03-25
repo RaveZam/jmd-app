@@ -51,7 +51,6 @@ export function StoreDetailModal({
       <ModalOverlay onClose={onClose} />
       <div className="relative z-10 w-full max-w-2xl">
         <div className="pointer-events-auto w-full rounded-2xl border bg-background shadow-xl">
-          {/* Header */}
           <div className="flex items-start justify-between border-b px-5 py-4">
             <div>
               <h2 className="text-base font-semibold">{store.storeName}</h2>
@@ -66,10 +65,8 @@ export function StoreDetailModal({
               <X className="h-4 w-4" />
             </button>
           </div>
-
-          {/* Body — two columns */}
+          c
           <div className="flex divide-x">
-            {/* Left: store info */}
             <div className="flex-1 space-y-4 px-5 py-4">
               <section>
                 <h3 className="mb-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
@@ -78,24 +75,32 @@ export function StoreDetailModal({
                 <div className="space-y-1 text-sm">
                   {store.province && (
                     <div className="flex gap-2">
-                      <span className="w-20 shrink-0 text-muted-foreground">Province</span>
+                      <span className="w-20 shrink-0 text-muted-foreground">
+                        Province
+                      </span>
                       <span>{store.province}</span>
                     </div>
                   )}
                   {store.city && (
                     <div className="flex gap-2">
-                      <span className="w-20 shrink-0 text-muted-foreground">City</span>
+                      <span className="w-20 shrink-0 text-muted-foreground">
+                        City
+                      </span>
                       <span>{store.city}</span>
                     </div>
                   )}
                   {store.barangay && (
                     <div className="flex gap-2">
-                      <span className="w-20 shrink-0 text-muted-foreground">Barangay</span>
+                      <span className="w-20 shrink-0 text-muted-foreground">
+                        Barangay
+                      </span>
                       <span>{store.barangay}</span>
                     </div>
                   )}
                   {!store.province && !store.city && !store.barangay && (
-                    <span className="text-muted-foreground">No address on file</span>
+                    <span className="text-muted-foreground">
+                      No address on file
+                    </span>
                   )}
                 </div>
               </section>
@@ -106,11 +111,15 @@ export function StoreDetailModal({
                 </h3>
                 <div className="space-y-1 text-sm">
                   <div className="flex gap-2">
-                    <span className="w-20 shrink-0 text-muted-foreground">Owner</span>
+                    <span className="w-20 shrink-0 text-muted-foreground">
+                      Owner
+                    </span>
                     <span>{store.contactName ?? "—"}</span>
                   </div>
                   <div className="flex gap-2">
-                    <span className="w-20 shrink-0 text-muted-foreground">Phone</span>
+                    <span className="w-20 shrink-0 text-muted-foreground">
+                      Phone
+                    </span>
                     <span>{store.contactNumber ?? "—"}</span>
                   </div>
                 </div>
@@ -121,7 +130,10 @@ export function StoreDetailModal({
                   Performance
                 </h3>
                 <div className="grid grid-cols-2 gap-2">
-                  <StatCard label="Revenue" value={formatCurrencyPHP(store.totalRevenue)} />
+                  <StatCard
+                    label="Revenue"
+                    value={formatCurrencyPHP(store.totalRevenue)}
+                  />
                   <StatCard label="Sold" value={store.totalSales} />
                   <StatCard label="Back Orders" value={store.totalBO} />
                   <StatCard label="Visits" value={store.visitCount} />
@@ -139,7 +151,9 @@ export function StoreDetailModal({
               </div>
 
               {store.topItems.length === 0 ? (
-                <p className="text-xs text-muted-foreground">No sales recorded.</p>
+                <p className="text-xs text-muted-foreground">
+                  No sales recorded.
+                </p>
               ) : (
                 <ol className="space-y-2.5">
                   {store.topItems.map((item, i) => (

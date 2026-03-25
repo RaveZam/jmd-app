@@ -24,6 +24,7 @@ export async function fetchRecords(): Promise<{
   saleSessionMap: Map<string, string>; // saleId → routeSessionId
 }> {
   const supabase = await createClient();
+
   const supabaseAdmin = createSupabaseClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
