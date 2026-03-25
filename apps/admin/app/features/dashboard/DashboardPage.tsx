@@ -1,14 +1,12 @@
 import type { ReactElement } from "react";
-import { HighBOAgentsList } from "@/app/features/dashboard/components/phase1/HighBOAgentsList";
+import { TopAgentsChart } from "@/app/features/dashboard/components/phase1/TopAgentsChart";
 import { KpiStrip } from "@/app/features/dashboard/components/phase1/KpiStrip";
-import { TopProductsBOTable } from "@/app/features/dashboard/components/phase1/TopProductsBOTable";
+import { ProductSoldVsBoChart } from "@/app/features/dashboard/components/phase1/ProductSoldVsBoChart";
 import { TopProductsSoldTable } from "@/app/features/dashboard/components/phase1/TopProductsSoldTable";
 import { mockRecords } from "@/lib/mock/records";
 import { parseAdminFilters } from "@/lib/selectors/filters";
 import {
   selectDashboardKpis,
-  selectHighBOAgents,
-  selectTopProductsBO,
   selectTopProductsSold,
 } from "@/lib/selectors/metrics";
 import { DateRangeFilter } from "./components/DateRangeFilter";
@@ -37,9 +35,8 @@ export async function DashboardPage({
   const filters = parseAdminFilters(sp);
 
   const kpis = selectDashboardKpis(mockRecords, filters);
-  const highBOAgents = selectHighBOAgents(mockRecords, filters);
   const topSold = selectTopProductsSold(mockRecords, filters, 5);
-  const topBO = selectTopProductsBO(mockRecords, filters, 5);
+
 
   return (
     <>
@@ -95,8 +92,8 @@ export async function DashboardPage({
             <TopProductsSoldTable products={topSold} />
           </div>
           <div className="grid gap-6 xl:grid-cols-2">
-            <TopProductsBOTable products={topBO} />
-            <HighBOAgentsList agents={highBOAgents} />
+            <ProductSoldVsBoChart />
+            <TopAgentsChart />
           </div>
         </div>
       </div>
