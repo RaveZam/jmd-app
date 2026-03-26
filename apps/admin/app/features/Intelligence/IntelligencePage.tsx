@@ -5,9 +5,8 @@ import { KpiCard } from "@/app/features/dashboard/components/phase1/KpiCard";
 import { IntelligenceActionCard } from "@/app/features/Intelligence/components/IntelligenceActionCard";
 import { IntelligenceForecastChart } from "@/app/features/Intelligence/components/IntelligenceForecastChart";
 import { IntelligenceRangeDropdown } from "@/app/features/Intelligence/components/IntelligenceRangeDropdown";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { IntelligenceRiskChart } from "@/app/features/Intelligence/components/IntelligenceRiskChart";
+import { IntelligenceAgentForecast } from "@/app/features/Intelligence/components/IntelligenceAgentForecast";
+import { IntelligenceProductForecast } from "@/app/features/Intelligence/components/IntelligenceProductForecast";
 import {
   formatCurrencyPHP,
   formatPercent,
@@ -25,11 +24,8 @@ export async function IntelligencePage({
     rangeDays,
     snapshot,
     actions,
-    p0Count,
     revenueTrendPct,
     boRisk,
-    varianceRisk,
-    chartData,
   } = await buildIntelligenceContext(searchParams, mockRecords);
 
   return (
@@ -39,10 +35,10 @@ export async function IntelligencePage({
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-3xl font-semibold tracking-tight">
-                Route Intelligence
+                Intelligence
               </h1>
               <p className="mt-1 text-sm text-muted-foreground">
-                Actionable insights based on your sales + BO + variance
+                Health overview, predicted revenue, next best actions, and agent risk signals
               </p>
             </div>
             <IntelligenceRangeDropdown
@@ -75,20 +71,21 @@ export async function IntelligencePage({
                 tone={revenueTrendPct >= 0 ? "primary" : "neutral"}
               />
               <KpiCard
+                title="Predicted sales tomorrow"
+                primary="₱24,810"
+                secondary="+3.2% vs today"
+                tone="primary"
+              />
+              <KpiCard
+                title="Avg sales next 7 days"
+                primary="₱23,450"
+                secondary="7-day projected average"
+                tone="primary"
+              />
+              <KpiCard
                 title="BO risk level"
                 primary={boRisk}
                 secondary={`BO rate ${formatPercent(snapshot.totals.boRate)}`}
-              />
-              <KpiCard
-                title="Variance risk level"
-                primary={varianceRisk}
-                secondary={`${snapshot.totals.varianceQty} pcs today`}
-              />
-              <KpiCard
-                title="Attention required"
-                primary={String(p0Count)}
-                secondary={p0Count === 1 ? "P0 action" : "P0 actions"}
-                tone={p0Count > 0 ? "primary" : "neutral"}
               />
             </div>
           </section>
@@ -118,68 +115,15 @@ export async function IntelligencePage({
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-semibold">Risk & anomalies</h2>
-            <div className="grid gap-6 xl:grid-cols-2">
-              <Card className="shadow-soft">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base">Agents at risk</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {snapshot.agents.length ? (
-                    snapshot.agents
-                      .filter((a: any) => a.varianceQty > 0 || a.boRate > 0.1)
-                      .sort(
-                        (a: any, b: any) =>
-                          Math.abs(b.varianceQty) - Math.abs(a.varianceQty) ||
-                          b.boRate - a.boRate,
-                      )
-                      .map((a: any) => {
-                        const risk =
-                          a.varianceQty > 10 || a.boRate > 0.2
-                            ? "High"
-                            : a.varianceQty > 0 || a.boRate > 0.1
-                              ? "Med"
-                              : "Low";
-                        return (
-                          <div
-                            key={a.id}
-                            className="flex items-center justify-between gap-3 rounded-xl border bg-background px-3 py-2"
-                          >
-                            <div className="min-w-0">
-                              <p className="truncate text-sm font-medium">
-                                {a.name}
-                              </p>
-                              <p className="mt-0.5 text-xs text-muted-foreground">
-                                Variance {a.varianceQty} · BO{" "}
-                                {formatPercent(a.boRate)} ·{" "}
-                                {formatCurrencyPHP(a.revenue)}
-                              </p>
-                            </div>
-                            <Badge
-                              variant={
-                                risk === "High"
-                                  ? "warning"
-                                  : risk === "Med"
-                                    ? "secondary"
-                                    : "pending"
-                              }
-                            >
-                              {risk}
-                            </Badge>
-                          </div>
-                        );
-                      })
-                  ) : (
-                    <p className="text-sm text-muted-foreground">
-                      No agent risk data for this period.
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-
-              <IntelligenceRiskChart data={chartData} />
-            </div>
+            <h2 className="mb-3 text-lg font-semibold">Agent performance forecast</h2>
+            <IntelligenceAgentForecast />
           </section>
+
+          <section>
+            <h2 className="mb-3 text-lg font-semibold">Product performance forecast</h2>
+            <IntelligenceProductForecast />
+          </section>
+
         </div>
       </div>
     </>
