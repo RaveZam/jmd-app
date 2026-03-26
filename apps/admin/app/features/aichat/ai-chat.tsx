@@ -1,12 +1,75 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { MessageCircle, X, Send, Bot } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
+const FAB_SIZE = 52;
+const EDGE_MARGIN = 24;
+
+type Pos = { x: number; y: number };
+
 export default function AiChat() {
   const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState<Pos | null>(null);
+  const [snapping, setSnapping] = useState(false);
+  const dragRef = useRef<{
+    startMx: number;
+    startMy: number;
+    startBx: number;
+    startBy: number;
+    moved: boolean;
+  } | null>(null);
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    const rect = e.currentTarget.getBoundingClientRect();
+    dragRef.current = {
+      startMx: e.clientX,
+      startMy: e.clientY,
+      startBx: rect.left,
+      startBy: rect.top,
+      moved: false,
+    };
+    setSnapping(false);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLButtonElement>) => {
+    if (!dragRef.current) return;
+    const dx = e.clientX - dragRef.current.startMx;
+    const dy = e.clientY - dragRef.current.startMy;
+    if (!dragRef.current.moved && Math.sqrt(dx * dx + dy * dy) > 6) {
+      dragRef.current.moved = true;
+    }
+    if (dragRef.current.moved) {
+      setPos({ x: dragRef.current.startBx + dx, y: dragRef.current.startBy + dy });
+    }
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLButtonElement>) => {
+    if (!dragRef.current) return;
+    const { moved } = dragRef.current;
+    dragRef.current = null;
+
+    if (!moved) {
+      setOpen(true);
+      return;
+    }
+
+    setSnapping(true);
+    setPos((prev) => {
+      if (!prev) return prev;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const snapX =
+        prev.x + FAB_SIZE / 2 > vw / 2
+          ? vw - FAB_SIZE - EDGE_MARGIN
+          : EDGE_MARGIN;
+      const clampedY = Math.max(EDGE_MARGIN, Math.min(vh - FAB_SIZE - EDGE_MARGIN, prev.y));
+      return { x: snapX, y: clampedY };
+    });
+  };
 
   return (
     <>
@@ -69,11 +132,28 @@ export default function AiChat() {
 
       {/* FAB */}
       <button
-        onClick={() => setOpen(true)}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
         className={cn(
-          "fixed bottom-6 right-6 z-50 flex h-13 w-13 items-center justify-center rounded-full bg-emerald-700 text-white shadow-lg hover:bg-emerald-800 transition-all duration-200",
+          "fixed z-50 flex h-13 w-13 items-center justify-center rounded-full bg-emerald-700 text-white shadow-lg hover:bg-emerald-800",
+          !pos && "bottom-6 right-6",
           open && "opacity-0 pointer-events-none scale-90",
         )}
+        style={
+          pos
+            ? {
+                left: pos.x,
+                top: pos.y,
+                bottom: "auto",
+                right: "auto",
+                transition: snapping
+                  ? "left 0.35s cubic-bezier(0.34,1.56,0.64,1), top 0.35s cubic-bezier(0.34,1.56,0.64,1)"
+                  : "none",
+                cursor: dragRef.current?.moved ? "grabbing" : "grab",
+              }
+            : undefined
+        }
         aria-label="Open AI chat"
       >
         <MessageCircle className="h-5 w-5" />
