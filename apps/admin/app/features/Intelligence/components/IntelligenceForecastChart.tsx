@@ -14,31 +14,29 @@ import {
   Legend,
   ReferenceArea,
 } from "recharts";
-import type { DashboardSnapshot } from "@/lib/intelligence/types";
-import { buildForecast } from "@/lib/intelligence/forecast";
 
 function formatCurrencyPHP(value: number): string {
   return `₱${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
 }
 
-type ChartDatum = { date: string; actual?: number; forecast?: number; label: string };
+const DATA = [
+  { label: "Mar 19", actual: 42000 },
+  { label: "Mar 20", actual: 38500 },
+  { label: "Mar 21", actual: 51000 },
+  { label: "Mar 22", actual: 47000 },
+  { label: "Mar 23", actual: 55000 },
+  { label: "Mar 24", actual: 49500 },
+  { label: "Mar 25", actual: 53000 },
+  { label: "Mar 26", forecast: 51000 },
+  { label: "Mar 27", forecast: 54000 },
+  { label: "Mar 28", forecast: 50000 },
+  { label: "Mar 29", forecast: 56000 },
+  { label: "Mar 30", forecast: 52000 },
+  { label: "Mar 31", forecast: 58000 },
+  { label: "Apr 1", forecast: 55000 },
+];
 
-export function IntelligenceForecastChart({ snapshot }: { snapshot: DashboardSnapshot }): ReactElement {
-  const forecast = buildForecast(snapshot, 7, 7);
-  const actualData = snapshot.history.map((h) => ({
-    date: h.date,
-    actual: h.revenue,
-    forecast: undefined,
-    label: h.date,
-  }));
-  const forecastData: ChartDatum[] = forecast.map((f) => ({
-    date: f.date,
-    actual: undefined,
-    forecast: f.revenue,
-    label: f.date,
-  }));
-  const combined = [...actualData, ...forecastData];
-
+export function IntelligenceForecastChart(): ReactElement {
   return (
     <Card className="shadow-soft">
       <CardHeader className="pb-3">
@@ -47,25 +45,34 @@ export function IntelligenceForecastChart({ snapshot }: { snapshot: DashboardSna
       <CardContent>
         <div className="h-[280px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={combined} margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
+            <ComposedChart
+              data={DATA}
+              margin={{ top: 8, right: 8, left: 8, bottom: 8 }}
+            >
               <defs>
                 <linearGradient id="actualGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#10b981" stopOpacity={0.35} />
                   <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.35)" vertical={true} horizontal={true} />
-              {forecastData.length > 0 && (
-                <ReferenceArea
-                  x1={forecastData[0].label}
-                  x2={forecastData[forecastData.length - 1].label}
-                  fill="rgb(148,163,184)"
-                  fillOpacity={0.12}
-                  strokeOpacity={0}
-                />
-              )}
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="rgba(148,163,184,0.35)"
+                vertical={true}
+                horizontal={true}
+              />
+              <ReferenceArea
+                x1="Mar 26"
+                x2="Apr 1"
+                fill="rgb(148,163,184)"
+                fillOpacity={0.12}
+                strokeOpacity={0}
+              />
               <XAxis dataKey="label" tick={{ fontSize: 11 }} />
-              <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `₱${(v / 1000).toFixed(0)}k`} />
+              <YAxis
+                tick={{ fontSize: 11 }}
+                tickFormatter={(v) => `₱${(v / 1000).toFixed(0)}k`}
+              />
               <Tooltip
                 formatter={(value: number) => [formatCurrencyPHP(value), ""]}
                 labelFormatter={(label) => label}

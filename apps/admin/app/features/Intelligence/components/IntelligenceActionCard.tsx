@@ -1,26 +1,25 @@
 import type { ReactElement } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import type { InsightAction } from "@/lib/intelligence/types";
 
-
-const priorityVariant = {
-  P0: "warning" as const,
-  P1: "secondary" as const,
-  P2: "pending" as const,
-  P3: "warning" as const,
+const priorityVariant: Record<string, "warning" | "secondary" | "pending"> = {
+  P0: "warning",
+  P1: "secondary",
+  P2: "pending",
+  P3: "warning",
 };
-const confidenceVariant = {
-  High: "success" as const,
-  Med: "default" as const,
-  Low: "pending" as const,
-  Critical: "warning" as const,
+
+const confidenceVariant: Record<string, "success" | "default" | "pending" | "warning"> = {
+  High: "success",
+  Med: "default",
+  Low: "pending",
+  Critical: "warning",
 };
 
 export function IntelligenceActionCard({
   action,
 }: {
-  action: InsightAction;
+  action: any;
 }): ReactElement {
   return (
     <Card className="shadow-soft">
@@ -33,10 +32,10 @@ export function IntelligenceActionCard({
           Next step: {action.action}
         </p>
         <div className="flex flex-wrap items-center gap-2 pt-4">
-          <Badge variant={priorityVariant[action.priority]}>
+          <Badge variant={priorityVariant[action.priority] ?? "secondary"}>
             {action.priority}
           </Badge>
-          <Badge variant={confidenceVariant[action.confidence]}>
+          <Badge variant={confidenceVariant[action.confidence] ?? "default"}>
             {action.confidence}
           </Badge>
         </div>

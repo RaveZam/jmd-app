@@ -1,33 +1,13 @@
 import type { ReactElement } from "react";
-import { mockRecords } from "@/lib/mock/records";
-import { buildIntelligenceContext } from "../../../lib/intelligence/compute";
+
 import { KpiCard } from "@/app/features/dashboard/components/phase1/KpiCard";
 import { IntelligenceActionCard } from "@/app/features/Intelligence/components/IntelligenceActionCard";
 import { IntelligenceForecastChart } from "@/app/features/Intelligence/components/IntelligenceForecastChart";
 import { IntelligenceRangeDropdown } from "@/app/features/Intelligence/components/IntelligenceRangeDropdown";
 import { IntelligenceAgentForecast } from "@/app/features/Intelligence/components/IntelligenceAgentForecast";
 import { IntelligenceProductForecast } from "@/app/features/Intelligence/components/IntelligenceProductForecast";
-import {
-  formatCurrencyPHP,
-  formatPercent,
-} from "@/app/features/Intelligence/helpers";
 
-export async function IntelligencePage({
-  searchParams,
-}: {
-  searchParams:
-    | Promise<Record<string, string | string[] | undefined>>
-    | Record<string, string | string[] | undefined>;
-}): Promise<ReactElement> {
-  const {
-    filters,
-    rangeDays,
-    snapshot,
-    actions,
-    revenueTrendPct,
-    boRisk,
-  } = await buildIntelligenceContext(searchParams, mockRecords);
-
+export async function IntelligencePage() {
   return (
     <>
       <header className="sticky top-0 z-20 border-b bg-slate-50/80 px-6 py-5 backdrop-blur dark:bg-background/80">
@@ -38,12 +18,13 @@ export async function IntelligencePage({
                 Intelligence
               </h1>
               <p className="mt-1 text-sm text-muted-foreground">
-                Health overview, predicted revenue, next best actions, and agent risk signals
+                Health overview, predicted revenue, next best actions, and agent
+                risk signals
               </p>
             </div>
             <IntelligenceRangeDropdown
-              currentRange={rangeDays === 30 ? 30 : 7}
-              currentDate={filters.date}
+              currentRange={7}
+              currentDate="2026-03-26"
             />
           </div>
         </div>
@@ -58,60 +39,70 @@ export async function IntelligencePage({
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
               <KpiCard
                 title="Revenue trend vs previous day"
-                primary={
-                  revenueTrendPct >= 0
-                    ? `+${revenueTrendPct.toFixed(1)}%`
-                    : `${revenueTrendPct.toFixed(1)}%`
-                }
-                secondary={
-                  snapshot.totals.revenue > 0
-                    ? `Today ${formatCurrencyPHP(snapshot.totals.revenue)}`
-                    : undefined
-                }
-                tone={revenueTrendPct >= 0 ? "primary" : "neutral"}
+                primary="+4.2%"
+                secondary="Today ₱48,200"
+                tone="primary"
               />
               <KpiCard
                 title="Predicted sales tomorrow"
-                primary="₱24,810"
-                secondary="+3.2% vs today"
+                primary="₱50,250"
+                secondary="+4.3% vs today"
                 tone="primary"
               />
               <KpiCard
                 title="Avg sales next 7 days"
-                primary="₱23,450"
+                primary="₱49,100"
                 secondary="7-day projected average"
                 tone="primary"
               />
               <KpiCard
                 title="BO risk level"
-                primary={boRisk}
-                secondary={`BO rate ${formatPercent(snapshot.totals.boRate)}`}
+                primary="Low"
+                secondary="BO rate 8.0%"
               />
-            </div>
-          </section>
-          <section>
-            <h2 className="mb-3 text-lg font-semibold">Next best actions</h2>
-            <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-3">
-              {actions.length ? (
-                actions
-                  .slice(0, 3)
-                  .map((action: any) => (
-                    <IntelligenceActionCard key={action.id} action={action} />
-                  ))
-              ) : (
-                <Card className="shadow-soft">
-                  <CardContent className="p-5">
-                    <p className="text-sm text-muted-foreground">
-                      No priority actions right now.
-                    </p>
-                  </CardContent>
-                </Card>
-              )}
             </div>
           </section>
 
           <section>
-            <IntelligenceForecastChart snapshot={snapshot} />
+            <h2 className="mb-3 text-lg font-semibold">Next best actions</h2>
+            <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-3">
+              <IntelligenceActionCard
+                action={{
+                  id: "a-1",
+                  title: "Reduce Spanish Bread allocation",
+                  why: "BO rate hit 44% over the last 3 sessions — excess stock is not selling through.",
+                  action:
+                    "Cut delivery by 20% for next run and monitor sell-through.",
+                  priority: "P1",
+                  confidence: "High",
+                }}
+              />
+              <IntelligenceActionCard
+                action={{
+                  id: "a-2",
+                  title: "Follow up with Ben on variance discrepancy",
+                  why: "5-unit variance recorded on 2026-02-21 with no return logged.",
+                  action: "Request end-of-day reconciliation sheet from agent.",
+                  priority: "P2",
+                  confidence: "Med",
+                }}
+              />
+              <IntelligenceActionCard
+                action={{
+                  id: "a-3",
+                  title: "Increase Pandesal allocation at SM City",
+                  why: "Consistently sells out — Angel's last 3 sessions show zero BO for this SKU.",
+                  action:
+                    "Add 10 units to next delivery and track for over-ordering.",
+                  priority: "P2",
+                  confidence: "Med",
+                }}
+              />
+            </div>
+          </section>
+
+          <section>
+            <IntelligenceForecastChart />
           </section>
 
           <section>
@@ -121,7 +112,6 @@ export async function IntelligencePage({
           <section>
             <IntelligenceProductForecast />
           </section>
-
         </div>
       </div>
     </>

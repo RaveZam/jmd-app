@@ -1,17 +1,7 @@
 import type { ReactElement } from "react";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { TopProduct } from "@/lib/selectors/metrics";
 
-function formatCurrencyPHP(value: number): string {
-  return `₱${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
-}
-
-export function TopProductsBOTable({
-  products,
-}: {
-  products: TopProduct[];
-}): ReactElement {
+export function TopProductsBOTable(): ReactElement {
   return (
     <Card className="shadow-soft">
       <CardHeader className="pb-3">
@@ -28,28 +18,31 @@ export function TopProductsBOTable({
               </tr>
             </thead>
             <tbody>
-              {products.length ? (
-                products.map((p) => (
-                  <tr key={p.product} className="border-t">
-                    <td className="px-3 py-2">{p.product}</td>
-                    <td className="px-3 py-2 text-right tabular-nums">
-                      {p.qty}
-                    </td>
-                    <td className="px-3 py-2 text-right tabular-nums">
-                      {formatCurrencyPHP(p.value)}
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td
-                    colSpan={3}
-                    className="px-3 py-6 text-center text-muted-foreground"
-                  >
-                    No data.
-                  </td>
-                </tr>
-              )}
+              <tr className="border-t">
+                <td className="px-3 py-2">Spanish Bread</td>
+                <td className="px-3 py-2 text-right tabular-nums">20</td>
+                <td className="px-3 py-2 text-right tabular-nums">₱600</td>
+              </tr>
+              <tr className="border-t">
+                <td className="px-3 py-2">Ensaymada</td>
+                <td className="px-3 py-2 text-right tabular-nums">7</td>
+                <td className="px-3 py-2 text-right tabular-nums">₱245</td>
+              </tr>
+              <tr className="border-t">
+                <td className="px-3 py-2">Cheese Bread</td>
+                <td className="px-3 py-2 text-right tabular-nums">5</td>
+                <td className="px-3 py-2 text-right tabular-nums">₱200</td>
+              </tr>
+              <tr className="border-t">
+                <td className="px-3 py-2">Brownies (4pc)</td>
+                <td className="px-3 py-2 text-right tabular-nums">4</td>
+                <td className="px-3 py-2 text-right tabular-nums">₱380</td>
+              </tr>
+              <tr className="border-t">
+                <td className="px-3 py-2">Pandesal (12pc)</td>
+                <td className="px-3 py-2 text-right tabular-nums">3</td>
+                <td className="px-3 py-2 text-right tabular-nums">₱165</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -57,4 +50,3 @@ export function TopProductsBOTable({
     </Card>
   );
 }
-
