@@ -1,7 +1,7 @@
 "use client";
 
-import type { ReactElement } from "react";
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+import { type ReactElement, useEffect, useState } from "react";
+import { Cell, Pie, PieChart, Tooltip } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const mockData = [
@@ -19,6 +19,9 @@ function formatCurrencyPHP(value: number): string {
 }
 
 export function TopProductsSoldTable(): ReactElement {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const totalQty = mockData.reduce((sum, d) => sum + d.qty, 0);
 
   return (
@@ -29,8 +32,8 @@ export function TopProductsSoldTable(): ReactElement {
       <CardContent>
         <div className="flex items-center gap-6">
           <div className="shrink-0">
-            <ResponsiveContainer width={200} height={220}>
-              <PieChart>
+            {mounted && (
+              <PieChart width={200} height={220}>
                 <Pie
                   data={mockData}
                   dataKey="qty"
@@ -56,7 +59,7 @@ export function TopProductsSoldTable(): ReactElement {
                   }}
                 />
               </PieChart>
-            </ResponsiveContainer>
+            )}
           </div>
 
           <div className="flex-1 space-y-2">

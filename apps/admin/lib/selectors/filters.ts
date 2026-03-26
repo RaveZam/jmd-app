@@ -19,11 +19,12 @@ export const ALL_SESSIONS = "All" as const;
 
 export type RecordsFilters = {
   dateFrom: string; // YYYY-MM-DD
-  dateTo: string;   // YYYY-MM-DD
+  dateTo: string; // YYYY-MM-DD
   agent: string | typeof ALL_AGENTS;
   sessionId: string | typeof ALL_SESSIONS;
 };
 
+//filter parser by claude
 export function parseRecordsFilters(
   searchParams: Record<string, string | string[] | undefined>,
 ): RecordsFilters {
@@ -46,9 +47,10 @@ export function parseRecordsFilters(
 
   return {
     dateFrom:
-      dateFrom && /^\d{4}-\d{2}-\d{2}$/.test(dateFrom) ? dateFrom : sevenDaysAgoStr,
-    dateTo:
-      dateTo && /^\d{4}-\d{2}-\d{2}$/.test(dateTo) ? dateTo : todayStr,
+      dateFrom && /^\d{4}-\d{2}-\d{2}$/.test(dateFrom)
+        ? dateFrom
+        : sevenDaysAgoStr,
+    dateTo: dateTo && /^\d{4}-\d{2}-\d{2}$/.test(dateTo) ? dateTo : todayStr,
     agent: agent && agent.trim() ? agent : ALL_AGENTS,
     sessionId: sessionId && sessionId.trim() ? sessionId : ALL_SESSIONS,
   };

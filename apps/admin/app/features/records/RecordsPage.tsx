@@ -15,7 +15,7 @@ export async function RecordsPage({
   searchParams,
 }: {
   searchParams: Promise<SearchParams> | SearchParams;
-}): Promise<ReactElement> {
+}) {
   const sp = await searchParams;
 
   const [{ records, saleSessionMap }, sessions] = await Promise.all([
@@ -36,7 +36,14 @@ export async function RecordsPage({
 
   const data = getRecordsPageData(records, filters, sessionSaleIds, sp);
 
-  return <RecordsClient data={data} sessions={sessions} sp={sp} buildUrl={buildRecordsPageUrl} />;
+  return (
+    <RecordsClient
+      data={data}
+      sessions={sessions}
+      sp={sp}
+      buildUrl={buildRecordsPageUrl}
+    />
+  );
 }
 
 export default RecordsPage;

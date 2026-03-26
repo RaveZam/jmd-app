@@ -46,7 +46,6 @@ export async function getSessions(): Promise<SessionRow[]> {
   const uuids = [...new Set(sessions.map((s) => s.conducted_by))];
   const agentNames = await resolveAgentNames(uuids);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return sessions.map((s: any) => {
     const storeRows: { visited: boolean }[] = s.session_stores ?? [];
     return {
