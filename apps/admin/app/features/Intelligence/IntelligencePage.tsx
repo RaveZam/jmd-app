@@ -115,12 +115,10 @@ export async function IntelligencePage({
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-semibold">Agent performance forecast</h2>
             <IntelligenceAgentForecast />
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-semibold">Product performance forecast</h2>
             <IntelligenceProductForecast />
           </section>
 

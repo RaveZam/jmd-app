@@ -1,14 +1,14 @@
 import type { ReactElement } from "react";
-import type { AgentRow } from "../types/agent-types";
-import { AgentCard } from "./AgentCard";
-import { AgentCardSkeleton } from "./AgentCardSkeleton";
+import type { AdminRow } from "../types/admin-types";
+import { AdminCard } from "./AdminCard";
+import { AdminCardSkeleton } from "./AdminCardSkeleton";
 
-export function AgentGrid({
-  agents,
+export function AdminGrid({
+  admins,
   loading,
   onDelete,
 }: {
-  agents: AgentRow[];
+  admins: AdminRow[];
   loading: boolean;
   onDelete: (id: string) => void;
 }): ReactElement {
@@ -16,7 +16,7 @@ export function AgentGrid({
     return (
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {Array.from({ length: 6 }).map((_, i) => (
-          <AgentCardSkeleton key={i} />
+          <AdminCardSkeleton key={i} />
         ))}
       </div>
     );
@@ -25,12 +25,12 @@ export function AgentGrid({
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground">
-        Showing <span className="font-medium text-foreground">{agents.length}</span>{" "}
-        {agents.length === 1 ? "agent" : "agents"}
+        Showing <span className="font-medium text-foreground">{admins.length}</span>{" "}
+        {admins.length === 1 ? "admin" : "admins"}
       </p>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {agents.map((agent) => (
-          <AgentCard key={agent.id} agent={agent} onDelete={onDelete} />
+        {admins.map((admin) => (
+          <AdminCard key={admin.id} admin={admin} onDelete={onDelete} />
         ))}
       </div>
     </div>

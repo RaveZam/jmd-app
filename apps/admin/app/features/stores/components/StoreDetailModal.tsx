@@ -65,7 +65,7 @@ export function StoreDetailModal({
               <X className="h-4 w-4" />
             </button>
           </div>
-          c
+
           <div className="flex divide-x">
             <div className="flex-1 space-y-4 px-5 py-4">
               <section>

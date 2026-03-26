@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { InsightAction } from "@/lib/intelligence/types";
 
+
 const priorityVariant = {
   P0: "warning" as const,
   P1: "secondary" as const,

@@ -1,8 +1,9 @@
 import type { ReactElement } from "react";
-import { CalendarDays, Store, TrendingUp } from "lucide-react";
+import { CalendarDays, Store, Trash2, TrendingUp } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import type { AgentRow } from "../types/agent-types";
 
 const AVATAR_COLORS = [
@@ -34,7 +35,13 @@ function visitRate(visited: number, planned: number): string {
   return `${Math.round((visited / planned) * 100)}%`;
 }
 
-export function AgentCard({ agent }: { agent: AgentRow }): ReactElement {
+export function AgentCard({
+  agent,
+  onDelete,
+}: {
+  agent: AgentRow;
+  onDelete: (id: string) => void;
+}): ReactElement {
   const rate = visitRate(agent.totalStoresVisited, agent.totalStoresPlanned);
   const isActive = agent.totalSessions > 0;
 
@@ -55,9 +62,21 @@ export function AgentCard({ agent }: { agent: AgentRow }): ReactElement {
               </p>
             </div>
           </div>
-          <Badge variant={isActive ? "success" : "pending"}>
-            {isActive ? "Active" : "Inactive"}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant={isActive ? "success" : "pending"}>
+              {isActive ? "Active" : "Inactive"}
+            </Badge>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 text-muted-foreground hover:text-red-600"
+              onClick={() => onDelete(agent.id)}
+              aria-label={`Delete ${agent.name}`}
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </Button>
+          </div>
         </div>
 
         <div className="mt-4 grid grid-cols-3 gap-3">

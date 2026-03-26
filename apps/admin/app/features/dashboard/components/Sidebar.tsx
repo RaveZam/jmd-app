@@ -10,6 +10,7 @@ import {
   MapPin,
   Package,
   Settings,
+  ShieldCheck,
   Sparkles,
   Users,
 } from "lucide-react";
@@ -35,7 +36,7 @@ const navGroups: NavGroup[] = [
     title: "OVERVIEW",
     items: [
       { href: "/dashboard", label: "Dashboard", icon: LayoutGrid },
-      { href: "/Intelligence", label: "Forecast", icon: Sparkles },
+      { href: "/Intelligence", label: "Intelligence", icon: Sparkles },
       { href: "/records", label: "Records", icon: FileText },
     ],
   },
@@ -51,6 +52,7 @@ const navGroups: NavGroup[] = [
     items: [
       { href: "/products", label: "Products", icon: Package },
       { href: "/agents", label: "Agents", icon: Users },
+      { href: "/admins", label: "Admins", icon: ShieldCheck },
       { href: "/settings", label: "Settings", icon: Settings },
     ],
   },
