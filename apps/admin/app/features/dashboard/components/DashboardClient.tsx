@@ -72,7 +72,7 @@ export function DashboardClient({ data }: { data: any }) {
           <KpiStrip data={data} filter={filter} />
           <div className="grid gap-6 xl:grid-cols-[7fr_3fr]">
             <SalesLineChart data={data} filter={filter} />
-            <TopProductsSoldTable />
+            <TopProductsSoldTable data={data} />
           </div>
           <div className="grid gap-6 xl:grid-cols-2">
             <ProductSoldVsBoChart />

@@ -1,7 +1,6 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
 import { createClient } from "@/utils/supabase/server";
-import type { LedgerRecord } from "@/lib/mock/records";
 
 type SaleRow = {
   id: string;
@@ -20,7 +19,7 @@ type SaleRow = {
 };
 
 export async function fetchRecords(): Promise<{
-  records: LedgerRecord[];
+  records: any;
   saleSessionMap: Map<string, string>; // saleId → routeSessionId
 }> {
   const supabase = await createClient();
@@ -58,7 +57,7 @@ export async function fetchRecords(): Promise<{
     ]),
   );
 
-  const records: LedgerRecord[] = [];
+  const records = [];
   const saleSessionMap = new Map<string, string>();
 
   for (const sale of salesResult.data as unknown as SaleRow[]) {

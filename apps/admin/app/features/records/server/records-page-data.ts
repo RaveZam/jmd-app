@@ -1,4 +1,3 @@
-import type { LedgerRecord } from "@/lib/mock/records";
 import {
   ALL_AGENTS,
   ALL_SESSIONS,
@@ -9,6 +8,7 @@ import {
   selectAgents,
   type RecordDerived,
 } from "@/lib/selectors/metrics";
+import type { LedgerRecord } from "@/app/features/records/types";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -49,6 +49,26 @@ export type RecordsPageData = {
   rawQuery: string;
 };
 
+function searchRows(rows: RecordsPageRow[], q: string): RecordsPageRow[] {
+  if (!q) return rows;
+  return rows.filter(
+    ({ record: r }) =>
+      r.store.toLowerCase().includes(q) || r.product.toLowerCase().includes(q),
+  );
+}
+
+function sumTotals(rows: RecordsPageRow[]): RecordsPageTotals {
+  return rows.reduce<RecordsPageTotals>(
+    (acc, { record: r, derived }) => {
+      acc.soldQty += r.soldQty;
+      acc.boQty += r.boQty;
+      acc.lineTotal += derived.lineTotal;
+      return acc;
+    },
+    { soldQty: 0, boQty: 0, lineTotal: 0 },
+  );
+}
+
 export function getRecordsPageData(
   records: LedgerRecord[],
   filters: RecordsFilters,
@@ -58,45 +78,28 @@ export function getRecordsPageData(
 ): RecordsPageData {
   const agents = selectAgents(records);
   const rawQuery = (firstParam(sp, "q") ?? "").trim();
-  const q = rawQuery.toLowerCase();
   const rawPage = Number(firstParam(sp, "page") ?? "1");
   const requestedPage =
     Number.isFinite(rawPage) && rawPage > 0 ? Math.floor(rawPage) : 1;
 
   const base = filterRecordsForPage(records, filters, sessionSaleIds);
-  const searched = q
-    ? base.filter(
-        (r) =>
-          r.store.toLowerCase().includes(q) ||
-          r.product.toLowerCase().includes(q),
-      )
-    : base;
-
-  const rows = searched.map((r) => ({ record: r, derived: deriveRecord(r) }));
-
-  const totalPages = Math.max(1, Math.ceil(rows.length / pageSize));
-  const page = Math.min(requestedPage, totalPages);
-  const pageStart = (page - 1) * pageSize;
-  const pageRows = rows.slice(pageStart, pageStart + pageSize);
-
-  const totals = rows.reduce<RecordsPageTotals>(
-    (acc, row) => {
-      acc.soldQty += row.record.soldQty;
-      acc.boQty += row.record.boQty;
-      acc.lineTotal += row.derived.lineTotal;
-      return acc;
-    },
-    { soldQty: 0, boQty: 0, lineTotal: 0 },
+  const allRows = searchRows(
+    base.map((r) => ({ record: r, derived: deriveRecord(r) })),
+    rawQuery.toLowerCase(),
   );
+
+  const totalPages = Math.max(1, Math.ceil(allRows.length / pageSize));
+  const page = Math.min(requestedPage, totalPages);
+  const pageRows = allRows.slice((page - 1) * pageSize, page * pageSize);
 
   return {
     agents,
     filters,
     pageRows,
-    totals,
+    totals: sumTotals(allRows),
     page,
     totalPages,
-    rowCount: rows.length,
+    rowCount: allRows.length,
     rawQuery,
   };
 }

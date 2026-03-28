@@ -1,4 +1,4 @@
-import type { LedgerRecord } from "@/lib/mock/records";
+import type { LedgerRecord } from "@/app/features/records/types";
 
 export type RecordDerived = {
   lineTotal: number;
