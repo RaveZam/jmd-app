@@ -1,14 +1,46 @@
-import type { ReactElement } from "react";
 import { KpiCard } from "./KpiCard";
+import { useComputeSalesKPI } from "../../hooks/useComputeSalesKPI";
+import { FilterRange } from "../../types";
 
-export function KpiStrip(): ReactElement {
+const FILTER_LABEL: Record<FilterRange, string> = {
+  today: "Today",
+  "7days": "Past 7 Days",
+  "30days": "Past 30 Days",
+};
+
+export function KpiStrip({ data, filter }: { data: any; filter: FilterRange }) {
+  const { totalSales, avgPerStore, totalBO, finalBboRate, totalSold } =
+    useComputeSalesKPI(data);
+
+  const label = FILTER_LABEL[filter];
+
   return (
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-      <KpiCard title="Total Sales Today" primary="₱0" tone="primary" />
-      <KpiCard title="Avg Sales per Store" primary="₱0" />
-      <KpiCard title="Total Sold Today" primary="0 pcs" />
-      <KpiCard title="Total BO Today" primary="0" secondary="₱0" />
-      <KpiCard title="BO Rate" primary="0%" />
+      <KpiCard
+        title={`Total Sales ${label}`}
+        primary={"₱" + totalSales.toLocaleString()}
+        tone="primary"
+      />
+      <KpiCard
+        title="Avg Sales per Store"
+        primary={
+          "₱" +
+          avgPerStore.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })
+        }
+      />
+      <KpiCard
+        title={`Total Sold ${label}`}
+        primary={totalSold.toLocaleString() + "pcs"}
+      />
+      <KpiCard
+        title={`Total BO ${label}`}
+        primary={Number(totalBO).toLocaleString() + "pcs"}
+        // secondary="₱0"
+      />
+      <KpiCard title="BO Rate" primary={finalBboRate.toFixed(2) + "%"} />
     </div>
   );
 }

@@ -60,10 +60,10 @@ export function AddStoreModal({
     onClose();
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!name.trim()) return;
     if (isEditing && initialStore) {
-      useUpdateStore(
+      await useUpdateStore(
         initialStore.id,
         name.trim(),
         province.trim(),
@@ -74,7 +74,7 @@ export function AddStoreModal({
       );
       onUpdated?.();
     } else {
-      useAddStore(
+      await useAddStore(
         provinceId,
         name.trim(),
         province.trim(),

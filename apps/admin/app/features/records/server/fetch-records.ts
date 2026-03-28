@@ -77,5 +77,7 @@ export async function fetchRecords(): Promise<{
     saleSessionMap.set(sale.id, session.id);
   }
 
+  records.sort((a, b) => b.date.localeCompare(a.date));
+
   return { records, saleSessionMap };
 }

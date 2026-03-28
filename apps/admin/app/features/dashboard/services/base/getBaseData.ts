@@ -41,6 +41,7 @@ export const getRecords = cache(async (filters: any) => {
       soldQty: row.quantity_sold ?? 0,
       boQty: row.quantity_bo ?? 0,
       unitPrice: row.snapshot_price ?? 0,
+      total: row.total ?? 0,
     };
   });
 });

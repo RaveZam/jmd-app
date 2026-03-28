@@ -11,7 +11,6 @@ import { FILTERS } from "../types";
 import { useRouter } from "next/navigation";
 
 export function DashboardClient({ data }: { data: any }) {
-  console.log(data);
   const router = useRouter();
   const [filter, setFilter] = useState<FilterRange>("today");
 
@@ -70,9 +69,9 @@ export function DashboardClient({ data }: { data: any }) {
 
       <div className="flex-1 overflow-y-auto px-6 py-6">
         <div className="mx-auto w-full max-w-300 space-y-6">
-          <KpiStrip />
+          <KpiStrip data={data} filter={filter} />
           <div className="grid gap-6 xl:grid-cols-[7fr_3fr]">
-            <SalesLineChart />
+            <SalesLineChart data={data} filter={filter} />
             <TopProductsSoldTable />
           </div>
           <div className="grid gap-6 xl:grid-cols-2">
