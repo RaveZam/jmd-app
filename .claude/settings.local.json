@@ -8,7 +8,11 @@
       "Bash(git add:*)",
       "Bash(grep:*)",
       "Bash(wc:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Skill(commit-commands:commit-push-pr)",
+      "Bash(git checkout:*)"
     ]
   }
 }

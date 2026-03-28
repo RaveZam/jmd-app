@@ -7,7 +7,12 @@ import { IntelligenceRangeDropdown } from "@/app/features/Intelligence/component
 import { IntelligenceAgentForecast } from "@/app/features/Intelligence/components/IntelligenceAgentForecast";
 import { IntelligenceProductForecast } from "@/app/features/Intelligence/components/IntelligenceProductForecast";
 
-export async function IntelligencePage() {
+export async function IntelligencePage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  await searchParams;
   return (
     <>
       <header className="sticky top-0 z-20 border-b bg-slate-50/80 px-6 py-5 backdrop-blur dark:bg-background/80">
