@@ -27,6 +27,13 @@ function formatXLabel(dateStr: string, filter: FilterRange): string {
   return date.toLocaleDateString("en-PH", { weekday: "short" });
 }
 
+function formatHourLabel(hour: number): string {
+  if (hour === 0) return "12am";
+  if (hour < 12) return `${hour}am`;
+  if (hour === 12) return "12pm";
+  return `${hour - 12}pm`;
+}
+
 const CHART_TITLE: Record<FilterRange, string> = {
   today: "Sales Today",
   "7days": "Sales — Last 7 Days",
@@ -40,17 +47,34 @@ export function SalesLineChart({
   data: any[];
   filter: FilterRange;
 }): ReactElement {
-  const salesByDate: Record<string, number> = {};
-  for (const row of data) {
-    salesByDate[row.date] = (salesByDate[row.date] ?? 0) + row.total;
-  }
+  let chartData: { label: string; sales: number }[];
 
-  const chartData = Object.keys(salesByDate)
-    .sort()
-    .map((date) => ({
-      label: formatXLabel(date, filter),
-      sales: salesByDate[date],
-    }));
+  if (filter === "today") {
+    const salesByHour: Record<number, number> = {};
+    for (const row of data) {
+      const hour = row.createdAt ? parseInt(row.createdAt.slice(11, 13)) : null;
+      if (hour === null) continue;
+      salesByHour[hour] = (salesByHour[hour] ?? 0) + row.total;
+    }
+    chartData = Object.keys(salesByHour)
+      .map(Number)
+      .sort((a, b) => a - b)
+      .map((hour) => ({
+        label: formatHourLabel(hour),
+        sales: salesByHour[hour],
+      }));
+  } else {
+    const salesByDate: Record<string, number> = {};
+    for (const row of data) {
+      salesByDate[row.date] = (salesByDate[row.date] ?? 0) + row.total;
+    }
+    chartData = Object.keys(salesByDate)
+      .sort()
+      .map((date) => ({
+        label: formatXLabel(date, filter),
+        sales: salesByDate[date],
+      }));
+  }
 
   return (
     <Card className="shadow-soft">

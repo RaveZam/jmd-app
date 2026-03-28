@@ -75,8 +75,8 @@ export function DashboardClient({ data }: { data: any }) {
             <TopProductsSoldTable data={data} />
           </div>
           <div className="grid gap-6 xl:grid-cols-2">
-            <ProductSoldVsBoChart />
-            <TopAgentsChart />
+            <ProductSoldVsBoChart data={data} />
+            <TopAgentsChart data={data} />
           </div>
         </div>
       </div>

@@ -17,16 +17,19 @@ type Record = {
 };
 
 function computeTopProducts(data: Record[]) {
-  const map = new Map<string, { qty: number; value: number }>();
+  const totals: { [product: string]: { qty: number; value: number } } = {};
 
   for (const row of data) {
-    const entry = map.get(row.product) ?? { qty: 0, value: 0 };
-    entry.qty += row.soldQty;
-    entry.value += row.total;
-    map.set(row.product, entry);
+    if (!totals[row.product])
+      totals[row.product] = {
+        qty: 0,
+        value: 0,
+      };
+    totals[row.product].qty += row.soldQty;
+    totals[row.product].value += row.total;
   }
 
-  return Array.from(map.entries())
+  return Object.entries(totals)
     .map(([name, { qty, value }]) => ({ name, qty, value }))
     .sort((a, b) => b.qty - a.qty)
     .slice(0, 5);

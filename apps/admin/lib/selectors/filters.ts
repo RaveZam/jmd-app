@@ -49,7 +49,7 @@ export function parseRecordsFilters(
     dateFrom:
       dateFrom && /^\d{4}-\d{2}-\d{2}$/.test(dateFrom)
         ? dateFrom
-        : sevenDaysAgoStr,
+        : todayStr,
     dateTo: dateTo && /^\d{4}-\d{2}-\d{2}$/.test(dateTo) ? dateTo : todayStr,
     agent: agent && agent.trim() ? agent : ALL_AGENTS,
     sessionId: sessionId && sessionId.trim() ? sessionId : ALL_SESSIONS,

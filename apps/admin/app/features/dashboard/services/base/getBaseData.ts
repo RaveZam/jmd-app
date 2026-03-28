@@ -35,6 +35,7 @@ export const getRecords = cache(async (filters: any) => {
     return {
       id: row.id,
       date: session?.session_date,
+      createdAt: row.created_at ?? null,
       agent: agentMap[agentId]?.name ?? "Unknown",
       store: store?.store_name ?? "",
       product: row.snapshot_product_name ?? "",
