@@ -6,10 +6,13 @@ import { IntelligenceAgentForecast } from "./IntelligenceAgentForecast";
 import { IntelligenceForecastChart } from "./IntelligenceForecastChart";
 import { IntelligenceProductForecast } from "./IntelligenceProductForecast";
 import { IntelligenceRangeDropdown } from "./IntelligenceRangeDropdown";
+import { computeAverageSalesOnThatDay } from "../helpers/computeAverageSalesOnThatDay";
 
 export function IntelligencePageClient({ data }: { data: any }) {
   const { totalSalesToday, totalSalesYesterday, percentageDiff } =
     computeRevenueTodayAndYesterday(data);
+  const { predictedRevenueForTomorrow, dayToday } =
+    computeAverageSalesOnThatDay(data);
 
   return (
     <>
@@ -54,14 +57,14 @@ export function IntelligencePageClient({ data }: { data: any }) {
                 tone="primary"
               />
               <KpiCard
-                title="Predicted sales tomorrow"
-                primary="₱50,250"
-                secondary="+4.3% vs today"
+                title={`Predicted sales tomorrow (${["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][(dayToday + 1) % 7]})`}
+                primary={"₱" + predictedRevenueForTomorrow}
+                secondary={`Your Average Sales On  ${["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][(dayToday + 1) % 7]} for the past month`}
                 tone="primary"
               />
               <KpiCard
-                title="Avg sales next 7 days"
-                primary="₱49,100"
+                title="Projected 7 Day Revenue"
+                primary="₱490,100"
                 secondary="7-day projected average"
                 tone="primary"
               />

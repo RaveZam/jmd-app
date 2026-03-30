@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 
 export function DashboardClient({ data }: { data: any }) {
   const router = useRouter();
-  const [filter, setFilter] = useState<FilterRange>("today");
+  const [filter, setFilter] = useState<FilterRange>("7days");
 
   function onFilterChange(newFilters: any) {
     const date = getDateRange(newFilters);
