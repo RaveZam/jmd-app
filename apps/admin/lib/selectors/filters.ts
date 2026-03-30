@@ -13,8 +13,6 @@ export function formatLocalISODate(d: Date): string {
   return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
 }
 
-const DEFAULT_DATE = "2026-02-21";
-
 export const ALL_SESSIONS = "All" as const;
 
 export type RecordsFilters = {
@@ -24,49 +22,45 @@ export type RecordsFilters = {
   sessionId: string | typeof ALL_SESSIONS;
 };
 
-//filter parser by claude
+function first(
+  sp: Record<string, string | string[] | undefined>,
+  key: string,
+): string | undefined {
+  const v = sp[key];
+  return Array.isArray(v) ? v[0] : v;
+}
+
+function daysAgo(n: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() - n);
+  return formatLocalISODate(d);
+}
+
 export function parseRecordsFilters(
   searchParams: Record<string, string | string[] | undefined>,
 ): RecordsFilters {
-  const first = (key: string) => {
-    const v = searchParams[key];
-    return Array.isArray(v) ? v[0] : v;
-  };
-
-  const dateFrom = first("dateFrom");
-  const dateTo = first("dateTo");
-  const agent = first("agent");
-  const sessionId = first("sessionId");
-
-  const today = new Date();
-  const sevenDaysAgo = new Date(today);
-  sevenDaysAgo.setDate(today.getDate() - 6);
-
-  const todayStr = formatLocalISODate(today);
-  const sevenDaysAgoStr = formatLocalISODate(sevenDaysAgo);
-
   return {
-    dateFrom:
-      dateFrom && /^\d{4}-\d{2}-\d{2}$/.test(dateFrom)
-        ? dateFrom
-        : todayStr,
-    dateTo: dateTo && /^\d{4}-\d{2}-\d{2}$/.test(dateTo) ? dateTo : todayStr,
-    agent: agent && agent.trim() ? agent : ALL_AGENTS,
-    sessionId: sessionId && sessionId.trim() ? sessionId : ALL_SESSIONS,
+    dateFrom: first(searchParams, "dateFrom") ?? daysAgo(6),
+    dateTo: first(searchParams, "dateTo") ?? daysAgo(0),
+    agent: first(searchParams, "agent") ?? ALL_AGENTS,
+    sessionId: first(searchParams, "sessionId") ?? ALL_SESSIONS,
+  };
+}
+
+export function parseRecordsFiltersLast30Days(
+  searchParams: Record<string, string | string[] | undefined>,
+): RecordsFilters {
+  return {
+    ...parseRecordsFilters(searchParams),
+    dateFrom: first(searchParams, "dateFrom") ?? daysAgo(30),
   };
 }
 
 export function parseAdminFilters(
   searchParams: Record<string, string | string[] | undefined>,
 ): AdminFilters {
-  const rawDate = searchParams.date;
-  const date = Array.isArray(rawDate) ? rawDate[0] : rawDate;
-
-  const rawAgent = searchParams.agent;
-  const agent = Array.isArray(rawAgent) ? rawAgent[0] : rawAgent;
-
   return {
-    date: date && /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : DEFAULT_DATE,
-    agent: agent && agent.trim() ? agent : ALL_AGENTS,
+    date: first(searchParams, "date") ?? daysAgo(0),
+    agent: first(searchParams, "agent") ?? ALL_AGENTS,
   };
 }

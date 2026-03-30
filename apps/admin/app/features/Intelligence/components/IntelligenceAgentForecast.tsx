@@ -12,12 +12,10 @@ interface AgentForecastRow {
   name: string;
   initials: string;
   color: string;
-  todayRevenue: number;
-  avgRevenue: number;
-  projectedTomorrow: number;
-  todayBoRate: number;
+  soldLast30Days: number;
+  projectedNext7Days: number;
   boTrend: BOTrend;
-  sparkline: number[]; // last 5 days relative values 0–1
+  sparkline: number[]; // last 7 days relative values 0–1
 }
 
 const MOCK_AGENTS: AgentForecastRow[] = [
@@ -26,60 +24,50 @@ const MOCK_AGENTS: AgentForecastRow[] = [
     name: "Juan dela Cruz",
     initials: "JC",
     color: "bg-violet-500",
-    todayRevenue: 9_420,
-    avgRevenue: 8_750,
-    projectedTomorrow: 9_100,
-    todayBoRate: 0.06,
+    soldLast30Days: 262_500,
+    projectedNext7Days: 63_700,
     boTrend: "improving",
-    sparkline: [0.65, 0.72, 0.8, 0.91, 1.0],
+    sparkline: [0.65, 0.70, 0.72, 0.8, 0.88, 0.91, 1.0],
   },
   {
     id: "2",
     name: "Maria Santos",
     initials: "MS",
     color: "bg-sky-500",
-    todayRevenue: 7_180,
-    avgRevenue: 8_200,
-    projectedTomorrow: 7_900,
-    todayBoRate: 0.14,
+    soldLast30Days: 246_000,
+    projectedNext7Days: 55_300,
     boTrend: "stable",
-    sparkline: [0.95, 0.88, 0.82, 0.79, 0.74],
+    sparkline: [0.95, 0.91, 0.88, 0.82, 0.80, 0.79, 0.74],
   },
   {
     id: "3",
     name: "Roberto Reyes",
     initials: "RR",
     color: "bg-emerald-500",
-    todayRevenue: 11_050,
-    avgRevenue: 10_300,
-    projectedTomorrow: 10_800,
-    todayBoRate: 0.04,
+    soldLast30Days: 309_000,
+    projectedNext7Days: 75_600,
     boTrend: "improving",
-    sparkline: [0.7, 0.78, 0.85, 0.94, 1.0],
+    sparkline: [0.7, 0.74, 0.78, 0.83, 0.88, 0.94, 1.0],
   },
   {
     id: "4",
     name: "Ana Lim",
     initials: "AL",
     color: "bg-rose-500",
-    todayRevenue: 4_650,
-    avgRevenue: 7_100,
-    projectedTomorrow: 5_800,
-    todayBoRate: 0.27,
+    soldLast30Days: 213_000,
+    projectedNext7Days: 40_600,
     boTrend: "worsening",
-    sparkline: [1.0, 0.88, 0.74, 0.62, 0.52],
+    sparkline: [1.0, 0.91, 0.88, 0.74, 0.66, 0.62, 0.52],
   },
   {
     id: "5",
     name: "Carlo Bautista",
     initials: "CB",
     color: "bg-amber-500",
-    todayRevenue: 6_340,
-    avgRevenue: 6_500,
-    projectedTomorrow: 6_420,
-    todayBoRate: 0.11,
+    soldLast30Days: 195_000,
+    projectedNext7Days: 44_940,
     boTrend: "stable",
-    sparkline: [0.88, 0.92, 0.96, 0.91, 0.95],
+    sparkline: [0.88, 0.90, 0.92, 0.94, 0.91, 0.93, 0.95],
   },
 ];
 
@@ -89,8 +77,11 @@ const boTrendConfig: Record<BOTrend, { label: string; variant: "success" | "pend
   worsening: { label: "Worsening", variant: "warning"  },
 };
 
-function DeltaChip({ today, projected }: { today: number; projected: number }): ReactElement {
-  const pct = today > 0 ? ((projected - today) / today) * 100 : 0;
+// Compares projected next 7 days daily avg vs 30-day daily avg
+function DeltaChip({ sold30d, projected7d }: { sold30d: number; projected7d: number }): ReactElement {
+  const avg30 = sold30d / 30;
+  const avg7 = projected7d / 7;
+  const pct = avg30 > 0 ? ((avg7 - avg30) / avg30) * 100 : 0;
   const up = pct >= 0;
   return (
     <span
@@ -221,7 +212,7 @@ function MiniLineChart({ values, agentName }: { values: number[]; agentName: str
 }
 
 export function IntelligenceAgentForecast(): ReactElement {
-  const sorted = [...MOCK_AGENTS].sort((a, b) => b.projectedTomorrow - a.projectedTomorrow);
+  const sorted = [...MOCK_AGENTS].sort((a, b) => b.projectedNext7Days - a.projectedNext7Days);
 
   return (
     <Card className="shadow-soft">
@@ -230,7 +221,7 @@ export function IntelligenceAgentForecast(): ReactElement {
           <div>
             <CardTitle className="text-base">Agent performance forecast</CardTitle>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              Projected tomorrow based on 7-day rolling average · sorted by projected revenue
+              30-day revenue vs projected next 7 days · sorted by projected revenue
             </p>
           </div>
           <Badge variant="pending" className="text-xs">Mock data</Badge>
@@ -239,23 +230,21 @@ export function IntelligenceAgentForecast(): ReactElement {
 
       <CardContent className="p-0">
         {/* Header row */}
-        <div className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-x-4 border-b px-5 py-2 text-xs font-medium text-muted-foreground">
+        <div className="grid grid-cols-[1fr_auto_auto_auto] gap-x-4 border-b px-5 py-2 text-xs font-medium text-muted-foreground">
           <span>Agent</span>
-          <span className="w-24 text-right">Today</span>
-          <span className="w-24 text-right">7-day avg</span>
-          <span className="w-28 text-right">Projected tomorrow</span>
+          <span className="w-32 text-right">Sold (past 30 days)</span>
+          <span className="w-36 text-right">Projected next 7 days</span>
           <span className="w-24 text-right">BO trend</span>
         </div>
 
         <div className="divide-y">
           {sorted.map((agent, idx) => {
             const trend = boTrendConfig[agent.boTrend];
-            const aboveAvg = agent.todayRevenue >= agent.avgRevenue;
 
             return (
               <div
                 key={agent.id}
-                className="grid grid-cols-[1fr_auto_auto_auto_auto] items-center gap-x-4 px-5 py-3 hover:bg-muted/40 transition-colors"
+                className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-x-4 px-5 py-3 hover:bg-muted/40 transition-colors"
               >
                 {/* Agent info */}
                 <div className="flex items-center gap-3 min-w-0">
@@ -275,30 +264,22 @@ export function IntelligenceAgentForecast(): ReactElement {
                   </div>
                 </div>
 
-                {/* Today revenue */}
-                <div className="w-24 text-right">
-                  <p className={`text-sm font-semibold tabular-nums ${aboveAvg ? "text-emerald-600 dark:text-emerald-400" : "text-rose-500 dark:text-rose-400"}`}>
-                    {formatCurrencyPHP(agent.todayRevenue)}
+                {/* Sold past 30 days */}
+                <div className="w-32 text-right">
+                  <p className="text-sm font-semibold tabular-nums">
+                    {formatCurrencyPHP(agent.soldLast30Days)}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    BO {formatPercent(agent.todayBoRate)}
+                    {formatCurrencyPHP(Math.round(agent.soldLast30Days / 30))} / day avg
                   </p>
                 </div>
 
-                {/* 7-day avg */}
-                <div className="w-24 text-right">
-                  <p className="text-sm font-medium tabular-nums text-muted-foreground">
-                    {formatCurrencyPHP(agent.avgRevenue)}
-                  </p>
-                  <p className="text-xs text-muted-foreground">avg / day</p>
-                </div>
-
-                {/* Projected tomorrow */}
-                <div className="w-28 text-right">
+                {/* Projected next 7 days */}
+                <div className="w-36 text-right">
                   <p className="text-sm font-semibold tabular-nums">
-                    {formatCurrencyPHP(agent.projectedTomorrow)}
+                    {formatCurrencyPHP(agent.projectedNext7Days)}
                   </p>
-                  <DeltaChip today={agent.todayRevenue} projected={agent.projectedTomorrow} />
+                  <DeltaChip sold30d={agent.soldLast30Days} projected7d={agent.projectedNext7Days} />
                 </div>
 
                 {/* BO trend */}
@@ -316,8 +297,8 @@ export function IntelligenceAgentForecast(): ReactElement {
             {MOCK_AGENTS.filter(a => a.boTrend === "worsening").length} agent{MOCK_AGENTS.filter(a => a.boTrend === "worsening").length !== 1 ? "s" : ""} with worsening BO trend
           </p>
           <p className="text-xs text-muted-foreground">
-            Total projected: <span className="font-semibold text-foreground">
-              {formatCurrencyPHP(MOCK_AGENTS.reduce((s, a) => s + a.projectedTomorrow, 0))}
+            Total projected (7d): <span className="font-semibold text-foreground">
+              {formatCurrencyPHP(MOCK_AGENTS.reduce((s, a) => s + a.projectedNext7Days, 0))}
             </span>
           </p>
         </div>

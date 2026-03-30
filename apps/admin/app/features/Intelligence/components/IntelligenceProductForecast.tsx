@@ -3,21 +3,19 @@
 import React, { type ReactElement, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { formatPercent } from "@/app/features/Intelligence/helpers";
 
+type BOTrend = "improving" | "stable" | "worsening";
 type ProductStatus = "hot" | "stable" | "declining" | "high_spoilage";
 
 interface ProductForecastRow {
   id: string;
   name: string;
   emoji: string;
-  soldSparkline: number[];   // relative 0–1, last 5 days
-  boSparkline: number[];     // relative 0–1, last 5 days
-  todaySold: number;
-  avgSold: number;
-  projectedTomorrow: number;
-  todayBoQty: number;
-  boRate: number;
+  soldSparkline: number[];   // relative 0–1, last 7 days
+  boSparkline: number[];     // relative 0–1, last 7 days
+  soldLast30Days: number;
+  projectedNext7Days: number;
+  boTrend: BOTrend;
   status: ProductStatus;
 }
 
@@ -26,78 +24,66 @@ const MOCK_PRODUCTS: ProductForecastRow[] = [
     id: "1",
     name: "Pandesal",
     emoji: "🍞",
-    soldSparkline:  [0.72, 0.78, 0.85, 0.93, 1.0],
-    boSparkline:    [0.3,  0.25, 0.2,  0.15, 0.1],
-    todaySold: 420,
-    avgSold: 380,
-    projectedTomorrow: 435,
-    todayBoQty: 12,
-    boRate: 0.03,
+    soldSparkline: [0.72, 0.75, 0.78, 0.83, 0.88, 0.93, 1.0],
+    boSparkline:   [0.3,  0.28, 0.25, 0.22, 0.18, 0.15, 0.1],
+    soldLast30Days: 11_400,
+    projectedNext7Days: 3_045,
+    boTrend: "improving",
     status: "hot",
   },
   {
     id: "2",
     name: "Spanish Bread",
     emoji: "🥖",
-    soldSparkline:  [0.9,  0.85, 0.8,  0.75, 0.68],
-    boSparkline:    [0.2,  0.3,  0.42, 0.5,  0.6],
-    todaySold: 195,
-    avgSold: 260,
-    projectedTomorrow: 210,
-    todayBoQty: 38,
-    boRate: 0.16,
+    soldSparkline: [0.9,  0.88, 0.85, 0.82, 0.78, 0.75, 0.68],
+    boSparkline:   [0.2,  0.26, 0.32, 0.38, 0.44, 0.52, 0.6],
+    soldLast30Days: 7_800,
+    projectedNext7Days: 1_470,
+    boTrend: "worsening",
     status: "declining",
   },
   {
     id: "3",
     name: "Ensaymada",
     emoji: "🧁",
-    soldSparkline:  [0.55, 0.6,  0.58, 0.62, 0.59],
-    boSparkline:    [0.4,  0.38, 0.42, 0.39, 0.41],
-    todaySold: 88,
-    avgSold: 90,
-    projectedTomorrow: 89,
-    todayBoQty: 22,
-    boRate: 0.2,
+    soldSparkline: [0.55, 0.58, 0.6,  0.57, 0.59, 0.62, 0.59],
+    boSparkline:   [0.4,  0.41, 0.38, 0.42, 0.40, 0.39, 0.41],
+    soldLast30Days: 2_700,
+    projectedNext7Days: 623,
+    boTrend: "stable",
     status: "high_spoilage",
   },
   {
     id: "4",
     name: "Tasty Bread",
     emoji: "🍞",
-    soldSparkline:  [0.8,  0.82, 0.79, 0.83, 0.81],
-    boSparkline:    [0.15, 0.18, 0.14, 0.16, 0.15],
-    todaySold: 310,
-    avgSold: 305,
-    projectedTomorrow: 308,
-    todayBoQty: 14,
-    boRate: 0.04,
+    soldSparkline: [0.8,  0.81, 0.82, 0.79, 0.83, 0.82, 0.81],
+    boSparkline:   [0.15, 0.16, 0.18, 0.14, 0.16, 0.17, 0.15],
+    soldLast30Days: 9_150,
+    projectedNext7Days: 2_156,
+    boTrend: "stable",
     status: "stable",
   },
   {
     id: "5",
     name: "Cheese Roll",
     emoji: "🥐",
-    soldSparkline:  [1.0,  0.88, 0.75, 0.63, 0.5],
-    boSparkline:    [0.1,  0.25, 0.42, 0.58, 0.75],
-    todaySold: 62,
-    avgSold: 115,
-    projectedTomorrow: 75,
-    todayBoQty: 54,
-    boRate: 0.47,
+    soldSparkline: [1.0,  0.88, 0.80, 0.75, 0.63, 0.57, 0.5],
+    boSparkline:   [0.1,  0.20, 0.30, 0.42, 0.55, 0.65, 0.75],
+    soldLast30Days: 3_450,
+    projectedNext7Days: 525,
+    boTrend: "worsening",
     status: "high_spoilage",
   },
   {
     id: "6",
     name: "Monay",
     emoji: "🫓",
-    soldSparkline:  [0.65, 0.7,  0.74, 0.78, 0.82],
-    boSparkline:    [0.35, 0.3,  0.28, 0.22, 0.18],
-    todaySold: 145,
-    avgSold: 130,
-    projectedTomorrow: 152,
-    todayBoQty: 8,
-    boRate: 0.05,
+    soldSparkline: [0.65, 0.68, 0.70, 0.74, 0.77, 0.80, 0.82],
+    boSparkline:   [0.35, 0.32, 0.30, 0.27, 0.24, 0.21, 0.18],
+    soldLast30Days: 3_900,
+    projectedNext7Days: 1_064,
+    boTrend: "improving",
     status: "hot",
   },
 ];
@@ -107,6 +93,12 @@ const statusConfig: Record<ProductStatus, { label: string; variant: "success" | 
   stable:        { label: "Stable",        variant: "pending", desc: "Consistent sell-through"      },
   declining:     { label: "Declining",     variant: "default", desc: "Sales dropping over period"   },
   high_spoilage: { label: "High Spoilage", variant: "warning", desc: "BO rate needs attention"      },
+};
+
+const boTrendConfig: Record<BOTrend, { label: string; variant: "success" | "pending" | "warning" }> = {
+  improving: { label: "Improving", variant: "success" },
+  stable:    { label: "Stable",    variant: "pending"  },
+  worsening: { label: "Worsening", variant: "warning"  },
 };
 
 type SortKey = "sold" | "bo" | "projected";
@@ -199,8 +191,11 @@ function MiniSparkline({
   );
 }
 
-function DeltaChip({ today, projected }: { today: number; projected: number }): ReactElement {
-  const pct = today > 0 ? ((projected - today) / today) * 100 : 0;
+// Compares projected next 7 days daily avg vs 30-day daily avg
+function DeltaChip({ sold30d, projected7d }: { sold30d: number; projected7d: number }): ReactElement {
+  const avg30 = sold30d / 30;
+  const avg7 = projected7d / 7;
+  const pct = avg30 > 0 ? ((avg7 - avg30) / avg30) * 100 : 0;
   const up = pct >= 0;
   return (
     <span className={`inline-flex items-center gap-0.5 text-xs font-semibold ${up ? "text-emerald-600 dark:text-emerald-400" : "text-rose-500 dark:text-rose-400"}`}>
@@ -212,10 +207,12 @@ function DeltaChip({ today, projected }: { today: number; projected: number }): 
 export function IntelligenceProductForecast(): ReactElement {
   const [sortBy, setSortBy] = useState<SortKey>("sold");
 
+  const boTrendOrder: Record<BOTrend, number> = { worsening: 0, stable: 1, improving: 2 };
+
   const sorted = [...MOCK_PRODUCTS].sort((a, b) => {
-    if (sortBy === "sold")      return b.todaySold - a.todaySold;
-    if (sortBy === "bo")        return b.boRate - a.boRate;
-    if (sortBy === "projected") return b.projectedTomorrow - a.projectedTomorrow;
+    if (sortBy === "sold")      return b.soldLast30Days - a.soldLast30Days;
+    if (sortBy === "bo")        return boTrendOrder[a.boTrend] - boTrendOrder[b.boTrend];
+    if (sortBy === "projected") return b.projectedNext7Days - a.projectedNext7Days;
     return 0;
   });
 
@@ -230,7 +227,7 @@ export function IntelligenceProductForecast(): ReactElement {
           <div>
             <CardTitle className="text-base">Product performance forecast</CardTitle>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              Sold qty and BO trends per product · identifies spoilage, growth, and decline
+              30-day sold qty vs projected next 7 days · identifies spoilage, growth, and decline
             </p>
           </div>
           <div className="flex items-center gap-1.5">
@@ -262,28 +259,27 @@ export function IntelligenceProductForecast(): ReactElement {
           <span className="w-[220px]">Trends (Sold · BO)</span>
           <button
             onClick={() => setSortBy("sold")}
-            className={`w-20 text-right transition-colors hover:text-foreground ${sortBy === "sold" ? "text-foreground font-semibold" : ""}`}
+            className={`w-32 text-right transition-colors hover:text-foreground ${sortBy === "sold" ? "text-foreground font-semibold" : ""}`}
           >
-            Today sold {sortBy === "sold" && "↓"}
+            Sold (past 30d) {sortBy === "sold" && "↓"}
           </button>
           <button
             onClick={() => setSortBy("projected")}
-            className={`w-28 text-right transition-colors hover:text-foreground ${sortBy === "projected" ? "text-foreground font-semibold" : ""}`}
+            className={`w-36 text-right transition-colors hover:text-foreground ${sortBy === "projected" ? "text-foreground font-semibold" : ""}`}
           >
-            Projected {sortBy === "projected" && "↓"}
+            Projected next 7d {sortBy === "projected" && "↓"}
           </button>
           <button
             onClick={() => setSortBy("bo")}
             className={`w-24 text-right transition-colors hover:text-foreground ${sortBy === "bo" ? "text-foreground font-semibold" : ""}`}
           >
-            BO rate {sortBy === "bo" && "↓"}
+            BO trend {sortBy === "bo" && "↓"}
           </button>
         </div>
 
         <div className="divide-y">
           {sorted.map((product) => {
             const status = statusConfig[product.status];
-            const boHigh = product.boRate >= 0.2;
 
             return (
               <div
@@ -317,24 +313,24 @@ export function IntelligenceProductForecast(): ReactElement {
                   />
                 </div>
 
-                {/* Today sold */}
-                <div className="w-20 text-right">
-                  <p className="text-sm font-semibold tabular-nums">{product.todaySold} pcs</p>
-                  <p className="text-xs text-muted-foreground">avg {product.avgSold}</p>
+                {/* Sold past 30 days */}
+                <div className="w-32 text-right">
+                  <p className="text-sm font-semibold tabular-nums">{product.soldLast30Days.toLocaleString()} pcs</p>
+                  <p className="text-xs text-muted-foreground">
+                    {Math.round(product.soldLast30Days / 30)} pcs / day avg
+                  </p>
                 </div>
 
-                {/* Projected tomorrow */}
-                <div className="w-28 text-right">
-                  <p className="text-sm font-semibold tabular-nums">{product.projectedTomorrow} pcs</p>
-                  <DeltaChip today={product.todaySold} projected={product.projectedTomorrow} />
+                {/* Projected next 7 days */}
+                <div className="w-36 text-right">
+                  <p className="text-sm font-semibold tabular-nums">{product.projectedNext7Days.toLocaleString()} pcs</p>
+                  <DeltaChip sold30d={product.soldLast30Days} projected7d={product.projectedNext7Days} />
                 </div>
 
-                {/* BO rate + status */}
+                {/* BO trend + status */}
                 <div className="w-24 flex flex-col items-end gap-1">
-                  <Badge variant={status.variant}>{status.label}</Badge>
-                  <span className={`text-xs font-medium tabular-nums ${boHigh ? "text-rose-500 dark:text-rose-400" : "text-muted-foreground"}`}>
-                    {formatPercent(product.boRate)} BO
-                  </span>
+                  <Badge variant={boTrendConfig[product.boTrend].variant}>{boTrendConfig[product.boTrend].label}</Badge>
+                  <Badge variant={status.variant} className="text-[10px]">{status.label}</Badge>
                 </div>
               </div>
             );
@@ -346,14 +342,14 @@ export function IntelligenceProductForecast(): ReactElement {
           <p className="text-xs text-muted-foreground">
             Sorted by{" "}
             <span className="font-medium text-foreground">
-              {sortBy === "sold" ? "today's sold qty" : sortBy === "bo" ? "BO rate" : "projected tomorrow"}
+              {sortBy === "sold" ? "sold (past 30d)" : sortBy === "bo" ? "BO trend" : "projected next 7d"}
             </span>
             {" "}· click column headers to reorder
           </p>
           <p className="text-xs text-muted-foreground">
-            Total projected:{" "}
+            Total projected (7d):{" "}
             <span className="font-semibold text-foreground">
-              {MOCK_PRODUCTS.reduce((s, p) => s + p.projectedTomorrow, 0).toLocaleString()} pcs
+              {MOCK_PRODUCTS.reduce((s, p) => s + p.projectedNext7Days, 0).toLocaleString()} pcs
             </span>
           </p>
         </div>

@@ -1,7 +1,7 @@
-import type { ReactElement } from "react";
-
+"use client";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
 
 export function KpiCard({
   title,
@@ -13,20 +13,20 @@ export function KpiCard({
   primary: string;
   secondary?: string;
   tone?: "neutral" | "primary";
-}): ReactElement {
+}) {
   return (
     <Card
       className={cn(
         "shadow-soft",
         tone === "primary" &&
-          "border-transparent bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-700 text-white"
+          "border-transparent bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-700 text-white",
       )}
     >
       <CardContent className="p-5">
         <p
           className={cn(
             "text-sm font-medium",
-            tone === "primary" ? "text-emerald-50/90" : "text-muted-foreground"
+            tone === "primary" ? "text-emerald-50/90" : "text-muted-foreground",
           )}
         >
           {title}
@@ -38,7 +38,9 @@ export function KpiCard({
           <p
             className={cn(
               "mt-3 text-xs",
-              tone === "primary" ? "text-emerald-50/80" : "text-muted-foreground"
+              tone === "primary"
+                ? "text-emerald-50/80"
+                : "text-muted-foreground",
             )}
           >
             {secondary}
@@ -48,4 +50,3 @@ export function KpiCard({
     </Card>
   );
 }
-

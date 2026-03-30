@@ -1,5 +1,5 @@
 import { DashboardClient } from "./components/DashboardClient";
-import { getRecords } from "./services/base/getBaseData";
+import { getRecords } from "../../server/getBaseData";
 import { parseRecordsFilters } from "@/lib/selectors/filters";
 
 export async function DashboardPage({
