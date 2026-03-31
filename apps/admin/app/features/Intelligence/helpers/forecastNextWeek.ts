@@ -25,6 +25,14 @@ export function forecastNextWeek(data: any[]): ForecastChartData {
       label: dateToFindStr,
       actual: totalSalesThatDay,
     });
+    const dateToForecast = new Date();
+    dateToForecast.setDate(dateToForecast.getDate() + dayOffset + 1);
+    const dateToForecastStr = dateToForecast.toISOString().split("T")[0];
+
+    sevenDayForecastData.push({
+      label: dateToForecastStr,
+      forecast: 1200,
+    });
   }
 
   return {
@@ -32,6 +40,6 @@ export function forecastNextWeek(data: any[]): ForecastChartData {
     forecastStart: "...",
     forecastEnd: "...",
     yFormatter: (v) => `₱${(v / 1000).toFixed(0)}k`,
-    data: sevenDayForecastData.reverse(),
+    data: sevenDayForecastData.sort((a, b) => a.label.localeCompare(b.label)),
   };
 }
