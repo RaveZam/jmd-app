@@ -19,8 +19,8 @@ export function computeRevenueTodayAndYesterday(data: any) {
   const percentageDiff =
     ((totalSalesToday - totalSalesYesterday) / totalSalesYesterday) * 100;
 
-  console.log("total", totalSalesToday);
-  console.log("total", totalSalesYesterday);
+  // console.log("total", totalSalesToday);
+  // console.log("total", totalSalesYesterday);
 
   return {
     totalSalesToday,

@@ -7,12 +7,15 @@ import { IntelligenceForecastChart } from "./IntelligenceForecastChart";
 import { IntelligenceProductForecast } from "./IntelligenceProductForecast";
 import { IntelligenceRangeDropdown } from "./IntelligenceRangeDropdown";
 import { computeAverageSalesOnThatDay } from "../helpers/computeAverageSalesOnThatDay";
+import { computeMovingAverageAndDayAverage } from "../helpers/computeMovingAverageAndDayAverage";
 
 export function IntelligencePageClient({ data }: { data: any }) {
+  computeMovingAverageAndDayAverage(data);
   const { totalSalesToday, totalSalesYesterday, percentageDiff } =
     computeRevenueTodayAndYesterday(data);
   const { predictedRevenueForTomorrow, dayToday } =
     computeAverageSalesOnThatDay(data);
+  const { averageSalesNextWeek } = computeMovingAverageAndDayAverage(data);
 
   return (
     <>
@@ -57,15 +60,22 @@ export function IntelligencePageClient({ data }: { data: any }) {
                 tone="primary"
               />
               <KpiCard
-                title={`Predicted sales tomorrow (${["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][(dayToday + 1) % 7]})`}
-                primary={"₱" + predictedRevenueForTomorrow}
-                secondary={`Your Average Sales On  ${["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][(dayToday + 1) % 7]} for the past month`}
+                title="Predicted sales Tomorrow"
+                primary={
+                  "₱" +
+                  (isNaN(predictedRevenueForTomorrow)
+                    ? 0
+                    : predictedRevenueForTomorrow)
+                }
+                secondary={`Your Typical Sales On  ${["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][(dayToday + 1) % 7]}`}
                 tone="primary"
               />
               <KpiCard
                 title="Projected 7 Day Revenue"
-                primary="₱490,100"
-                secondary="7-day projected average"
+                primary={
+                  "₱" + Math.round(averageSalesNextWeek).toLocaleString()
+                }
+                secondary="Based From your weekly Sales This Month"
                 tone="primary"
               />
               <KpiCard
