@@ -20,11 +20,13 @@ export const getRecords = cache(async (filters: any) => {
       )
     `,
     )
+    .order("created_at", { ascending: false })
     .gte("session_stores.route_sessions.session_date", filters.dateFrom)
     .lte("session_stores.route_sessions.session_date", filters.dateTo);
 
   // console.log("getRecords raw response:", JSON.stringify(data, null, 2));
 
+  console.log(data);
   if (error) throw new Error(error.message);
 
   return (data ?? []).map((row) => {

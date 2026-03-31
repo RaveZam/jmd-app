@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { ReactElement } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -14,39 +15,57 @@ import {
   Legend,
   ReferenceArea,
 } from "recharts";
+import { ForecastRange } from "../types/forecast_types";
+import { useGetForecastChart } from "../hooks/useGetForecastChart";
 
-function formatCurrencyPHP(value: number): string {
-  return `₱${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
-}
-
-const DATA = [
-  { label: "Mar 19", actual: 42000 },
-  { label: "Mar 20", actual: 38500 },
-  { label: "Mar 21", actual: 51000 },
-  { label: "Mar 22", actual: 47000 },
-  { label: "Mar 23", actual: 55000 },
-  { label: "Mar 24", actual: 49500 },
-  { label: "Mar 25", actual: 53000 },
-  { label: "Mar 26", forecast: 51000 },
-  { label: "Mar 27", forecast: 54000 },
-  { label: "Mar 28", forecast: 50000 },
-  { label: "Mar 29", forecast: 56000 },
-  { label: "Mar 30", forecast: 52000 },
-  { label: "Mar 31", forecast: 58000 },
-  { label: "Apr 1", forecast: 55000 },
+const RANGES: { value: ForecastRange; label: string }[] = [
+  { value: "weekly", label: "Weekly" },
+  { value: "monthly", label: "Monthly" },
+  { value: "yearly", label: "Yearly" },
 ];
 
-export function IntelligenceForecastChart(): ReactElement {
+export function IntelligenceForecastChart({
+  data,
+}: {
+  data: any;
+}): ReactElement {
+  const [range, setRange] = useState<ForecastRange>("weekly");
+  const { getForecastData } = useGetForecastChart(data);
+  const {
+    title,
+    data: chartData,
+    forecastStart,
+    forecastEnd,
+    yFormatter,
+  } = getForecastData(range);
+
   return (
     <Card className="shadow-soft">
       <CardHeader className="pb-3">
-        <CardTitle className="text-base">7-day revenue forecast</CardTitle>
+        <div className="flex items-center justify-between gap-3">
+          <CardTitle className="text-base">{title}</CardTitle>
+          <div className="flex rounded-md overflow-hidden text-xs font-medium border border-emerald-800">
+            {RANGES.map((r) => (
+              <button
+                key={r.value}
+                onClick={() => setRange(r.value)}
+                className={`px-3 py-1.5 transition-colors ${
+                  range === r.value
+                    ? "bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-700 text-white"
+                    : "bg-background text-emerald-800 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950"
+                }`}
+              >
+                {r.label}
+              </button>
+            ))}
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="h-[280px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart
-              data={DATA}
+              data={chartData}
               margin={{ top: 8, right: 8, left: 8, bottom: 8 }}
             >
               <defs>
@@ -58,23 +77,21 @@ export function IntelligenceForecastChart(): ReactElement {
               <CartesianGrid
                 strokeDasharray="3 3"
                 stroke="rgba(148,163,184,0.35)"
-                vertical={true}
-                horizontal={true}
               />
               <ReferenceArea
-                x1="Mar 26"
-                x2="Apr 1"
+                x1={forecastStart}
+                x2={forecastEnd}
                 fill="rgb(148,163,184)"
                 fillOpacity={0.12}
                 strokeOpacity={0}
               />
               <XAxis dataKey="label" tick={{ fontSize: 11 }} />
-              <YAxis
-                tick={{ fontSize: 11 }}
-                tickFormatter={(v) => `₱${(v / 1000).toFixed(0)}k`}
-              />
+              <YAxis tick={{ fontSize: 11 }} tickFormatter={yFormatter} />
               <Tooltip
-                formatter={(value: number) => [formatCurrencyPHP(value), ""]}
+                formatter={(value: number) => [
+                  `₱${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
+                  "",
+                ]}
                 labelFormatter={(label) => label}
               />
               <Legend />

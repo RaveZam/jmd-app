@@ -20,16 +20,6 @@ export function computeMovingAverageAndDayAverage(data: any) {
       totalSalesThatDay / (howManyDaysOfThatDayInAMonth || 1);
 
     averageSalesNextWeek += averageWeeklySaleOfTheDay;
-
-    // console.log(
-    //   totalSalesThatDay +
-    //     " " +
-    //     day +
-    //     "Weeks:" +
-    //     howManyDaysOfThatDayInAMonth +
-    //     " Average is " +
-    //     averageWeeklySaleOfTheDay,
-    // );
   }
 
   return {

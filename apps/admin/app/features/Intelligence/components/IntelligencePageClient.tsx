@@ -5,9 +5,19 @@ import { IntelligenceActionCard } from "./IntelligenceActionCard";
 import { IntelligenceAgentForecast } from "./IntelligenceAgentForecast";
 import { IntelligenceForecastChart } from "./IntelligenceForecastChart";
 import { IntelligenceProductForecast } from "./IntelligenceProductForecast";
-import { IntelligenceRangeDropdown } from "./IntelligenceRangeDropdown";
 import { computeAverageSalesOnThatDay } from "../helpers/computeAverageSalesOnThatDay";
 import { computeMovingAverageAndDayAverage } from "../helpers/computeMovingAverageAndDayAverage";
+import { computeBORateThisMonth } from "../helpers/computeBORateThisMonth";
+import {
+  TrendingUp,
+  TrendingDown,
+  CalendarDays,
+  BarChart2,
+  ShieldCheck,
+  AlertCircle,
+  AlertTriangle,
+  ShieldAlert,
+} from "lucide-react";
 
 export function IntelligencePageClient({ data }: { data: any }) {
   computeMovingAverageAndDayAverage(data);
@@ -16,6 +26,35 @@ export function IntelligencePageClient({ data }: { data: any }) {
   const { predictedRevenueForTomorrow, dayToday } =
     computeAverageSalesOnThatDay(data);
   const { averageSalesNextWeek } = computeMovingAverageAndDayAverage(data);
+
+  const { borate } = computeBORateThisMonth(data);
+
+  const boRiskTone =
+    borate < 5
+      ? "healthy"
+      : borate < 10
+        ? "medium"
+        : borate < 20
+          ? "warning"
+          : "critical";
+
+  const boRiskLabel =
+    borate < 5
+      ? "Healthy"
+      : borate < 10
+        ? "Medium"
+        : borate < 20
+          ? "At Risk"
+          : "Critical";
+
+  const boRiskIcon =
+    borate < 5
+      ? ShieldCheck
+      : borate < 10
+        ? AlertCircle
+        : borate < 20
+          ? AlertTriangle
+          : ShieldAlert;
 
   return (
     <>
@@ -31,10 +70,6 @@ export function IntelligencePageClient({ data }: { data: any }) {
                 risk signals
               </p>
             </div>
-            <IntelligenceRangeDropdown
-              currentRange={7}
-              currentDate="2026-03-26"
-            />
           </div>
         </div>
       </header>
@@ -58,6 +93,7 @@ export function IntelligencePageClient({ data }: { data: any }) {
                   totalSalesYesterday
                 }
                 tone="primary"
+                icon={percentageDiff >= 0 ? TrendingUp : TrendingDown}
               />
               <KpiCard
                 title="Predicted sales Tomorrow"
@@ -69,6 +105,7 @@ export function IntelligencePageClient({ data }: { data: any }) {
                 }
                 secondary={`Your Typical Sales On  ${["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][(dayToday + 1) % 7]}`}
                 tone="primary"
+                icon={CalendarDays}
               />
               <KpiCard
                 title="Projected 7 Day Revenue"
@@ -77,11 +114,14 @@ export function IntelligencePageClient({ data }: { data: any }) {
                 }
                 secondary="Based From your weekly Sales This Month"
                 tone="primary"
+                icon={BarChart2}
               />
               <KpiCard
                 title="BO risk level"
-                primary="Low"
-                secondary="BO rate 8.0%"
+                primary={boRiskLabel}
+                secondary={"BO Rate " + borate.toFixed(1) + "% This Month"}
+                tone={boRiskTone}
+                icon={boRiskIcon}
               />
             </div>
           </section>
@@ -125,7 +165,7 @@ export function IntelligencePageClient({ data }: { data: any }) {
           </section>
 
           <section>
-            <IntelligenceForecastChart />
+            <IntelligenceForecastChart data={data} />
           </section>
 
           <section>
