@@ -26,7 +26,6 @@ export const getRecords = cache(async (filters: any) => {
 
   // console.log("getRecords raw response:", JSON.stringify(data, null, 2));
 
-  console.log(data);
   if (error) throw new Error(error.message);
 
   return (data ?? []).map((row) => {
