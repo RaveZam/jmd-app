@@ -11,7 +11,7 @@ import {
   YAxis,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FilterRange } from "../../types";
+import { FilterRange } from "../types";
 
 function formatCurrencyPHP(value: number): string {
   if (value >= 1_000_000) return `₱${(value / 1_000_000).toFixed(1)}M`;

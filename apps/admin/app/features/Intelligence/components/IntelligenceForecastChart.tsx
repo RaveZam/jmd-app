@@ -17,6 +17,7 @@ import {
 } from "recharts";
 import { ForecastRange } from "../types/forecast_types";
 import { useGetForecastChart } from "../hooks/useGetForecastChart";
+import { useRouter } from "next/navigation";
 
 const RANGES: { value: ForecastRange; label: string }[] = [
   { value: "weekly", label: "Weekly" },
@@ -29,15 +30,42 @@ export function IntelligenceForecastChart({
 }: {
   data: any;
 }): ReactElement {
+  const router = useRouter();
   const [range, setRange] = useState<ForecastRange>("weekly");
   const { getForecastData } = useGetForecastChart(data);
   const {
     title,
-    data: chartData,
+    data: rawChartData,
     forecastStart,
     forecastEnd,
     yFormatter,
   } = getForecastData(range);
+
+  // Bridge the actual and forecast lines visually by carrying the last actual
+  // value forward as the forecast anchor point. Mark it so the tooltip can
+  // suppress the duplicate forecast entry at that point.
+  const chartData = rawChartData.map((point, i, arr) => {
+    const isLastActual =
+      point.actual != null &&
+      point.forecast == null &&
+      arr[i + 1]?.forecast != null;
+    return isLastActual
+      ? { ...point, forecast: point.actual, isBridge: true }
+      : point;
+  });
+
+  function setFilterRange(range: any) {
+    setRange(range);
+    if (range === "monthly") {
+      router.push("?range=monthly");
+    }
+    if (range === "weekly") {
+      router.push("?range=weekly");
+    }
+    if (range === "yearly") {
+      router.push("?range=yearly");
+    }
+  }
 
   return (
     <Card className="shadow-soft">
@@ -48,7 +76,7 @@ export function IntelligenceForecastChart({
             {RANGES.map((r) => (
               <button
                 key={r.value}
-                onClick={() => setRange(r.value)}
+                onClick={() => setFilterRange(r.value)}
                 className={`px-3 py-1.5 transition-colors ${
                   range === r.value
                     ? "bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-700 text-white"
@@ -88,11 +116,24 @@ export function IntelligenceForecastChart({
               <XAxis dataKey="label" tick={{ fontSize: 11 }} />
               <YAxis tick={{ fontSize: 11 }} tickFormatter={yFormatter} />
               <Tooltip
-                formatter={(value: number) => [
-                  `₱${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
-                  "",
-                ]}
-                labelFormatter={(label) => label}
+                content={({ active, payload, label }) => {
+                  if (!active || !payload?.length) return null;
+                  const isBridge = payload[0]?.payload?.isBridge;
+                  const entries = isBridge
+                    ? payload.filter((p) => p.dataKey !== "forecast")
+                    : payload;
+                  return (
+                    <div className="rounded-md border bg-background px-3 py-2 text-xs shadow-md">
+                      <p className="mb-1 font-medium">{label}</p>
+                      {entries.map((p) => (
+                        <p key={p.dataKey} style={{ color: p.color }}>
+                          {p.name}:{" "}
+                          ₱{(p.value as number).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                        </p>
+                      ))}
+                    </div>
+                  );
+                }}
               />
               <Legend />
               <Area

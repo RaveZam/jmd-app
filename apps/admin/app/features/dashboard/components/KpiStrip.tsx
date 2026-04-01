@@ -1,6 +1,6 @@
 import { KpiCard } from "./KpiCard";
-import { useComputeSalesKPI } from "../../hooks/useComputeSalesKPI";
-import { FilterRange } from "../../types";
+import { useComputeSalesKPI } from "../hooks/useComputeSalesKPI";
+import { FilterRange } from "../types";
 
 const FILTER_LABEL: Record<FilterRange, string> = {
   today: "Today",

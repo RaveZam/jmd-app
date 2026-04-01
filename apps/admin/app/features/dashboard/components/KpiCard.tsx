@@ -64,9 +64,7 @@ export function KpiCard({
       <CardContent className="p-5">
         <div className="flex items-start justify-between">
           <p className={cn("text-sm font-medium", styles.label)}>{title}</p>
-          {Icon && (
-            <Icon className={cn("h-5 w-5 shrink-0", styles.icon)} />
-          )}
+          {Icon && <Icon className={cn("h-5 w-5 shrink-0", styles.icon)} />}
         </div>
         <p className="mt-2 text-3xl font-semibold leading-none tracking-tight">
           {primary}

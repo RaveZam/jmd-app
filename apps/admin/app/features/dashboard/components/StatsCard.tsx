@@ -11,10 +11,17 @@ function StatsCardArrow({ tone }: { tone: StatsCardTone }): ReactElement {
     <div
       className={cn(
         "grid h-8 w-8 place-items-center rounded-full border",
-        tone === "primary" ? "border-white/25 bg-white/10" : "border-border bg-background"
+        tone === "primary"
+          ? "border-white/25 bg-white/10"
+          : "border-border bg-background",
       )}
     >
-      <ArrowUpRight className={cn("h-4 w-4", tone === "primary" ? "text-white" : "text-muted-foreground")} />
+      <ArrowUpRight
+        className={cn(
+          "h-4 w-4",
+          tone === "primary" ? "text-white" : "text-muted-foreground",
+        )}
+      />
     </div>
   );
 }
@@ -28,7 +35,12 @@ function StatsCardFooter({
 }): ReactElement | null {
   if (!footer) return null;
   return (
-    <p className={cn("mt-4 text-xs", tone === "primary" ? "text-emerald-50/80" : "text-muted-foreground")}>
+    <p
+      className={cn(
+        "mt-4 text-xs",
+        tone === "primary" ? "text-emerald-50/80" : "text-muted-foreground",
+      )}
+    >
       {footer}
     </p>
   );
@@ -46,12 +58,29 @@ export function StatsCard({
   tone?: StatsCardTone;
 }): ReactElement {
   return (
-    <Card className={cn("relative overflow-hidden", tone === "primary" && "border-transparent bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-700 text-white")}>
+    <Card
+      className={cn(
+        "relative overflow-hidden",
+        tone === "primary" &&
+          "border-transparent bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-700 text-white",
+      )}
+    >
       <CardContent className="p-5">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className={cn("text-sm font-medium", tone === "primary" ? "text-emerald-50/90" : "text-muted-foreground")}>{title}</p>
-            <p className="mt-2 text-4xl font-semibold leading-none tracking-tight">{value}</p>
+            <p
+              className={cn(
+                "text-sm font-medium",
+                tone === "primary"
+                  ? "text-emerald-50/90"
+                  : "text-muted-foreground",
+              )}
+            >
+              {title}
+            </p>
+            <p className="mt-2 text-4xl font-semibold leading-none tracking-tight">
+              {value}
+            </p>
           </div>
           <StatsCardArrow tone={tone} />
         </div>
@@ -60,4 +89,3 @@ export function StatsCard({
     </Card>
   );
 }
-

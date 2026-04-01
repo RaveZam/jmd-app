@@ -5,7 +5,7 @@ import { forecastNextYear } from "../helpers/forecastNextYear";
 
 export function useGetForecastChart(data: any) {
   function getForecastData(range: ForecastRange): ForecastChartData {
-    if (range === "monthly") return forecastNextMonth(data);
+    if (range === "monthly") return forecastNextMonth();
     if (range === "yearly") return forecastNextYear(data);
     return forecastNextWeek(data);
   }

@@ -1,5 +1,5 @@
 "use client";
-import { KpiCard } from "../../dashboard/components/phase1/KpiCard";
+import { KpiCard } from "../../dashboard/components/KpiCard";
 import { computeRevenueTodayAndYesterday } from "../helpers/computeRevenueTodayAndYesterday";
 import { IntelligenceActionCard } from "./IntelligenceActionCard";
 import { IntelligenceAgentForecast } from "./IntelligenceAgentForecast";
@@ -19,7 +19,13 @@ import {
   ShieldAlert,
 } from "lucide-react";
 
-export function IntelligencePageClient({ data }: { data: any }) {
+export function IntelligencePageClient({
+  data,
+  yearData,
+}: {
+  data: any;
+  yearData: any;
+}) {
   computeMovingAverageAndDayAverage(data);
   const { totalSalesToday, totalSalesYesterday, percentageDiff } =
     computeRevenueTodayAndYesterday(data);

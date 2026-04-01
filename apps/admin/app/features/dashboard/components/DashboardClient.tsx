@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { TopAgentsChart } from "@/app/features/dashboard/components/phase1/TopAgentsChart";
-import { KpiStrip } from "@/app/features/dashboard/components/phase1/KpiStrip";
-import { ProductSoldVsBoChart } from "@/app/features/dashboard/components/phase1/ProductSoldVsBoChart";
-import { TopProductsSoldTable } from "@/app/features/dashboard/components/phase1/TopProductsSoldTable";
-import { SalesLineChart } from "@/app/features/dashboard/components/phase1/SalesLineChart";
+import { TopAgentsChart } from "@/app/features/dashboard/components/TopAgentsChart";
+import { KpiStrip } from "@/app/features/dashboard/components/KpiStrip";
+import { ProductSoldVsBoChart } from "@/app/features/dashboard/components/ProductSoldVsBoChart";
+import { TopProductsSoldTable } from "@/app/features/dashboard/components/TopProductsSoldTable";
+import { SalesLineChart } from "@/app/features/dashboard/components/SalesLineChart";
 import { FilterRange } from "../types";
 import { FILTERS } from "../types";
 import { useRouter } from "next/navigation";
@@ -22,17 +22,20 @@ export function DashboardClient({ data }: { data: any }) {
 
   function getDateRange(filter: FilterRange): { from: string; to: string } {
     const now = new Date();
-    const to = now.toISOString();
+    const phTime = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+    const today = phTime.toISOString().split("T")[0];
 
     if (filter === "today") {
-      const today = to.split("T")[0];
       return { from: today, to: today };
     }
 
-    const days = filter === "7days" ? 7 : 30;
-    const from = new Date(now);
+    const days = filter === "7days" ? 6 : 29;
+
+    const fromPh = new Date();
+    const fromphTime = new Date(fromPh.getTime() + 8 * 60 * 60 * 1000);
+    const from = fromphTime;
     from.setDate(now.getDate() - days);
-    return { from: from.toISOString().split("T")[0], to: to.split("T")[0] };
+    return { from: from.toISOString().split("T")[0], to: today };
   }
 
   return (

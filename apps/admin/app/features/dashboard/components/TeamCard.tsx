@@ -55,4 +55,3 @@ export function TeamCard({ members }: { members: TeamMember[] }) {
     </Card>
   );
 }
-

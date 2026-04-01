@@ -1,0 +1,24 @@
+{
+  "name": "jmdbakery",
+  "version": "1.0.0",
+  "description": "A monorepo for managing bakery/retail distribution operations — tracking field agents, store visits, sales records, and route sessions across three interconnected apps.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RaveZam/jmd-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/RaveZam/jmd-app/issues"
+  },
+  "homepage": "https://github.com/RaveZam/jmd-app#readme",
+  "devDependencies": {
+    "supabase": "^2.84.5"
+  }
+}

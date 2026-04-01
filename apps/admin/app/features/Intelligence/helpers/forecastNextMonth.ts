@@ -1,6 +1,8 @@
 import { ForecastChartData } from "../types/forecast_types";
 
-export function forecastNextMonth(data: any): ForecastChartData {
+export function forecastNextMonth(): ForecastChartData {
+  // const data = getOneYearOfSalesData();
+
   return {
     title: "Next month revenue forecast",
     forecastStart: "Apr W1",
