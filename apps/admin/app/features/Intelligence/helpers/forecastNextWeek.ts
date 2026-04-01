@@ -1,11 +1,16 @@
 import { DataPoint, ForecastChartData } from "../types/forecast_types";
 
+function phNow(): Date {
+  const now = new Date();
+  return new Date(now.getTime() + 8 * 60 * 60 * 1000);
+}
+
 export function forecastNextWeek(data: any[]): ForecastChartData {
   let dayOffset = 0;
   const sevenDayForecastData: DataPoint[] = [];
 
   for (dayOffset; dayOffset < 7; dayOffset++) {
-    const dateToFind = new Date();
+    const dateToFind = phNow();
     dateToFind.setDate(dateToFind.getDate() - dayOffset);
     const dateToFindStr = dateToFind.toISOString().split("T")[0];
 
@@ -26,7 +31,7 @@ export function forecastNextWeek(data: any[]): ForecastChartData {
       actual: totalSalesThatDay,
     });
 
-    const dateToForecast = new Date();
+    const dateToForecast = phNow();
     dateToForecast.setDate(dateToForecast.getDate() + dayOffset + 1);
     const dateToForecastStr = dateToForecast.toISOString().split("T")[0];
 

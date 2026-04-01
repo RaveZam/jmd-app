@@ -1,5 +1,10 @@
+function phNow(): Date {
+  const now = new Date();
+  return new Date(now.getTime() + 8 * 60 * 60 * 1000);
+}
+
 export function computeAverageSalesOnThatDay(data: any) {
-  const dayToday = new Date().getDay();
+  const dayToday = phNow().getDay();
 
   const salesThatDay = data.filter((r: any) => {
     const rawDate = r.createdAt.split("T")[0];

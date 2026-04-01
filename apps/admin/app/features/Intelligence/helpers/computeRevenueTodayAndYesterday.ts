@@ -1,7 +1,10 @@
 export function computeRevenueTodayAndYesterday(data: any) {
-  const today = new Date().toISOString().split("T")[0];
-  ("2026-03-30");
-  const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
+  const now = new Date();
+  const phTime = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+  const today = phTime.toISOString().split("T")[0];
+
+  const yesterdayPh = new Date(now.getTime() + 8 * 60 * 60 * 1000 - 86400000);
+  const yesterday = yesterdayPh.toISOString().split("T")[0];
 
   const todayData = data.filter((r: { date: string }) => r.date === today);
   const yesterdayData = data.filter(
