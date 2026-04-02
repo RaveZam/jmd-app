@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ReactElement } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import { ChevronsUpDown, ChevronUp, ChevronDown } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -98,10 +99,26 @@ function StoreTotalsRow({ stores }: { stores: StoreRow[] }): ReactElement {
   );
 }
 
-export function StoresTable({ stores }: { stores: StoreRow[] }): ReactElement {
+export function StoresTable({
+  stores,
+  years,
+  selectedYear,
+}: {
+  stores: StoreRow[];
+  years: number[];
+  selectedYear?: number;
+}): ReactElement {
+  const router = useRouter();
+  const pathname = usePathname();
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>(null);
   const [selectedStore, setSelectedStore] = useState<StoreRow | null>(null);
+
+  function handleYearChange(value: string): void {
+    const params = new URLSearchParams();
+    if (value) params.set("year", value);
+    router.push(`${pathname}${params.size ? `?${params}` : ""}`);
+  }
 
   function handleSort(key: SortKey): void {
     if (sortKey !== key) {
@@ -123,6 +140,24 @@ export function StoresTable({ stores }: { stores: StoreRow[] }): ReactElement {
 
   return (
     <>
+      <div className="flex items-center gap-2">
+        <label className="text-sm text-muted-foreground" htmlFor="year-filter">
+          Year
+        </label>
+        <select
+          id="year-filter"
+          className="rounded-md border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+          value={selectedYear ?? ""}
+          onChange={(e) => handleYearChange(e.target.value)}
+        >
+          {years.map((y) => (
+            <option key={y} value={y}>
+              {y}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <div className="overflow-auto rounded-2xl border bg-card shadow-soft">
         <table className="w-full min-w-[800px] text-sm">
           <thead className="sticky top-0 z-10 bg-muted/60 text-xs text-muted-foreground backdrop-blur">

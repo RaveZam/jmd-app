@@ -3,10 +3,30 @@
 import { createClient } from "@/utils/supabase/server";
 import type { StoreRow } from "../types/store-types";
 
-export async function getStores(): Promise<StoreRow[]> {
+export async function getStoreSaleYears(): Promise<number[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("route_sessions")
+    .select("session_date")
+    .order("session_date", { ascending: true });
+
+  if (error) throw new Error(error.message);
+
+  const years = [
+    ...new Set(
+      (data ?? []).map((r) => new Date(r.session_date).getFullYear())
+    ),
+  ].sort((a, b) => a - b);
+
+  return years;
+}
+
+export async function getStores(year?: number): Promise<StoreRow[]> {
   const supabase = await createClient();
 
-  const { data, error } = await supabase.rpc("get_stores_summary");
+  const { data, error } = await supabase.rpc("get_stores_summary", {
+    p_year: year ?? null,
+  });
 
   if (error) throw new Error(error.message);
 

@@ -1,11 +1,15 @@
 import type { ReactElement } from "react";
 import { Store } from "lucide-react";
 
-import { getStores } from "./services/storesService";
+import { getStores, getStoreSaleYears } from "./services/storesService";
 import { StoresTable } from "./components/StoresTable";
 
-export async function StoresPage(): Promise<ReactElement> {
-  const stores = await getStores();
+export async function StoresPage({
+  year,
+}: {
+  year?: number;
+}): Promise<ReactElement> {
+  const [stores, years] = await Promise.all([getStores(year), getStoreSaleYears()]);
 
   return (
     <>
@@ -39,7 +43,7 @@ export async function StoresPage(): Promise<ReactElement> {
                 </span>{" "}
                 stores
               </p>
-              <StoresTable stores={stores} />
+              <StoresTable stores={stores} years={years} selectedYear={year} />
             </>
           )}
         </div>
