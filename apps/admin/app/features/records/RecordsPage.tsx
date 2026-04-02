@@ -5,7 +5,7 @@ import {
   buildRecordsPageUrl,
   getRecordsPageData,
 } from "@/app/features/records/server/records-page-data";
-import { fetchRecords } from "@/app/features/records/server/fetch-records";
+import { getRecords } from "@/app/server/getBaseData";
 import { fetchSessions } from "@/app/features/records/server/fetch-sessions";
 import { RecordsClient } from "@/app/features/records/components/RecordsClient";
 
@@ -17,13 +17,14 @@ export async function RecordsPage({
   searchParams: Promise<SearchParams> | SearchParams;
 }) {
   const sp = await searchParams;
+  const filters = parseRecordsFilters(sp);
 
-  const [{ records, saleSessionMap }, sessions] = await Promise.all([
-    fetchRecords(),
+  const [records, sessions] = await Promise.all([
+    getRecords(filters),
     fetchSessions(),
   ]);
 
-  const filters = parseRecordsFilters(sp);
+  const saleSessionMap = new Map(records.map((r) => [r.id, r.sessionId]));
 
   const sessionSaleIds =
     filters.sessionId === ALL_SESSIONS

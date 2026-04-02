@@ -18,14 +18,6 @@ type RecordsFiltersBarProps = {
   filtersDefault: RecordsFilters;
 };
 
-function getMonday(d: Date): Date {
-  const day = d.getDay();
-  const diff = day === 0 ? -6 : 1 - day;
-  const monday = new Date(d);
-  monday.setDate(d.getDate() + diff);
-  return monday;
-}
-
 export function RecordsFiltersBar({
   agents,
   sessions,
@@ -71,11 +63,13 @@ export function RecordsFiltersBar({
       return d;
     })(),
   );
-  const thisWeekStart = formatLocalISODate(getMonday(new Date()));
+  const sixDaysAgo = formatLocalISODate(
+    (() => { const d = new Date(); d.setDate(d.getDate() - 6); return d; })(),
+  );
 
   const isToday = dateFrom === today && dateTo === today;
   const isYesterday = dateFrom === yesterday && dateTo === yesterday;
-  const isThisWeek = dateFrom === thisWeekStart && dateTo === today;
+  const isThisWeek = dateFrom === sixDaysAgo && dateTo === today;
 
   return (
     <div className="flex flex-wrap items-end gap-4 rounded-2xl border bg-card px-5 py-4 shadow-sm">
@@ -90,7 +84,7 @@ export function RecordsFiltersBar({
             <input
               type="date"
               value={dateFrom}
-              onChange={(e) => push({ dateFrom: e.target.value })}
+              onChange={(e) => push({ dateFrom: e.target.value, dateTo })}
               className="h-9 rounded-xl border bg-background pl-8 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
@@ -107,7 +101,7 @@ export function RecordsFiltersBar({
             <input
               type="date"
               value={dateTo}
-              onChange={(e) => push({ dateTo: e.target.value })}
+              onChange={(e) => push({ dateFrom, dateTo: e.target.value })}
               className="h-9 rounded-xl border bg-background pl-8 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
@@ -118,7 +112,7 @@ export function RecordsFiltersBar({
           {[
             { label: "Today", active: isToday, onClick: () => toggleDateRange(today, today) },
             { label: "Yesterday", active: isYesterday, onClick: () => toggleDateRange(yesterday, yesterday) },
-            { label: "This Week", active: isThisWeek, onClick: () => toggleDateRange(thisWeekStart, today) },
+            { label: "This Week", active: isThisWeek, onClick: () => toggleDateRange(sixDaysAgo, today) },
           ].map(({ label, active, onClick }) => (
             <button
               key={label}

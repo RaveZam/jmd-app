@@ -10,38 +10,42 @@ export const getRecords = cache(async (filters: any) => {
   ]);
 
   const { data, error } = await supabase
-    .from("sales")
+    .from("route_sessions")
     .select(
       `
-     *,
+      id, session_date, conducted_by,
       session_stores!inner(
-        stores(store_name),
-        route_sessions!inner(session_date, conducted_by)
+        sales(*),
+        stores(store_name)
       )
     `,
     )
-    .order("created_at", { ascending: false })
-    .gte("session_stores.route_sessions.session_date", filters.dateFrom)
-    .lte("session_stores.route_sessions.session_date", filters.dateTo);
+    .gte("session_date", filters.dateFrom)
+    .lte("session_date", filters.dateTo)
+    .order("session_date", { ascending: false });
 
   if (error) throw new Error(error.message);
 
-  return (data ?? []).map((row) => {
-    const session = (row.session_stores as any)?.route_sessions;
-    const store = (row.session_stores as any)?.stores;
-    const agentId: string = session?.conducted_by ?? "";
+  return (data ?? []).flatMap((row) => {
+    const agentId: string = row.conducted_by ?? "";
+    const agent = agentMap[agentId]?.name ?? "Unknown";
 
-    return {
-      id: row.id,
-      date: session?.session_date,
-      createdAt: row.created_at ?? null,
-      agent: agentMap[agentId]?.name ?? "Unknown",
-      store: store?.store_name ?? "",
-      product: row.snapshot_product_name ?? "",
-      soldQty: row.quantity_sold ?? 0,
-      boQty: row.quantity_bo ?? 0,
-      unitPrice: row.snapshot_price ?? 0,
-      total: row.total ?? 0,
-    };
+    return (row.session_stores as any[]).flatMap((sessionStore) => {
+      const storeName: string = sessionStore.stores?.store_name ?? "";
+
+      return (sessionStore.sales as any[]).map((sale) => ({
+        id: sale.id,
+        sessionId: row.id as string,
+        date: row.session_date,
+        createdAt: sale.created_at ?? null,
+        agent,
+        store: storeName,
+        product: sale.snapshot_product_name ?? "",
+        soldQty: sale.quantity_sold ?? 0,
+        boQty: sale.quantity_bo ?? 0,
+        unitPrice: sale.snapshot_price ?? 0,
+        total: sale.total ?? 0,
+      }));
+    });
   });
 });

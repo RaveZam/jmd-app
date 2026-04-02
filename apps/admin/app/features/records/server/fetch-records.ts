@@ -5,6 +5,7 @@ import { createClient } from "@/utils/supabase/server";
 type SaleRow = {
   id: string;
   snapshot_price: number;
+  snapshot_product_name: string;
   quantity_sold: number;
   quantity_bo: number;
   session_stores: {
@@ -15,7 +16,6 @@ type SaleRow = {
       conducted_by: string;
     };
   };
-  products: { product_name: string };
 };
 
 export async function fetchRecords(): Promise<{
@@ -33,6 +33,7 @@ export async function fetchRecords(): Promise<{
     supabase.from("sales").select(`
       id,
       snapshot_price,
+      snapshot_product_name,
       quantity_sold,
       quantity_bo,
       session_stores!inner (
@@ -42,8 +43,7 @@ export async function fetchRecords(): Promise<{
           session_date,
           conducted_by
         )
-      ),
-      products!inner ( product_name )
+      )
     `),
     supabaseAdmin.auth.admin.listUsers(),
   ]);
@@ -67,7 +67,7 @@ export async function fetchRecords(): Promise<{
       date: session.session_date,
       agent: userMap.get(session.conducted_by) ?? "Unknown",
       store: sale.session_stores.stores.store_name,
-      product: sale.products.product_name,
+      product: sale.snapshot_product_name ?? "",
       deliveredQty: sale.quantity_sold,
       soldQty: sale.quantity_sold,
       boQty: sale.quantity_bo,
