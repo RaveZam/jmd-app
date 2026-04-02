@@ -5,9 +5,10 @@ export const getOneYearOfSalesData = cache(async () => {
   const supabase = await createClient();
   console.log("Calling One Year Worth Of Data");
 
-  const dateFrom = new Date();
+  const now = new Date();
+  const dateTo = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+  const dateFrom = new Date(dateTo);
   dateFrom.setFullYear(dateFrom.getFullYear() - 1);
-  const dateTo = new Date();
 
   const { data, error } = await supabase
     .from("sales")
