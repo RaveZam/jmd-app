@@ -3,11 +3,6 @@ import {
   ALL_SESSIONS,
   type RecordsFilters,
 } from "@/lib/selectors/filters";
-import {
-  deriveRecord,
-  selectAgents,
-  type RecordDerived,
-} from "@/lib/selectors/metrics";
 import type { LedgerRecord } from "@/app/features/records/types";
 
 type SearchParams = Record<string, string | string[] | undefined>;
@@ -17,20 +12,29 @@ function firstParam(sp: SearchParams, key: string): string | undefined {
   return Array.isArray(v) ? v[0] : v;
 }
 
-function filterRecordsForPage(
+function filterRecords(
   records: LedgerRecord[],
   filters: RecordsFilters,
-  sessionSaleIds: Set<string> | null,
 ): LedgerRecord[] {
   return records.filter((r) => {
-    if (r.date < filters.dateFrom || r.date > filters.dateTo) return false;
     if (filters.agent !== ALL_AGENTS && r.agent !== filters.agent) return false;
-    if (sessionSaleIds !== null && !sessionSaleIds.has(r.id)) return false;
+    if (filters.sessionId !== ALL_SESSIONS && r.sessionId !== filters.sessionId)
+      return false;
     return true;
   });
 }
 
-export type RecordsPageRow = { record: LedgerRecord; derived: RecordDerived };
+function searchRecords(
+  records: LedgerRecord[],
+  q: string,
+): LedgerRecord[] {
+  if (!q) return records;
+  return records.filter(
+    (r) =>
+      r.store.toLowerCase().includes(q) ||
+      r.product.toLowerCase().includes(q),
+  );
+}
 
 export type RecordsPageTotals = {
   soldQty: number;
@@ -41,7 +45,7 @@ export type RecordsPageTotals = {
 export type RecordsPageData = {
   agents: string[];
   filters: RecordsFilters;
-  pageRows: RecordsPageRow[];
+  rows: LedgerRecord[];
   totals: RecordsPageTotals;
   page: number;
   totalPages: number;
@@ -49,57 +53,45 @@ export type RecordsPageData = {
   rawQuery: string;
 };
 
-function searchRows(rows: RecordsPageRow[], q: string): RecordsPageRow[] {
-  if (!q) return rows;
-  return rows.filter(
-    ({ record: r }) =>
-      r.store.toLowerCase().includes(q) || r.product.toLowerCase().includes(q),
-  );
-}
-
-function sumTotals(rows: RecordsPageRow[]): RecordsPageTotals {
-  return rows.reduce<RecordsPageTotals>(
-    (acc, { record: r, derived }) => {
-      acc.soldQty += r.soldQty;
-      acc.boQty += r.boQty;
-      acc.lineTotal += derived.lineTotal;
-      return acc;
-    },
-    { soldQty: 0, boQty: 0, lineTotal: 0 },
-  );
+function sumTotals(records: LedgerRecord[]): RecordsPageTotals {
+  let soldQty = 0;
+  let boQty = 0;
+  let lineTotal = 0;
+  for (const r of records) {
+    soldQty += r.soldQty;
+    boQty += r.boQty;
+    lineTotal += r.lineTotal;
+  }
+  return { soldQty, boQty, lineTotal };
 }
 
 export function getRecordsPageData(
   records: LedgerRecord[],
   filters: RecordsFilters,
-  sessionSaleIds: Set<string> | null,
   sp: SearchParams,
   pageSize = 25,
 ): RecordsPageData {
-  const agents = selectAgents(records);
+  const agents = Array.from(new Set(records.map((r) => r.agent))).sort();
   const rawQuery = (firstParam(sp, "q") ?? "").trim();
   const rawPage = Number(firstParam(sp, "page") ?? "1");
   const requestedPage =
     Number.isFinite(rawPage) && rawPage > 0 ? Math.floor(rawPage) : 1;
 
-  const base = filterRecordsForPage(records, filters, sessionSaleIds);
-  const allRows = searchRows(
-    base.map((r) => ({ record: r, derived: deriveRecord(r) })),
-    rawQuery.toLowerCase(),
-  );
+  const filtered = filterRecords(records, filters);
+  const searched = searchRecords(filtered, rawQuery.toLowerCase());
 
-  const totalPages = Math.max(1, Math.ceil(allRows.length / pageSize));
+  const totalPages = Math.max(1, Math.ceil(searched.length / pageSize));
   const page = Math.min(requestedPage, totalPages);
-  const pageRows = allRows.slice((page - 1) * pageSize, page * pageSize);
+  const rows = searched.slice((page - 1) * pageSize, page * pageSize);
 
   return {
     agents,
     filters,
-    pageRows,
-    totals: sumTotals(allRows),
+    rows,
+    totals: sumTotals(searched),
     page,
     totalPages,
-    rowCount: allRows.length,
+    rowCount: searched.length,
     rawQuery,
   };
 }
@@ -120,6 +112,3 @@ export function buildRecordsPageUrl(
   }
   return `/records?${params.toString()}`;
 }
-
-// Re-export for convenience
-export { ALL_SESSIONS };

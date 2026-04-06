@@ -47,7 +47,9 @@ export function IntelligenceForecastChart({
   // Bridge the actual and forecast lines visually by carrying the last actual
   // value forward as the forecast anchor point. Mark it so the tooltip can
   // suppress the duplicate forecast entry at that point.
-  const chartData = rawChartData.map((point, i, arr) => {
+  const chartData = rawChartData
+    .filter((point) => point.actual == null || point.actual > 0)
+    .map((point, i, arr) => {
     const isLastActual =
       point.actual != null &&
       point.forecast == null &&

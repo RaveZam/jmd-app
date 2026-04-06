@@ -17,7 +17,7 @@ type Props = {
 };
 
 export function RecordsClient({ data, sessions, sp, buildUrl }: Props): ReactElement {
-  const { agents, filters, pageRows, totals, page, totalPages, rowCount, rawQuery } = data;
+  const { agents, filters, rows, totals, page, totalPages, rowCount, rawQuery } = data;
 
   return (
     <>
@@ -91,17 +91,17 @@ export function RecordsClient({ data, sessions, sp, buildUrl }: Props): ReactEle
                 </tr>
               </thead>
               <tbody>
-                {pageRows.length ? (
-                  pageRows.map(({ record, derived }) => (
-                    <tr key={record.id} className="border-t">
-                      <td className="px-3 py-2 tabular-nums">{record.date}</td>
-                      <td className="px-3 py-2">{record.agent}</td>
-                      <td className="px-3 py-2">{record.store}</td>
-                      <td className="px-3 py-2">{record.product}</td>
-                      <td className="px-3 py-2 text-right tabular-nums">{record.soldQty}</td>
-                      <td className="px-3 py-2 text-right tabular-nums">{record.boQty}</td>
-                      <td className="px-3 py-2 text-right tabular-nums">{formatCurrencyPHP(record.unitPrice)}</td>
-                      <td className="px-3 py-2 text-right tabular-nums">{formatCurrencyPHP(derived.lineTotal)}</td>
+                {rows.length ? (
+                  rows.map((r) => (
+                    <tr key={r.id} className="border-t">
+                      <td className="px-3 py-2 tabular-nums">{r.date}</td>
+                      <td className="px-3 py-2">{r.agent}</td>
+                      <td className="px-3 py-2">{r.store}</td>
+                      <td className="px-3 py-2">{r.product}</td>
+                      <td className="px-3 py-2 text-right tabular-nums">{r.soldQty}</td>
+                      <td className="px-3 py-2 text-right tabular-nums">{r.boQty}</td>
+                      <td className="px-3 py-2 text-right tabular-nums">{formatCurrencyPHP(r.unitPrice)}</td>
+                      <td className="px-3 py-2 text-right tabular-nums">{formatCurrencyPHP(r.lineTotal)}</td>
                     </tr>
                   ))
                 ) : (

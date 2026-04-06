@@ -1,6 +1,4 @@
-import type { ReactElement } from "react";
-
-import { ALL_SESSIONS, parseRecordsFilters } from "@/lib/selectors/filters";
+import { parseRecordsFilters } from "@/lib/selectors/filters";
 import {
   buildRecordsPageUrl,
   getRecordsPageData,
@@ -8,8 +6,16 @@ import {
 import { getRecords } from "@/app/server/getBaseData";
 import { fetchSessions } from "@/app/features/records/server/fetch-sessions";
 import { RecordsClient } from "@/app/features/records/components/RecordsClient";
+import type { LedgerRecord } from "@/app/features/records/types";
 
 type SearchParams = Record<string, string | string[] | undefined>;
+
+function toRecords(raw: Awaited<ReturnType<typeof getRecords>>): LedgerRecord[] {
+  return raw.map((r) => ({
+    ...r,
+    lineTotal: r.soldQty * r.unitPrice,
+  }));
+}
 
 export async function RecordsPage({
   searchParams,
@@ -19,23 +25,13 @@ export async function RecordsPage({
   const sp = await searchParams;
   const filters = parseRecordsFilters(sp);
 
-  const [records, sessions] = await Promise.all([
+  const [rawRecords, sessions] = await Promise.all([
     getRecords(filters),
     fetchSessions(),
   ]);
 
-  const saleSessionMap = new Map(records.map((r) => [r.id, r.sessionId]));
-
-  const sessionSaleIds =
-    filters.sessionId === ALL_SESSIONS
-      ? null
-      : new Set(
-          [...saleSessionMap.entries()]
-            .filter(([, sid]) => sid === filters.sessionId)
-            .map(([saleId]) => saleId),
-        );
-
-  const data = getRecordsPageData(records, filters, sessionSaleIds, sp);
+  const records = toRecords(rawRecords);
+  const data = getRecordsPageData(records, filters, sp);
 
   return (
     <RecordsClient

@@ -1,4 +1,5 @@
 import { ForecastChartData, DataPoint } from "../types/forecast_types";
+import * as ss from "simple-statistics";
 
 type yearData = { sale_date: string; total_sales: number; order_count: number };
 
@@ -39,46 +40,72 @@ function phNow(): Date {
 }
 
 export function forecastNextMonth(yearData: yearData[]): ForecastChartData {
+  const weeklyDateForThePastYear: { label: string; actual: number }[] = [];
   const nextMonthForecastData: DataPoint[] = [];
-  let month = 1;
+  const offsetDate = phNow();
+  offsetDate.setDate(offsetDate.getDate() - 31);
+  const startingDate = getWeekStart(offsetDate);
+  const now = phNow();
+  const cutoffDate = getWeekStart(now);
+  const cutoffMonth = cutoffDate.getMonth();
+  const nextMonthName = MONTH_NAMES[cutoffMonth];
 
-  const date = phNow();
-  date.setDate(date.getDate() - 28);
-  const startingDate = getWeekStart(date);
+  for (const record of yearData ?? []) {
+    const date = new Date(record.sale_date.split("T")[0]);
+    const day = date.getDate();
+    const monthIdx = date.getMonth();
+    const monthLabel = MONTH_NAMES[monthIdx];
+    const week = getWeekOfMonth(day);
+    const label = `${monthLabel} W${week}`;
 
-  for (month; month <= 12; month++) {
-    for (const record of yearData) {
-      const recordDate = record.sale_date;
-      const date = new Date(recordDate.split("T")[0]);
-      const day = new Date(record.sale_date).getDate();
-
-      if (startingDate < date) {
-        if (date.getMonth() === month) {
-          const monthLabel = MONTH_NAMES[month];
-          const week = getWeekOfMonth(day);
-          const label = `${monthLabel} W${week}`;
-
-          const existing = nextMonthForecastData.find((w) => w.label === label);
-
-          if (existing) {
-            if (existing.actual) existing.actual += record.total_sales;
-          } else {
-            nextMonthForecastData.push({ label, actual: record.total_sales });
-          }
-        }
+    if (date < cutoffDate) {
+      const existing = weeklyDateForThePastYear.find((w) => w.label === label);
+      if (existing) {
+        existing.actual += record.total_sales;
+      } else {
+        weeklyDateForThePastYear.push({ label, actual: record.total_sales });
       }
     }
-    console.log(nextMonthForecastData);
+
+    if (startingDate < date && date < cutoffDate) {
+      const chartExisting = nextMonthForecastData.find(
+        (w) => w.label === label,
+      );
+      if (chartExisting && chartExisting.actual) {
+        chartExisting.actual += record.total_sales;
+      } else {
+        nextMonthForecastData.push({ label, actual: record.total_sales });
+      }
+    }
   }
 
-  const firstForecastLabel = "test";
-  const lastLabel = "last";
+  const points = weeklyDateForThePastYear.map((d, i) => [i, d.actual]);
+  console.log(weeklyDateForThePastYear);
+  const reg = ss.linearRegression(points);
+  const line = ss.linearRegressionLine(reg);
+
+  console.log(reg);
+  console.log("points", JSON.stringify(points));
+  console.log("length", points.length);
+
+  const nextWeekStartIndex = weeklyDateForThePastYear.length;
+  for (let i = 0; i < 4; i++) {
+    nextMonthForecastData.push({
+      label: `${nextMonthName} W${i + 1}`,
+      forecast: Math.round(line(nextWeekStartIndex + i)),
+    });
+  }
 
   return {
-    title: "This month's revenue by week",
-    forecastStart: firstForecastLabel,
-    forecastEnd: lastLabel,
+    title: "Next Month Revenue Forecast",
+    forecastStart: "...",
+    forecastEnd: "...",
     yFormatter: (v) => `₱${(v / 1000).toFixed(0)}k`,
-    data: nextMonthForecastData,
+    data: nextMonthForecastData.sort(
+      (a, b) =>
+        MONTH_NAMES.indexOf(a.label.split(" ")[0]) -
+          MONTH_NAMES.indexOf(b.label.split(" ")[0]) ||
+        a.label.localeCompare(b.label),
+    ),
   };
 }
