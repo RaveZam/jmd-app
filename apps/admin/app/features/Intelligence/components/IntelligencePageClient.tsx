@@ -171,16 +171,16 @@ export function IntelligencePageClient({
           </section>
 
           <section>
-            <IntelligenceForecastChart data={data} />
+            <IntelligenceForecastChart data={data} yearData={yearData} />
           </section>
 
-          <section>
+          {/* <section>
             <IntelligenceAgentForecast />
           </section>
-
+            Future Possible Features nalang to since i want to make everything fully funcitonal and bug free
           <section>
             <IntelligenceProductForecast />
-          </section>
+          </section> */}
         </div>
       </div>
     </>

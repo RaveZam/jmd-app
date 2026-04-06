@@ -64,7 +64,11 @@ export function RecordsFiltersBar({
     })(),
   );
   const sixDaysAgo = formatLocalISODate(
-    (() => { const d = new Date(); d.setDate(d.getDate() - 6); return d; })(),
+    (() => {
+      const d = new Date();
+      d.setDate(d.getDate() - 6);
+      return d;
+    })(),
   );
 
   const isToday = dateFrom === today && dateTo === today;
@@ -110,9 +114,21 @@ export function RecordsFiltersBar({
         {/* Quick preset pills */}
         <div className="flex items-center self-end rounded-xl border bg-muted/40 p-0.5">
           {[
-            { label: "Today", active: isToday, onClick: () => toggleDateRange(today, today) },
-            { label: "Yesterday", active: isYesterday, onClick: () => toggleDateRange(yesterday, yesterday) },
-            { label: "This Week", active: isThisWeek, onClick: () => toggleDateRange(sixDaysAgo, today) },
+            {
+              label: "Today",
+              active: isToday,
+              onClick: () => toggleDateRange(today, today),
+            },
+            {
+              label: "Yesterday",
+              active: isYesterday,
+              onClick: () => toggleDateRange(yesterday, yesterday),
+            },
+            {
+              label: "This Week",
+              active: isThisWeek,
+              onClick: () => toggleDateRange(sixDaysAgo, today),
+            },
           ].map(({ label, active, onClick }) => (
             <button
               key={label}

@@ -44,17 +44,17 @@ export function forecastNextWeek(data: any[]): ForecastChartData {
       return dayOfTheSalesToForecast === dayOfTheRawDate;
     });
 
-    const numberOfThatDayConductedInTheMonth = new Set(
-      totalSalesThatDayOfTheWeekinTheMonth?.map(
-        (r: any) => r.createdAt.split("T")[0],
-      ),
-    ).size;
-
     const totalSalesOfThatDayThePastMonth =
       totalSalesThatDayOfTheWeekinTheMonth.reduce(
         (sum: number, r: any) => r.total + sum,
         0,
       );
+
+    const numberOfThatDayConductedInTheMonth = new Set(
+      totalSalesThatDayOfTheWeekinTheMonth?.map(
+        (r: any) => r.createdAt.split("T")[0],
+      ),
+    ).size;
 
     const forecastOfNextWeekOnThatDay =
       totalSalesOfThatDayThePastMonth === 0

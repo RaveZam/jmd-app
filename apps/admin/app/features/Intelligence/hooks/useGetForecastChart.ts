@@ -3,9 +3,9 @@ import { forecastNextWeek } from "../helpers/forecastNextWeek";
 import { forecastNextMonth } from "../helpers/forecastNextMonth";
 import { forecastNextYear } from "../helpers/forecastNextYear";
 
-export function useGetForecastChart(data: any) {
+export function useGetForecastChart(data: any, yearData: any) {
   function getForecastData(range: ForecastRange): ForecastChartData {
-    if (range === "monthly") return forecastNextMonth();
+    if (range === "monthly") return forecastNextMonth(yearData);
     if (range === "yearly") return forecastNextYear(data);
     return forecastNextWeek(data);
   }

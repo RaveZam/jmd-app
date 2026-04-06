@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import type { ReactElement } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -27,12 +27,15 @@ const RANGES: { value: ForecastRange; label: string }[] = [
 
 export function IntelligenceForecastChart({
   data,
+  yearData,
 }: {
   data: any;
+  yearData: any;
 }): ReactElement {
   const router = useRouter();
   const [range, setRange] = useState<ForecastRange>("weekly");
-  const { getForecastData } = useGetForecastChart(data);
+  const [isPending, startTransition] = useTransition();
+  const { getForecastData } = useGetForecastChart(data, yearData);
   const {
     title,
     data: rawChartData,
@@ -56,15 +59,15 @@ export function IntelligenceForecastChart({
 
   function setFilterRange(range: any) {
     setRange(range);
-    if (range === "monthly") {
-      router.push("?range=monthly");
-    }
-    if (range === "weekly") {
-      router.push("?range=weekly");
-    }
-    if (range === "yearly") {
-      router.push("?range=yearly");
-    }
+    startTransition(() => {
+      if (range === "monthly") {
+        router.push("?range=monthly");
+      } else if (range === "weekly") {
+        router.push("?range=weekly");
+      } else if (range === "yearly") {
+        router.push("?range=yearly");
+      }
+    });
   }
 
   return (
@@ -91,6 +94,11 @@ export function IntelligenceForecastChart({
       </CardHeader>
       <CardContent>
         <div className="h-[280px] w-full">
+          {isPending ? (
+            <div className="h-full w-full flex items-center justify-center">
+              <div className="h-8 w-8 rounded-full border-2 border-muted border-t-emerald-600 animate-spin" />
+            </div>
+          ) : (
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart
               data={chartData}
@@ -127,8 +135,10 @@ export function IntelligenceForecastChart({
                       <p className="mb-1 font-medium">{label}</p>
                       {entries.map((p) => (
                         <p key={p.dataKey} style={{ color: p.color }}>
-                          {p.name}:{" "}
-                          ₱{(p.value as number).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                          {p.name}: ₱
+                          {(p.value as number).toLocaleString(undefined, {
+                            maximumFractionDigits: 0,
+                          })}
                         </p>
                       ))}
                     </div>
@@ -159,6 +169,7 @@ export function IntelligenceForecastChart({
               />
             </ComposedChart>
           </ResponsiveContainer>
+          )}
         </div>
       </CardContent>
     </Card>

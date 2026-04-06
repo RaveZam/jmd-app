@@ -15,6 +15,7 @@ export function computeAverageSalesOnThatDay(data: any) {
     (sum: number, r: any) => r.total + sum,
     0,
   );
+
   const howManyDaysOfThatDayInAMonth = new Set(
     salesThatDay?.map((r: any) => r.createdAt.split("T")[0]),
   ).size;
