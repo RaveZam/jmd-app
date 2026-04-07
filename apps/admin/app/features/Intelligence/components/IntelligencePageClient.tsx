@@ -22,9 +22,11 @@ import {
 export function IntelligencePageClient({
   data,
   yearData,
+  allTimeData,
 }: {
   data: any;
   yearData: any;
+  allTimeData: any;
 }) {
   computeMovingAverageAndDayAverage(data);
   const { totalSalesToday, totalSalesYesterday, percentageDiff } =
@@ -171,7 +173,11 @@ export function IntelligencePageClient({
           </section>
 
           <section>
-            <IntelligenceForecastChart data={data} yearData={yearData} />
+            <IntelligenceForecastChart
+              data={data}
+              yearData={yearData}
+              allTimeData={allTimeData}
+            />
           </section>
 
           {/* <section>

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import type { ChatMessage } from "@/app/api/chat/route";
-import { sendMessage } from "../services/chatService";
+import { streamMessage } from "../services/chatService";
 
 const WELCOME: ChatMessage = {
   role: "assistant",
@@ -15,19 +15,25 @@ export function useChat() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function handleSend() {
+  const handleSend = useCallback(async () => {
     const text = input.trim();
     if (!text || loading) return;
 
-    const next: ChatMessage[] = [...messages, { role: "user", content: text }];
-    setMessages(next);
+    const userMsg: ChatMessage = { role: "user", content: text };
+    const next: ChatMessage[] = [...messages, userMsg];
+    const assistantMsg: ChatMessage = { role: "assistant", content: "" };
+
+    setMessages([...next, assistantMsg]);
     setInput("");
     setLoading(true);
 
-    const reply = await sendMessage(next);
-    setMessages([...next, { role: "assistant", content: reply }]);
+    await streamMessage(next, (chunk) => {
+      assistantMsg.content += chunk;
+      setMessages([...next, { ...assistantMsg }]);
+    });
+
     setLoading(false);
-  }
+  }, [input, loading, messages]);
 
   return { messages, input, setInput, loading, handleSend };
 }

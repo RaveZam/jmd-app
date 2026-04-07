@@ -88,6 +88,7 @@ export function forecastNextMonth(yearData: yearData[]): ForecastChartData {
   console.log("points", JSON.stringify(points));
   console.log("length", points.length);
 
+  //display the last 4 weeks sa forecast
   const nextWeekStartIndex = weeklyDateForThePastYear.length;
   for (let i = 0; i < 4; i++) {
     nextMonthForecastData.push({

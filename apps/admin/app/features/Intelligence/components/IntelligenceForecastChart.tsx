@@ -28,14 +28,16 @@ const RANGES: { value: ForecastRange; label: string }[] = [
 export function IntelligenceForecastChart({
   data,
   yearData,
+  allTimeData,
 }: {
   data: any;
   yearData: any;
+  allTimeData: any;
 }): ReactElement {
   const router = useRouter();
   const [range, setRange] = useState<ForecastRange>("weekly");
   const [isPending, startTransition] = useTransition();
-  const { getForecastData } = useGetForecastChart(data, yearData);
+  const { getForecastData } = useGetForecastChart(data, yearData, allTimeData);
   const {
     title,
     data: rawChartData,
@@ -50,14 +52,14 @@ export function IntelligenceForecastChart({
   const chartData = rawChartData
     .filter((point) => point.actual == null || point.actual > 0)
     .map((point, i, arr) => {
-    const isLastActual =
-      point.actual != null &&
-      point.forecast == null &&
-      arr[i + 1]?.forecast != null;
-    return isLastActual
-      ? { ...point, forecast: point.actual, isBridge: true }
-      : point;
-  });
+      const isLastActual =
+        point.actual != null &&
+        point.forecast == null &&
+        arr[i + 1]?.forecast != null;
+      return isLastActual
+        ? { ...point, forecast: point.actual, isBridge: true }
+        : point;
+    });
 
   function setFilterRange(range: any) {
     setRange(range);
@@ -101,76 +103,82 @@ export function IntelligenceForecastChart({
               <div className="h-8 w-8 rounded-full border-2 border-muted border-t-emerald-600 animate-spin" />
             </div>
           ) : (
-          <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart
-              data={chartData}
-              margin={{ top: 8, right: 8, left: 8, bottom: 8 }}
-            >
-              <defs>
-                <linearGradient id="actualGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#10b981" stopOpacity={0.35} />
-                  <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="rgba(148,163,184,0.35)"
-              />
-              <ReferenceArea
-                x1={forecastStart}
-                x2={forecastEnd}
-                fill="rgb(148,163,184)"
-                fillOpacity={0.12}
-                strokeOpacity={0}
-              />
-              <XAxis dataKey="label" tick={{ fontSize: 11 }} />
-              <YAxis tick={{ fontSize: 11 }} tickFormatter={yFormatter} />
-              <Tooltip
-                content={({ active, payload, label }) => {
-                  if (!active || !payload?.length) return null;
-                  const isBridge = payload[0]?.payload?.isBridge;
-                  const entries = isBridge
-                    ? payload.filter((p) => p.dataKey !== "forecast")
-                    : payload;
-                  return (
-                    <div className="rounded-md border bg-background px-3 py-2 text-xs shadow-md">
-                      <p className="mb-1 font-medium">{label}</p>
-                      {entries.map((p) => (
-                        <p key={p.dataKey} style={{ color: p.color }}>
-                          {p.name}: ₱
-                          {(p.value as number).toLocaleString(undefined, {
-                            maximumFractionDigits: 0,
-                          })}
-                        </p>
-                      ))}
-                    </div>
-                  );
-                }}
-              />
-              <Legend />
-              <Area
-                type="monotone"
-                dataKey="actual"
-                name="Actual"
-                stroke="#10b981"
-                strokeWidth={2}
-                fill="url(#actualGradient)"
-                dot={{ r: 3, fill: "#10b981", strokeWidth: 0 }}
-                activeDot={{ r: 5, fill: "#059669", strokeWidth: 0 }}
-                connectNulls={false}
-              />
-              <Line
-                type="monotone"
-                dataKey="forecast"
-                name="Forecast"
-                stroke="rgb(100, 116, 139)"
-                strokeWidth={2}
-                strokeDasharray="5 5"
-                dot={{ r: 3 }}
-                connectNulls={false}
-              />
-            </ComposedChart>
-          </ResponsiveContainer>
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart
+                data={chartData}
+                margin={{ top: 8, right: 8, left: 8, bottom: 8 }}
+              >
+                <defs>
+                  <linearGradient
+                    id="actualGradient"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop offset="0%" stopColor="#10b981" stopOpacity={0.35} />
+                    <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="rgba(148,163,184,0.35)"
+                />
+                <ReferenceArea
+                  x1={forecastStart}
+                  x2={forecastEnd}
+                  fill="rgb(148,163,184)"
+                  fillOpacity={0.12}
+                  strokeOpacity={0}
+                />
+                <XAxis dataKey="label" tick={{ fontSize: 11 }} />
+                <YAxis tick={{ fontSize: 11 }} tickFormatter={yFormatter} />
+                <Tooltip
+                  content={({ active, payload, label }) => {
+                    if (!active || !payload?.length) return null;
+                    const isBridge = payload[0]?.payload?.isBridge;
+                    const entries = isBridge
+                      ? payload.filter((p) => p.dataKey !== "forecast")
+                      : payload;
+                    return (
+                      <div className="rounded-md border bg-background px-3 py-2 text-xs shadow-md">
+                        <p className="mb-1 font-medium">{label}</p>
+                        {entries.map((p) => (
+                          <p key={p.dataKey} style={{ color: p.color }}>
+                            {p.name}: ₱
+                            {(p.value as number).toLocaleString(undefined, {
+                              maximumFractionDigits: 0,
+                            })}
+                          </p>
+                        ))}
+                      </div>
+                    );
+                  }}
+                />
+                <Legend />
+                <Area
+                  type="monotone"
+                  dataKey="actual"
+                  name="Actual"
+                  stroke="#10b981"
+                  strokeWidth={2}
+                  fill="url(#actualGradient)"
+                  dot={{ r: 3, fill: "#10b981", strokeWidth: 0 }}
+                  activeDot={{ r: 5, fill: "#059669", strokeWidth: 0 }}
+                  connectNulls={false}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="forecast"
+                  name="Forecast"
+                  stroke="rgb(100, 116, 139)"
+                  strokeWidth={2}
+                  strokeDasharray="5 5"
+                  dot={{ r: 3 }}
+                  connectNulls={false}
+                />
+              </ComposedChart>
+            </ResponsiveContainer>
           )}
         </div>
       </CardContent>
