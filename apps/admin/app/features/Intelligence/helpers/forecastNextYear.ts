@@ -1,27 +1,107 @@
-import { ForecastChartData } from "../types/forecast_types";
+import { ForecastChartData, DataPoint } from "../types/forecast_types";
+import * as ss from "simple-statistics";
 
-export function forecastNextYear(data: any[]): ForecastChartData {
+type yearData = { sale_date: string; total_sales: number; order_count: number };
+
+const MONTH_NAMES = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+function phNow(): Date {
+  const now = new Date();
+  return new Date(now.getTime() + 8 * 60 * 60 * 1000);
+}
+
+export function forecastNextYear(allTimeData: yearData[]): ForecastChartData {
+  const forecastYearData: DataPoint[] = [];
+  const allTimeMonthlyData: { label: string; actual: number }[] = [];
+  const now = phNow();
+  const yearNow = now.getFullYear();
+  const monthNow = now.getMonth();
+
+  for (const record of allTimeData ?? []) {
+    const dateOfRecord = record.sale_date;
+    const date = new Date(dateOfRecord);
+    const monthOfRecord = date.getMonth();
+    const yearOfRecord = date.getFullYear();
+
+    const existing = allTimeMonthlyData.find(
+      (y) => y.label === MONTH_NAMES[monthOfRecord] + yearOfRecord,
+    );
+
+    if (existing && existing.actual) {
+      existing.actual += record.total_sales;
+    } else {
+      if (monthOfRecord !== monthNow || yearOfRecord !== yearNow) {
+        allTimeMonthlyData.push({
+          label: MONTH_NAMES[monthOfRecord] + yearOfRecord,
+          actual: record.total_sales,
+        });
+      }
+    }
+  }
+
+  console.log(allTimeMonthlyData);
+
+  const thisYearData = allTimeData?.filter((record: any) => {
+    const dateOfRecord = record.sale_date;
+    const date = new Date(dateOfRecord);
+    const yearOfRecord = date.getFullYear();
+
+    return yearOfRecord === yearNow;
+  });
+
+  for (const record of thisYearData ?? []) {
+    const date = new Date(record.sale_date);
+    const monthOfRecord = date.getMonth();
+
+    const existing = forecastYearData.find(
+      (y) => y.label === MONTH_NAMES[monthOfRecord],
+    );
+
+    if (existing && existing.actual) {
+      existing.actual += record.total_sales;
+    } else {
+      if (monthOfRecord !== monthNow || date.getFullYear() !== yearNow) {
+        forecastYearData.push({
+          label: MONTH_NAMES[monthOfRecord],
+          actual: record.total_sales,
+        });
+      }
+    }
+  }
+
+  const points = allTimeMonthlyData.map((d, i) => [i, d.actual]);
+  const reg = ss.linearRegression(points);
+  const line = ss.linearRegressionLine(reg);
+
+  const monthsWithData = forecastYearData.length;
+  const monthsToForecast = 12 - monthsWithData;
+
+  for (let i = 0; i < monthsToForecast; i++) {
+    const forecastMonthIndex = monthsWithData + i;
+    forecastYearData.push({
+      label: MONTH_NAMES[forecastMonthIndex],
+      forecast: Math.round(line(points.length + i)),
+    });
+  }
+
   return {
-    title: "Next year revenue forecast",
-    forecastStart: "Apr",
-    forecastEnd: "Dec",
-    yFormatter: (v) => `₱${(v / 1000000).toFixed(1)}M`,
-    data: [
-      { label: "Oct", actual: 1200000 },
-      { label: "Nov", actual: 1350000 },
-      { label: "Dec", actual: 1520000 },
-      { label: "Jan", actual: 1180000 },
-      { label: "Feb", actual: 1240000 },
-      { label: "Mar", actual: 1310000 },
-      { label: "Apr", forecast: 1360000 },
-      { label: "May", forecast: 1400000 },
-      { label: "Jun", forecast: 1380000 },
-      { label: "Jul", forecast: 1420000 },
-      { label: "Aug", forecast: 1450000 },
-      { label: "Sep", forecast: 1490000 },
-      { label: "Oct", forecast: 1530000 },
-      { label: "Nov", forecast: 1580000 },
-      { label: "Dec", forecast: 1650000 },
-    ],
+    title: "Yearly Revenue Forecast",
+    forecastStart: "...",
+    forecastEnd: "...",
+    yFormatter: (v) => `₱${(v / 1000).toFixed(0)}k`,
+    data: forecastYearData,
   };
 }
