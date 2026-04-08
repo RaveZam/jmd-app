@@ -20,6 +20,13 @@ export function validateSql(sql: string): string | null {
     }
   }
 
+  const blockedTables = ["users", "auth.users", "pg_", "information_schema"];
+  for (const table of blockedTables) {
+    if (normalized.includes(table)) {
+      return `Table not allowed: ${table}`;
+    }
+  }
+
   const allowedTables = [
     "products",
     "stores",

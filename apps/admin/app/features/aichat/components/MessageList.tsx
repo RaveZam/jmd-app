@@ -27,7 +27,7 @@ export function MessageList({ messages, loading }: Props) {
           </div>
         ),
       )}
-      {loading && (
+      {loading && messages[messages.length - 1]?.role !== "assistant" && (
         <div className="flex items-start gap-2">
           <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full" style={{ background: GEMINI_GRADIENT }}>
             <GeminiIcon className="h-4 w-4 text-white" />

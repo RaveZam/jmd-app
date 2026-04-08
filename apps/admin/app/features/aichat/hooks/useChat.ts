@@ -23,8 +23,8 @@ export function useChat() {
     const next: ChatMessage[] = [...messages, userMsg];
     const assistantMsg: ChatMessage = { role: "assistant", content: "" };
 
-    setMessages([...next, assistantMsg]);
     setInput("");
+    setMessages(next);
     setLoading(true);
 
     await streamMessage(next, (chunk) => {

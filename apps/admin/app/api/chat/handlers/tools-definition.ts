@@ -116,7 +116,7 @@ export const toolDefinitions = <any>[
   {
     name: "get_store_sales_trend",
     description:
-      "Returns daily sales trend for a specific store: quantity sold, quantity back-ordered, revenue, and number of distinct products ordered per day.",
+      "Returns daily sales trend for a specific store: what item sold, quantity sold, quantity back-ordered, revenue, and number of distinct products ordered per day.",
     parameters: {
       type: "object" as const,
       properties: {
@@ -151,7 +151,7 @@ export const toolDefinitions = <any>[
   {
     name: "get_slow_moving_products",
     description:
-      "Returns products with low sales (at or below a threshold) in a date range. Includes days since last sale to identify dead stock.",
+      "Returns products with low sales (worst/low ranked products) (at or below a threshold) in a date range. Includes days since last sale to identify dead stock.",
     parameters: {
       type: "object" as const,
       properties: {
