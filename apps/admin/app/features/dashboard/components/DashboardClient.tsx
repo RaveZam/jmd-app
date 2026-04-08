@@ -9,6 +9,7 @@ import { SalesLineChart } from "@/app/features/dashboard/components/SalesLineCha
 import { FilterRange } from "../types";
 import { FILTERS } from "../types";
 import { useRouter } from "next/navigation";
+import { formatLocalISODate } from "@/lib/selectors/filters";
 
 export function DashboardClient({ data }: { data: any }) {
   const router = useRouter();
@@ -21,21 +22,16 @@ export function DashboardClient({ data }: { data: any }) {
   }
 
   function getDateRange(filter: FilterRange): { from: string; to: string } {
-    const now = new Date();
-    const phTime = new Date(now.getTime() + 8 * 60 * 60 * 1000);
-    const today = phTime.toISOString().split("T")[0];
+    const today = formatLocalISODate(new Date());
 
     if (filter === "today") {
       return { from: today, to: today };
     }
 
     const days = filter === "7days" ? 6 : 29;
-
-    const fromPh = new Date();
-    const fromphTime = new Date(fromPh.getTime() + 8 * 60 * 60 * 1000);
-    const from = fromphTime;
-    from.setDate(now.getDate() - days);
-    return { from: from.toISOString().split("T")[0], to: today };
+    const from = new Date();
+    from.setDate(from.getDate() - days);
+    return { from: formatLocalISODate(from), to: today };
   }
 
   return (
