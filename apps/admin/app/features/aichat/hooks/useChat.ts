@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import type { ChatMessage } from "@/app/api/chat/route";
 import { streamMessage } from "../services/chatService";
 
@@ -14,22 +14,32 @@ export function useChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([WELCOME]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const accumulatorRef = useRef("");
 
   const handleSend = useCallback(async () => {
     const text = input.trim();
     if (!text || loading) return;
 
     const userMsg: ChatMessage = { role: "user", content: text };
-    const next: ChatMessage[] = [...messages, userMsg];
-    const assistantMsg: ChatMessage = { role: "assistant", content: "" };
+    accumulatorRef.current = "";
 
     setInput("");
-    setMessages(next);
+    setMessages((prev) => [...prev, userMsg]);
     setLoading(true);
 
-    await streamMessage(next, (chunk) => {
-      assistantMsg.content += chunk;
-      setMessages([...next, { ...assistantMsg }]);
+    await streamMessage([...messages, userMsg], (chunk) => {
+      accumulatorRef.current += chunk;
+      const accumulated = accumulatorRef.current;
+      setMessages((prev) => {
+        const last = prev[prev.length - 1];
+        if (last?.role === "assistant") {
+          return [
+            ...prev.slice(0, -1),
+            { role: "assistant", content: accumulated },
+          ];
+        }
+        return [...prev, { role: "assistant", content: accumulated }];
+      });
     });
 
     setLoading(false);

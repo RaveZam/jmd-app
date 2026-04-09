@@ -88,14 +88,21 @@ export function forecastNextMonth(yearData: yearData[]): ForecastChartData {
   console.log("points", JSON.stringify(points));
   console.log("length", points.length);
 
-  //display the last 4 weeks sa forecast
+  //display the remaining weeks of current month + 1 week into next month as forecast
   const nextWeekStartIndex = weeklyDateForThePastYear.length;
-  for (let i = 0; i < 4; i++) {
+  const currentWeek = getWeekOfMonth(cutoffDate.getDate());
+  const followingMonthName = MONTH_NAMES[(cutoffMonth + 1) % 12];
+  for (let i = currentWeek; i <= 4; i++) {
     nextMonthForecastData.push({
-      label: `${nextMonthName} W${i + 1}`,
-      forecast: Math.round(line(nextWeekStartIndex + i)),
+      label: `${nextMonthName} W${i}`,
+      forecast: Math.round(line(nextWeekStartIndex + (i - currentWeek))),
     });
   }
+  const weeksForecasted = 4 - currentWeek + 1;
+  nextMonthForecastData.push({
+    label: `${followingMonthName} W1`,
+    forecast: Math.round(line(nextWeekStartIndex + weeksForecasted)),
+  });
 
   return {
     title: "Next Month Revenue Forecast",

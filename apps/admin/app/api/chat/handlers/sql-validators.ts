@@ -5,15 +5,7 @@ export function validateSql(sql: string): string | null {
     return "Only SELECT statements are allowed.";
   }
 
-  const forbidden = [
-    "insert",
-    "update",
-    "delete",
-    "drop",
-    "alter",
-    "truncate",
-    "create",
-  ];
+  const forbidden = ["insert", "update", "delete", "drop", "alter", "truncate"];
   for (const keyword of forbidden) {
     if (normalized.includes(keyword)) {
       return `Forbidden keyword detected: ${keyword}`;
