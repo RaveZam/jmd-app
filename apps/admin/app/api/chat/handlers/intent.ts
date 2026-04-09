@@ -65,6 +65,15 @@ export async function handleChat(
     return;
   }
 
+  if (!data || (Array.isArray(data) && data.length === 0)) {
+    controller.enqueue(
+      encoder.encode(
+        "I couldn't find any results for that. Could you clarify your question a bit more? For example, double-check the store name, product, or date range you're asking about.",
+      ),
+    );
+    return;
+  }
+
   // Turn 2: stream Gemini's summary of the query results
   const lastUserContent = contents[contents.length - 1];
   const turn2Contents: GeminiContent[] = [
@@ -74,7 +83,7 @@ export async function handleChat(
       role: "user",
       parts: [
         {
-          text: `Query results: ${JSON.stringify(data)}. Summarize this for the user. Start by stating the exact date range queried. Only include what they asked for. Use plain language, no asterisks, no markdown bold.`,
+          text: `Query results (this is the ONLY source of truth — do NOT invent, guess, or add any data not present here): ${JSON.stringify(data)}. Summarize ONLY what is in these results. Start by stating the exact date range queried. Use the exact names, numbers, and values from the results — never fabricate store names, agent names, or figures. If results contain conducted_by UUIDs, replace them with agent names from the AGENT MAP. Use plain language, no asterisks, no markdown bold.`,
         },
       ],
     },

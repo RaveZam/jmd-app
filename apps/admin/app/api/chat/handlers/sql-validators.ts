@@ -12,7 +12,7 @@ export function validateSql(sql: string): string | null {
     }
   }
 
-  const blockedTables = ["users", "auth.users", "pg_", "information_schema"];
+  const blockedTables = ["pg_", "information_schema"];
   for (const table of blockedTables) {
     if (normalized.includes(table)) {
       return `Table not allowed: ${table}`;
@@ -30,6 +30,14 @@ export function validateSql(sql: string): string | null {
   const mentionedTables = allowedTables.filter((t) => normalized.includes(t));
   if (mentionedTables.length === 0) {
     return "Query must reference at least one allowed table.";
+  }
+
+  // Block commonly hallucinated tables
+  const blockedHallucinations = ["users", "agents", "agent_lookup", "auth."];
+  for (const table of blockedHallucinations) {
+    if (normalized.includes(table)) {
+      return `Table "${table}" does not exist. Use the agent map to resolve agent names.`;
+    }
   }
 
   return null; // valid

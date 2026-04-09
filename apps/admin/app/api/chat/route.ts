@@ -6,6 +6,16 @@ import { handleChat } from "./handlers/intent";
 
 export type { ChatMessage };
 
+/** Extract a short topic hint from a model response (no actual data values). */
+function summarizeTopic(content: string): string {
+  // Take first 80 chars, strip numbers/currency to avoid leaking data
+  const stripped = content
+    .replace(/[₱$,.\d]+/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  return stripped.slice(0, 80) || "previous query";
+}
+
 export async function POST(req: NextRequest): Promise<Response> {
   const { messages }: { messages: ChatMessage[] } = await req.json();
   const [supabase, agentMap] = await Promise.all([
@@ -13,10 +23,20 @@ export async function POST(req: NextRequest): Promise<Response> {
     getAgentMap(),
   ]);
 
-  const contents: GeminiContent[] = messages.slice(-4).map((m) => ({
-    role: m.role === "assistant" ? "model" : "user",
-    parts: [{ text: m.content }],
-  }));
+  const recent = messages.slice(-4);
+  const contents: GeminiContent[] = recent.map((m, i) => {
+    const isModel = m.role === "assistant";
+    const isLast = i === recent.length - 1;
+    // Strip data from older model responses so Gemini can't reuse them
+    // and is forced to generate fresh SQL for follow-ups.
+    // Keep only the topic context (e.g. "answered about Santos Mini-Mart sales").
+    const text =
+      isModel && !isLast
+        ? `[Previous answer was generated from a SQL query about: ${summarizeTopic(m.content)}. Do NOT reuse this data — generate a new SQL query for any follow-up.]`
+        : m.content;
+    return { role: isModel ? "model" : "user", parts: [{ text }] };
+  });
+
 
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
