@@ -34,6 +34,7 @@ export default function StorePage() {
     editItem,
     soldItems,
     summary,
+    remainingByProduct,
     showSoldAdder,
     setShowSoldAdder,
     confirmVisit,
@@ -137,6 +138,7 @@ export default function StorePage() {
         products={products}
         showPrice
         editData={editData}
+        remainingByProduct={remainingByProduct}
         onAdd={(productId, qty, boQty, boReason) => {
           if (editIndex !== null) {
             editItem(editIndex, productId, qty, boQty, boReason);

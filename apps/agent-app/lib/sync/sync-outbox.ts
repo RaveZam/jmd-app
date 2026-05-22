@@ -13,6 +13,9 @@ const TABLE_MAP: Record<string, string> = {
   SALE_CREATED: "sales",
   SALE_UPDATED: "sales",
   SALE_DELETED: "sales",
+  INVENTORY_CREATED: "session_inventory",
+  INVENTORY_UPDATED: "session_inventory",
+  INVENTORY_DELETED: "session_inventory",
 };
 
 export async function syncOutbox(): Promise<{
@@ -74,14 +77,17 @@ export async function syncOutbox(): Promise<{
       );
 
       let error;
-      if (entry.type === "SALE_DELETED") {
+      if (entry.type === "SALE_DELETED" || entry.type === "INVENTORY_DELETED") {
         ({ error } = await supabase.from(table).delete().eq("id", payload.id));
       } else if (entry.type === "SESSION_STORE_VISITED") {
         ({ error } = await supabase
           .from(table)
           .update({ visited: true })
           .eq("id", payload.id));
-      } else if (entry.type === "SALE_UPDATED") {
+      } else if (
+        entry.type === "SALE_UPDATED" ||
+        entry.type === "INVENTORY_UPDATED"
+      ) {
         const { id, ...fields } = payload;
         ({ error } = await supabase.from(table).update(fields).eq("id", id));
       } else {

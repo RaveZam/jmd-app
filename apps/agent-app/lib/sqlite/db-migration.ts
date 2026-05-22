@@ -67,6 +67,16 @@ CREATE TABLE IF NOT EXISTS sales (
   FOREIGN KEY (product_id) REFERENCES products(id)
 );
 
+CREATE TABLE IF NOT EXISTS session_inventory (
+  id                    TEXT PRIMARY KEY,
+  route_session_id      TEXT NOT NULL REFERENCES route_sessions(id) ON DELETE CASCADE,
+  product_id            TEXT NOT NULL,
+  snapshot_product_name TEXT NOT NULL,
+  quantity              INTEGER NOT NULL DEFAULT 0,
+  created_at            TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE(route_session_id, product_id)
+);
+
 CREATE TABLE IF NOT EXISTS outbox (
   id TEXT PRIMARY KEY,
   type TEXT NOT NULL,       

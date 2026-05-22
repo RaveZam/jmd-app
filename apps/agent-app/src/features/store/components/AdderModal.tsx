@@ -27,6 +27,7 @@ export function AdderModal({
   products,
   showPrice,
   editData,
+  remainingByProduct,
   onAdd,
 }: AdderModalProps) {
   return (
@@ -74,6 +75,7 @@ export function AdderModal({
               products={products}
               showPrice={showPrice}
               editData={editData}
+              remainingByProduct={remainingByProduct}
               onAdd={(productId, qty, boQty, boReason) => {
                 onAdd(productId, qty, boQty, boReason);
                 onClose();

@@ -108,7 +108,7 @@ const stepperStyles = StyleSheet.create({
   },
 });
 
-export function AdderPanel({ products, showPrice, editData, onAdd }: AdderPanelProps) {
+export function AdderPanel({ products, showPrice, editData, remainingByProduct, onAdd }: AdderPanelProps) {
   const initProduct = editData
     ? (products.find((p) => p.id === editData.productId) ?? products[0])
     : products[0];
@@ -127,8 +127,15 @@ export function AdderPanel({ products, showPrice, editData, onAdd }: AdderPanelP
     initReason === "Custom" ? (editData?.boReason ?? "") : ""
   );
 
+  const remaining = selected ? remainingByProduct?.[selected.id] : undefined;
+  const tracked = remaining !== undefined;
+  // When editing, this line's persisted sold qty is already subtracted from
+  // remaining, so add it back to get the headroom available for this line.
+  const available = tracked ? remaining + (editData?.qty ?? 0) : Infinity;
+  const overStock = tracked && qty > available;
+
   function handleAdd() {
-    if (!selected || (qty === 0 && boQty === 0)) return;
+    if (!selected || (qty === 0 && boQty === 0) || overStock) return;
     const boReason =
       boQty > 0
         ? reason === "Custom"
@@ -142,7 +149,7 @@ export function AdderPanel({ products, showPrice, editData, onAdd }: AdderPanelP
     setCustomReason("");
   }
 
-  const canAdd = qty > 0 || boQty > 0;
+  const canAdd = (qty > 0 || boQty > 0) && !overStock;
 
   return (
     <View style={styles.panel}>
@@ -162,6 +169,23 @@ export function AdderPanel({ products, showPrice, editData, onAdd }: AdderPanelP
               <Text style={styles.productPrice}>₱{selected.price} / pack</Text>
             )}
           </View>
+          {remaining !== undefined && (
+            <View
+              style={[
+                styles.remainingBadge,
+                remaining <= 0 && styles.remainingBadgeEmpty,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.remainingText,
+                  remaining <= 0 && styles.remainingTextEmpty,
+                ]}
+              >
+                {remaining} left
+              </Text>
+            </View>
+          )}
           <View style={styles.productChevron}>
             <Ionicons name="chevron-down" size={16} color="#64748B" />
           </View>
@@ -171,6 +195,14 @@ export function AdderPanel({ products, showPrice, editData, onAdd }: AdderPanelP
       {/* Sold qty */}
       <View style={styles.stepperSection}>
         <QtyStepper label="Sold qty" value={qty} onChange={setQty} autoFocus />
+        {overStock && (
+          <View style={styles.stockWarning}>
+            <Ionicons name="alert-circle" size={14} color="#DC2626" />
+            <Text style={styles.stockWarningText}>
+              Only {available} in stock for {selected?.name}
+            </Text>
+          </View>
+        )}
       </View>
 
       {/* Bad order divider */}
@@ -242,6 +274,7 @@ export function AdderPanel({ products, showPrice, editData, onAdd }: AdderPanelP
         visible={pickerOpen}
         products={products}
         showPrice={showPrice}
+        remainingByProduct={remainingByProduct}
         onSelect={setSelected}
         onClose={() => setPickerOpen(false)}
       />
@@ -283,11 +316,39 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  remainingBadge: {
+    borderRadius: 999,
+    backgroundColor: "#F0FDF4",
+    borderWidth: 1,
+    borderColor: "#BBF7D0",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    marginRight: 8,
+  },
+  remainingBadgeEmpty: {
+    backgroundColor: "#FEF2F2",
+    borderColor: "#FECACA",
+  },
+  remainingText: { fontSize: 12, fontWeight: "700", color: "#16A34A" },
+  remainingTextEmpty: { color: "#DC2626" },
 
   stepperSection: {
     alignItems: "center",
     paddingVertical: 4,
   },
+  stockWarning: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+    backgroundColor: "#FEF2F2",
+    borderWidth: 1,
+    borderColor: "#FECACA",
+  },
+  stockWarningText: { fontSize: 12, fontWeight: "600", color: "#DC2626" },
 
   sectionDivider: {
     flexDirection: "row",

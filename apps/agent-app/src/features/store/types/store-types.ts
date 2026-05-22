@@ -17,6 +17,7 @@ export type PickerModalProps = {
   visible: boolean;
   products: Product[];
   showPrice: boolean;
+  remainingByProduct?: Record<string, number>;
   onSelect: (product: Product) => void;
   onClose: () => void;
 };
@@ -25,6 +26,7 @@ export type AdderPanelProps = {
   products: Product[];
   showPrice: boolean;
   editData?: EditData;
+  remainingByProduct?: Record<string, number>;
   onAdd: (productId: string, qty: number, boQty: number, boReason?: string) => void;
 };
 

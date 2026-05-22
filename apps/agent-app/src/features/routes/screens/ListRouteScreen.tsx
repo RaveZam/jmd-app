@@ -303,7 +303,7 @@ export default function ListRouteScreen() {
             onPress={async () => {
               const newSessionId = await createSession();
               router.push({
-                pathname: "/main/routes/session",
+                pathname: "/main/routes/inventory",
                 params: { routeId, routeName, sessionId: newSessionId },
               });
             }}

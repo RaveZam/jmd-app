@@ -8,6 +8,7 @@ export function PickerModal({
   visible,
   products,
   showPrice,
+  remainingByProduct,
   onSelect,
   onClose,
 }: PickerModalProps) {
@@ -27,20 +28,48 @@ export function PickerModal({
           <FlatList
             data={products}
             keyExtractor={(p) => p.id}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={styles.modalOption}
-                onPress={() => {
-                  onSelect(item);
-                  onClose();
-                }}
-              >
-                <Text style={styles.modalOptionText}>
-                  {item.name}
-                  {showPrice ? `  —  ₱${item.price}` : ""}
-                </Text>
-              </TouchableOpacity>
-            )}
+            renderItem={({ item }) => {
+              const remaining = remainingByProduct?.[item.id];
+              const outOfStock =
+                remainingByProduct !== undefined && (remaining ?? 0) <= 0;
+              return (
+                <TouchableOpacity
+                  style={[styles.modalOption, outOfStock && styles.modalOptionDisabled]}
+                  disabled={outOfStock}
+                  onPress={() => {
+                    onSelect(item);
+                    onClose();
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.modalOptionText,
+                      outOfStock && styles.modalOptionTextDisabled,
+                    ]}
+                  >
+                    {item.name}
+                    {showPrice ? `  —  ₱${item.price}` : ""}
+                  </Text>
+                  {remaining !== undefined && (
+                    <View
+                      style={[
+                        styles.remainingBadge,
+                        remaining <= 0 && styles.remainingBadgeEmpty,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.remainingText,
+                          remaining <= 0 && styles.remainingTextEmpty,
+                        ]}
+                      >
+                        {remaining} left
+                      </Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              );
+            }}
           />
         </View>
       </TouchableOpacity>
@@ -62,10 +91,30 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   modalOption: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
     paddingHorizontal: 16,
     paddingVertical: 14,
     borderBottomWidth: 1,
     borderBottomColor: BORDER,
   },
-  modalOptionText: { fontSize: 14, color: "#0F172A" },
+  modalOptionDisabled: { backgroundColor: "#F8FAFC", opacity: 0.55 },
+  modalOptionText: { flex: 1, fontSize: 14, color: "#0F172A" },
+  modalOptionTextDisabled: { color: "#94A3B8" },
+  remainingBadge: {
+    borderRadius: 999,
+    backgroundColor: "#F0FDF4",
+    borderWidth: 1,
+    borderColor: "#BBF7D0",
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+  },
+  remainingBadgeEmpty: {
+    backgroundColor: "#FEF2F2",
+    borderColor: "#FECACA",
+  },
+  remainingText: { fontSize: 12, fontWeight: "700", color: "#16A34A" },
+  remainingTextEmpty: { color: "#DC2626" },
 });

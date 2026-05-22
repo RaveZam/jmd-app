@@ -3,6 +3,7 @@ import { useLocalSearchParams } from "expo-router";
 import { router } from "expo-router";
 import { ProductsDao } from "@/lib/sqlite/dao/products-dao";
 import SessionStoresDao from "@/lib/sqlite/dao/session-stores-dao";
+import SessionInventoryDao from "@/lib/sqlite/dao/session-inventory-dao";
 import OutboxDao from "@/lib/sqlite/dao/outbox-dao";
 import { useDistributionLog } from "./useDistributionLog";
 import { computeSummary } from "../helpers/distribution-helpers";
@@ -43,6 +44,14 @@ export function useStorePage() {
   const soldItems = loggedItems.map((item, idx) => ({ item, idx }));
   const summary = computeSummary(loggedItems);
 
+  const remainingByProduct = useMemo(
+    () =>
+      sessionStoreId
+        ? SessionInventoryDao.getRemainingBySessionStoreId(sessionStoreId)
+        : {},
+    [sessionStoreId, loggedItems],
+  );
+
   const confirmVisit = useCallback(() => {
     if (!sessionStoreId) return;
     SessionStoresDao.markVisited(sessionStoreId);
@@ -65,6 +74,7 @@ export function useStorePage() {
     editItem,
     soldItems,
     summary,
+    remainingByProduct,
     showSoldAdder,
     setShowSoldAdder,
     confirmVisit,
