@@ -24,12 +24,14 @@ export function SessionStoreList({
   stores,
   loading,
   inventory,
+  soldByProduct,
   inventoryLoading,
 }: {
   session: SessionRow;
   stores: SessionStoreRow[];
   loading: boolean;
   inventory: SessionInventoryRow[];
+  soldByProduct: Record<string, number>;
   inventoryLoading: boolean;
 }): ReactElement {
   const [expandedStoreId, setExpandedStoreId] = useState<string | null>(null);
@@ -62,7 +64,11 @@ export function SessionStoreList({
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
-        <InventorySection inventory={inventory} loading={inventoryLoading} />
+        <InventorySection
+          inventory={inventory}
+          soldByProduct={soldByProduct}
+          loading={inventoryLoading}
+        />
         {loading ? (
           <p className="py-6 text-center text-sm text-muted-foreground">
             Loading stores...

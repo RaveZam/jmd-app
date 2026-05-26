@@ -8,9 +8,11 @@ import type { SessionInventoryRow } from "../types/session-types";
 
 export function InventorySection({
   inventory,
+  soldByProduct,
   loading,
 }: {
   inventory: SessionInventoryRow[];
+  soldByProduct: Record<string, number>;
   loading: boolean;
 }): ReactElement {
   const [open, setOpen] = useState(false);
@@ -51,22 +53,51 @@ export function InventorySection({
               <thead>
                 <tr className="text-muted-foreground">
                   <th className="pb-1 text-left font-medium">Product</th>
-                  <th className="pb-1 text-right font-medium">Qty</th>
+                  <th className="pb-1 text-right font-medium">Morning</th>
+                  <th className="pb-1 text-right font-medium">Sold</th>
+                  <th className="pb-1 text-right font-medium">Remaining</th>
                 </tr>
               </thead>
               <tbody>
-                {inventory.map((item) => (
-                  <tr key={item.id} className="border-t border-border/50">
-                    <td className="py-1 pr-2">{item.productName}</td>
-                    <td className="py-1 text-right">{item.quantity}</td>
-                  </tr>
-                ))}
+                {inventory.map((item) => {
+                  const sold = soldByProduct[item.productId] ?? 0;
+                  const remaining = item.quantity - sold;
+                  return (
+                    <tr key={item.id} className="border-t border-border/50">
+                      <td className="py-1 pr-2">{item.productName}</td>
+                      <td className="py-1 text-right">{item.quantity}</td>
+                      <td className="py-1 text-right">{sold}</td>
+                      <td
+                        className={
+                          remaining < 0
+                            ? "py-1 text-right font-medium text-destructive"
+                            : "py-1 text-right font-medium"
+                        }
+                      >
+                        {remaining}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
               <tfoot>
-                <tr>
+                <tr className="border-t border-border/50">
                   <td className="py-1 font-medium">Total</td>
                   <td className="py-1 text-right font-medium">
                     {inventory.reduce((sum, i) => sum + i.quantity, 0)}
+                  </td>
+                  <td className="py-1 text-right font-medium">
+                    {inventory.reduce(
+                      (sum, i) => sum + (soldByProduct[i.productId] ?? 0),
+                      0,
+                    )}
+                  </td>
+                  <td className="py-1 text-right font-medium">
+                    {inventory.reduce(
+                      (sum, i) =>
+                        sum + i.quantity - (soldByProduct[i.productId] ?? 0),
+                      0,
+                    )}
                   </td>
                 </tr>
               </tfoot>

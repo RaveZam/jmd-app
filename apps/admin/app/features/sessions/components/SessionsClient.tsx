@@ -6,7 +6,10 @@ import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
 
 import type { SessionInventoryRow, SessionRow, SessionStoreRow } from "../types/session-types";
 import { getSessionStores } from "../services/sessionsService";
-import { getSessionInventory } from "../services/inventoryServices";
+import {
+  getSessionInventory,
+  getSessionSoldByProduct,
+} from "../services/inventoryServices";
 import { SessionCard } from "./SessionCard";
 import { SessionStoreList } from "./SessionStoreList";
 
@@ -19,6 +22,7 @@ export function SessionsClient({
   const [stores, setStores] = useState<SessionStoreRow[]>([]);
   const [storesLoading, setStoresLoading] = useState(false);
   const [inventory, setInventory] = useState<SessionInventoryRow[]>([]);
+  const [soldByProduct, setSoldByProduct] = useState<Record<string, number>>({});
   const [inventoryLoading, setInventoryLoading] = useState(false);
   const [page, setPage] = useState(1);
   const pageSize = 10;
@@ -37,12 +41,14 @@ export function SessionsClient({
     setStoresLoading(true);
     setInventoryLoading(true);
     try {
-      const [storesResult, inventoryResult] = await Promise.all([
+      const [storesResult, inventoryResult, soldResult] = await Promise.all([
         getSessionStores(id),
         getSessionInventory(id),
+        getSessionSoldByProduct(id),
       ]);
       setStores(storesResult);
       setInventory(inventoryResult);
+      setSoldByProduct(soldResult);
     } finally {
       setStoresLoading(false);
       setInventoryLoading(false);
@@ -116,6 +122,7 @@ export function SessionsClient({
                     stores={stores}
                     loading={storesLoading}
                     inventory={inventory}
+                    soldByProduct={soldByProduct}
                     inventoryLoading={inventoryLoading}
                   />
                 ) : (
