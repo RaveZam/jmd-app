@@ -3,7 +3,7 @@ import { createClient } from "@/utils/supabase/middleware";
 
 const authPaths = ["/login"];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   if (
     pathname.startsWith("/_next") ||

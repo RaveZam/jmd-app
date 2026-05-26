@@ -44,7 +44,7 @@ async function getGeoSales() {
   );
 }
 
-async function aggregateProvinces(): Promise<
+export async function getProvincesByRevenue(): Promise<
   { province: string; revenue: number }[]
 > {
   const rows = await getGeoSales();
@@ -60,7 +60,7 @@ async function aggregateProvinces(): Promise<
     .sort((a, b) => b.revenue - a.revenue);
 }
 
-async function aggregateBarangays(): Promise<GeoRevenueRow[]> {
+export async function getBarangaysByRevenue(): Promise<GeoRevenueRow[]> {
   const rows = await getGeoSales();
 
   const totals = new Map<string, GeoRevenueRow>();
@@ -80,24 +80,4 @@ async function aggregateBarangays(): Promise<GeoRevenueRow[]> {
   }
 
   return [...totals.values()].sort((a, b) => b.revenue - a.revenue);
-}
-
-export async function getTopProvincesByRevenue(): Promise<
-  { province: string; revenue: number }[]
-> {
-  return (await aggregateProvinces()).slice(0, 5);
-}
-
-export async function getTopBarangaysByRevenue(): Promise<GeoRevenueRow[]> {
-  return (await aggregateBarangays()).slice(0, 5);
-}
-
-export async function getBottomProvincesByRevenue(): Promise<
-  { province: string; revenue: number }[]
-> {
-  return (await aggregateProvinces()).slice(-3).reverse();
-}
-
-export async function getBottomBarangaysByRevenue(): Promise<GeoRevenueRow[]> {
-  return (await aggregateBarangays()).slice(-3).reverse();
 }

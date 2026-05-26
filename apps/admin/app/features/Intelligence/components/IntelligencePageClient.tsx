@@ -5,11 +5,8 @@ import { IntelligenceActionCard } from "./IntelligenceActionCard";
 import { IntelligenceAgentForecast } from "./IntelligenceAgentForecast";
 import { IntelligenceForecastChart } from "./IntelligenceForecastChart";
 import { IntelligenceProductForecast } from "./IntelligenceProductForecast";
-import { IntelligenceTopBarangays } from "./IntelligenceTopBarangays";
-import { IntelligenceBottomProvinces } from "./IntelligenceBottomProvinces";
-import { IntelligenceBottomBarangays } from "./IntelligenceBottomBarangays";
+import { RevenueRankCard } from "./RevenueRankCard";
 import { IntelligenceStockAllocation } from "./IntelligenceStockAllocation";
-import { IntelligenceRouteHotspot } from "./IntelligenceRouteHotspot";
 import { IntelligenceVarianceTracker } from "./IntelligenceVarianceTracker";
 import { computeAverageSalesOnThatDay } from "../helpers/computeAverageSalesOnThatDay";
 import { computeMovingAverageAndDayAverage } from "../helpers/computeMovingAverageAndDayAverage";
@@ -23,6 +20,8 @@ import {
   AlertCircle,
   AlertTriangle,
   ShieldAlert,
+  MapPin,
+  MapPinned,
 } from "lucide-react";
 import type { GeoRevenueRow } from "../../dashboard/services/revenueGeoService";
 
@@ -30,18 +29,14 @@ export function IntelligencePageClient({
   data,
   yearData,
   allTimeData,
-  topProvinces,
-  topBarangays,
-  bottomProvinces,
-  bottomBarangays,
+  provinces,
+  barangays,
 }: {
   data: any;
   yearData: any;
   allTimeData: any;
-  topProvinces: { province: string; revenue: number }[];
-  topBarangays: GeoRevenueRow[];
-  bottomProvinces: { province: string; revenue: number }[];
-  bottomBarangays: GeoRevenueRow[];
+  provinces: { province: string; revenue: number }[];
+  barangays: GeoRevenueRow[];
 }) {
   computeMovingAverageAndDayAverage(data);
   const { totalSalesToday, totalSalesYesterday, percentageDiff } =
@@ -200,22 +195,35 @@ export function IntelligencePageClient({
               Morning inventory insights
             </h2>
             <div className="grid gap-4 lg:grid-cols-2">
-              <IntelligenceRouteHotspot provinces={topProvinces} />
-              <IntelligenceTopBarangays barangays={topBarangays} />
+              <RevenueRankCard
+                title="Provinces by revenue"
+                icon={MapPinned}
+                iconClassName="text-orange-500"
+                rows={provinces.map((p) => ({
+                  key: p.province,
+                  title: p.province,
+                  revenue: p.revenue,
+                }))}
+                emptyLabel="No province revenue recorded in the last 6 months."
+              />
+              <RevenueRankCard
+                title="Barangays by revenue"
+                icon={MapPin}
+                iconClassName="text-amber-500"
+                rows={barangays.map((b) => ({
+                  key: `${b.province}|${b.barangay}`,
+                  title: b.barangay,
+                  caption: b.province || null,
+                  revenue: b.revenue,
+                }))}
+                emptyLabel="No barangay revenue recorded in the last 6 months."
+              />
             </div>
             <div className="mt-4 space-y-4">
               <IntelligenceStockAllocation />
               <IntelligenceVarianceTracker />
             </div>
           </section>
-
-          {/* <section>
-            <IntelligenceAgentForecast />
-          </section>
-            Future Possible Features nalang to since i want to make everything fully funcitonal and bug free
-          <section>
-            <IntelligenceProductForecast />
-          </section> */}
         </div>
       </div>
     </>
