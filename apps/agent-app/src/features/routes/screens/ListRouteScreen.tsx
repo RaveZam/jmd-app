@@ -12,18 +12,18 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { Swipeable } from "react-native-gesture-handler";
-import { ThemedView } from "@/components/ThemedView";
+import { ThemedView } from "@/src/shared/components/ThemedView";
 import { AddProvinceModal } from "../components/create-route-components/addProvinceModal";
 import { AddStoreModal } from "../components/create-route-components/addStoreModal";
 import { ViewStoreModal } from "../components/route-components/ViewStoreModal";
 import { DeleteProvinceModal } from "../components/route-components/DeleteProvinceModal";
 import { DeleteStoreModal } from "../components/route-components/DeleteStoreModal";
-import { Header } from "@/components/ui/header";
+import { Header } from "@/src/shared/components/ui/header";
 import { useRouteEditing } from "../hooks/useRouteEditing";
 import { useProvinces } from "../hooks/useProvinces";
 import { useRouteModals } from "../hooks/useRouteModals";
 import { StoreRow } from "../types/db-rows";
-import { usePlanRoute } from "../hooks/session_hooks/usePlanRoute";
+import { usePlanRoute } from "@/src/features/sessions/hooks/usePlanRoute";
 
 export default function ListRouteScreen() {
   const params = useLocalSearchParams<{

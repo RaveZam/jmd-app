@@ -7,9 +7,9 @@ import {
   Text,
   Modal,
 } from "react-native";
-import { ThemedText } from "@/components/ThemedText";
-import { Colors } from "@/constants/Colors";
-import RoutesDao from "@/lib/sqlite/dao/routes-dao";
+import { ThemedText } from "@/src/shared/components/ThemedText";
+import { Colors } from "@/src/shared/constants/Colors";
+import RoutesDao from "@/src/lib/dao/routes-dao";
 
 interface CreateRouteModalProps {
   onClose: () => void;

@@ -4,7 +4,7 @@ import {
   TextInputEndEditingEventData,
 } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
-import RoutesDao from "@/lib/sqlite/dao/routes-dao";
+import RoutesDao from "@/src/lib/dao/routes-dao";
 
 export function useRouteEditing(
   routeId: string | undefined,

@@ -12,12 +12,12 @@ import {
 } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { ThemedView } from "@/components/ThemedView";
-import { EndRouteModal } from "../components/session-route-components/EndRouteModal";
+import { ThemedView } from "@/src/shared/components/ThemedView";
+import { EndRouteModal } from "../components/EndRouteModal";
 import useSessionRoute, {
   SessionStore,
-} from "../hooks/session_hooks/useSessionRoute";
-import RouteSessionsDao from "@/lib/sqlite/dao/route-sessions-dao";
+} from "../hooks/useSessionRoute";
+import { completeSession } from "../services/sessionLocalService";
 
 function StoreConnector() {
   return (
@@ -164,7 +164,7 @@ export default function SessionRouteScreen() {
   }, [sessionStores]);
 
   const handleEndConfirm = () => {
-    if (sessionId) RouteSessionsDao.complete(sessionId);
+    if (sessionId) completeSession(sessionId);
     setShowEndModal(false);
     router.push("/main/routes");
   };

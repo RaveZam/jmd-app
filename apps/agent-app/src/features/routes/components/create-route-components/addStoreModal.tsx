@@ -10,9 +10,9 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import { ThemedText } from "@/components/ThemedText";
-import { Colors } from "@/constants/Colors";
-import StoresDao from "@/lib/sqlite/dao/store-dao";
+import { ThemedText } from "@/src/shared/components/ThemedText";
+import { Colors } from "@/src/shared/constants/Colors";
+import StoresDao from "@/src/lib/dao/store-dao";
 import { useAddStore } from "../../hooks/useAddStore";
 import { useUpdateStore } from "../../hooks/useUpdateStore";
 

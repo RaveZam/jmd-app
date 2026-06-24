@@ -10,8 +10,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { supabase } from "@/lib/supabase";
-import { Colors } from "@/constants/Colors";
+import { supabase } from "@/src/lib/supabase";
+import { Colors } from "@/src/shared/constants/Colors";
 import useLogin from "../hooks/useLogin";
 
 export default function AuthScreen(): ReactElement {

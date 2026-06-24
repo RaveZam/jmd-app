@@ -10,11 +10,11 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { ThemedView } from "@/components/ThemedView";
-import { ThemedText } from "@/components/ThemedText";
-import { supabase } from "@/lib/supabase";
-import { db } from "@/lib/sqlite/db-migration";
-import { Colors } from "@/constants/Colors";
+import { ThemedView } from "@/src/shared/components/ThemedView";
+import { ThemedText } from "@/src/shared/components/ThemedText";
+import { supabase } from "@/src/lib/supabase";
+import { getDb } from "@/src/lib/db";
+import { Colors } from "@/src/shared/constants/Colors";
 import type { Session } from "@supabase/supabase-js";
 
 export default function SettingsScreen() {
@@ -35,11 +35,11 @@ export default function SettingsScreen() {
           text: "Clear",
           style: "destructive",
           onPress: () => {
-            db.withTransactionSync(() => {
-              db.runSync(`DELETE FROM sales`);
-              db.runSync(`DELETE FROM session_stores`);
-              db.runSync(`DELETE FROM route_sessions`);
-              db.runSync(`DELETE FROM outbox`);
+            getDb().withTransactionSync(() => {
+              getDb().runSync(`DELETE FROM sales`);
+              getDb().runSync(`DELETE FROM session_stores`);
+              getDb().runSync(`DELETE FROM route_sessions`);
+              getDb().runSync(`DELETE FROM outbox`);
             });
             Alert.alert("Done", "Session data cleared.");
           },

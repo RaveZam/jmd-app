@@ -7,9 +7,9 @@ import {
   Text,
   Modal,
 } from "react-native";
-import { ThemedText } from "@/components/ThemedText";
-import { Colors } from "@/constants/Colors";
-import ProvincesDao from "@/lib/sqlite/dao/province-dao";
+import { ThemedText } from "@/src/shared/components/ThemedText";
+import { Colors } from "@/src/shared/constants/Colors";
+import ProvincesDao from "@/src/lib/dao/province-dao";
 
 interface AddProvinceModalProps {
   routeId: string;

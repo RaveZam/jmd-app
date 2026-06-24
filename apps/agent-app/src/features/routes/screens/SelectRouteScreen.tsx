@@ -12,14 +12,14 @@ import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { Swipeable } from "react-native-gesture-handler";
-import { ThemedView } from "@/components/ThemedView";
-import { Colors } from "@/constants/Colors";
+import { ThemedView } from "@/src/shared/components/ThemedView";
+import { Colors } from "@/src/shared/constants/Colors";
 
 import { CreateRouteModal } from "../components/create-route-components/createRouteModal";
-import { Header } from "@/components/ui/header";
+import { Header } from "@/src/shared/components/ui/header";
 import { useRoutes } from "../hooks/useRoutes";
-import RoutesDao from "@/lib/sqlite/dao/routes-dao";
-import { modalStyles as m } from "@/styles/modalStyles";
+import RoutesDao from "@/src/lib/dao/routes-dao";
+import { modalStyles as m } from "@/src/shared/styles/modalStyles";
 
 export default function SelectRouteScreen() {
   const [showCreateRouteModal, setShowCreateRouteModal] = useState(false);

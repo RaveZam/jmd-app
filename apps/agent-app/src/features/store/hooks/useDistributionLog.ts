@@ -1,8 +1,7 @@
 import { useState, useCallback } from "react";
 import type { Product } from "../types/store-types";
-import SalesDao from "@/lib/sqlite/dao/sales-dao";
-import OutboxDao from "@/lib/sqlite/dao/outbox-dao";
-import { getPhTime } from "@/helpers/getPhTime";
+import SalesDao from "@/src/lib/dao/sales-dao";
+import * as salesService from "../services/salesLocalService";
 
 export type LoggedItem = {
   saleId: string;
@@ -27,31 +26,15 @@ export function useDistributionLog(
       const product = products.find((p) => p.id === productId);
       if (!product || (qty === 0 && boQty === 0) || !sessionStoreId) return;
 
-      const saleId = SalesDao.insertSale(
+      const saleId = salesService.logSale({
         sessionStoreId,
-        product.id,
-        product.name,
-        product.price,
+        productId: product.id,
+        productName: product.name,
+        price: product.price,
         qty,
         boQty,
-        boReason ?? "",
-      );
-
-      OutboxDao.insertOutbox(
-        "SALE_CREATED",
-        JSON.stringify({
-          id: saleId,
-          session_store_id: sessionStoreId,
-          product_id: product.id,
-          snapshot_product_name: product.name,
-          snapshot_price: product.price,
-          quantity_sold: qty,
-          quantity_bo: boQty,
-          bo_reason: boReason ?? "",
-          created_at: getPhTime().toISOString(),
-        }),
-        4,
-      );
+        boReason: boReason ?? "",
+      });
 
       setLoggedItems((prev) => [
         ...prev,
@@ -69,56 +52,46 @@ export function useDistributionLog(
     [products, sessionStoreId],
   );
 
-  const updateItemQty = useCallback((index: number, delta: number) => {
-    setLoggedItems((prev) => {
-      const item = prev[index];
-      if (!item) return prev;
-      const newQty = Math.max(0, item.qty + delta);
-      if (sessionStoreId) {
-        if (newQty === 0 && item.boQty === 0) {
-          SalesDao.deleteSale(item.saleId);
-          OutboxDao.insertOutbox(
-            "SALE_DELETED",
-            JSON.stringify({ id: item.saleId }),
-            4,
-          );
-        } else {
-          SalesDao.updateSale(item.saleId, item.productId, item.productName, item.price, newQty, item.boQty, item.boReason ?? "");
-          OutboxDao.insertOutbox(
-            "SALE_UPDATED",
-            JSON.stringify({
-              id: item.saleId,
-              product_id: item.productId,
-              snapshot_product_name: item.productName,
-              snapshot_price: item.price,
-              quantity_sold: newQty,
-              quantity_bo: item.boQty,
-              bo_reason: item.boReason ?? "",
-            }),
-            4,
-          );
-        }
-      }
-      return prev
-        .map((it, i) => (i !== index ? it : { ...it, qty: newQty }))
-        .filter((it) => it.qty > 0 || it.boQty > 0);
-    });
-  }, [sessionStoreId]);
+  const updateItemQty = useCallback(
+    (index: number, delta: number) => {
+      if (!sessionStoreId) return;
+      setLoggedItems((prev) => {
+        const item = prev[index];
+        if (!item) return prev;
+        const newQty = Math.max(0, item.qty + delta);
 
-  const removeItem = useCallback((index: number) => {
-    setLoggedItems((prev) => {
-      const item = prev[index];
-      if (item && sessionStoreId) {
-        SalesDao.deleteSale(item.saleId);
-        OutboxDao.insertOutbox(
-          "SALE_DELETED",
-          JSON.stringify({ id: item.saleId }),
-          4,
-        );
-      }
-      return prev.filter((_, i) => i !== index);
-    });
-  }, [sessionStoreId]);
+        if (newQty === 0 && item.boQty === 0) {
+          salesService.deleteSale(item.saleId);
+        } else {
+          salesService.updateSale(item.saleId, {
+            productId: item.productId,
+            productName: item.productName,
+            price: item.price,
+            qty: newQty,
+            boQty: item.boQty,
+            boReason: item.boReason ?? "",
+          });
+        }
+
+        return prev
+          .map((it, i) => (i !== index ? it : { ...it, qty: newQty }))
+          .filter((it) => it.qty > 0 || it.boQty > 0);
+      });
+    },
+    [sessionStoreId],
+  );
+
+  const removeItem = useCallback(
+    (index: number) => {
+      if (!sessionStoreId) return;
+      setLoggedItems((prev) => {
+        const item = prev[index];
+        if (item) salesService.deleteSale(item.saleId);
+        return prev.filter((_, i) => i !== index);
+      });
+    },
+    [sessionStoreId],
+  );
 
   const editItem = useCallback(
     (
@@ -129,32 +102,21 @@ export function useDistributionLog(
       boReason?: string,
     ) => {
       const product = products.find((p) => p.id === productId);
-      if (!product) return;
+      if (!product || !sessionStoreId) return;
       setLoggedItems((prev) => {
         const item = prev[index];
-        if (item && sessionStoreId) {
+        if (item) {
           if (qty === 0 && boQty === 0) {
-            SalesDao.deleteSale(item.saleId);
-            OutboxDao.insertOutbox(
-              "SALE_DELETED",
-              JSON.stringify({ id: item.saleId }),
-              4,
-            );
+            salesService.deleteSale(item.saleId);
           } else {
-            SalesDao.updateSale(item.saleId, product.id, product.name, product.price, qty, boQty, boReason ?? "");
-            OutboxDao.insertOutbox(
-              "SALE_UPDATED",
-              JSON.stringify({
-                id: item.saleId,
-                product_id: product.id,
-                snapshot_product_name: product.name,
-                snapshot_price: product.price,
-                quantity_sold: qty,
-                quantity_bo: boQty,
-                bo_reason: boReason ?? "",
-              }),
-              4,
-            );
+            salesService.updateSale(item.saleId, {
+              productId: product.id,
+              productName: product.name,
+              price: product.price,
+              qty,
+              boQty,
+              boReason: boReason ?? "",
+            });
           }
         }
         return prev

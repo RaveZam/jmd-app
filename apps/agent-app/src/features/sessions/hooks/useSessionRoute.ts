@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { useFocusEffect } from "expo-router";
-import RouteSessionsDao from "@/lib/sqlite/dao/route-sessions-dao";
-import SessionStoresDao from "@/lib/sqlite/dao/session-stores-dao";
+import RouteSessionsDao from "@/src/lib/dao/route-sessions-dao";
+import SessionStoresDao from "@/src/lib/dao/session-stores-dao";
 
 export type RouteSession = {
   id: string;

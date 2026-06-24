@@ -12,8 +12,8 @@ import {
 } from "react-native-safe-area-context";
 import { router, useFocusEffect, Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { ThemedView } from "@/components/ThemedView";
-import RouteSessionsDao from "@/lib/sqlite/dao/route-sessions-dao";
+import { ThemedView } from "@/src/shared/components/ThemedView";
+import RouteSessionsDao from "@/src/lib/dao/route-sessions-dao";
 
 const HEADER_BG = "#0b4c29";
 

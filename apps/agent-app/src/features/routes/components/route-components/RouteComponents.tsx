@@ -1,5 +1,5 @@
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
-import { ThemedText } from "@/components/ThemedText";
+import { ThemedText } from "@/src/shared/components/ThemedText";
 import { StoreCard, TenderedCard } from "../../types/routes-type";
 
 export function StoreCard({

@@ -16,8 +16,8 @@ import {
 } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { ThemedView } from "@/components/ThemedView";
-import { ProductsDao } from "@/lib/sqlite/dao/products-dao";
+import { ThemedView } from "@/src/shared/components/ThemedView";
+import { ProductsDao } from "@/src/lib/dao/products-dao";
 import { PickerModal } from "@/src/features/store/components/PickerModal";
 import { useMorningInventory } from "@/src/features/store/hooks/useMorningInventory";
 import type { Product } from "@/src/features/store/types/store-types";

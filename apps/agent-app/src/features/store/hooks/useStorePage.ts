@@ -1,10 +1,9 @@
 import { useState, useMemo, useCallback } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { router } from "expo-router";
-import { ProductsDao } from "@/lib/sqlite/dao/products-dao";
-import SessionStoresDao from "@/lib/sqlite/dao/session-stores-dao";
-import SessionInventoryDao from "@/lib/sqlite/dao/session-inventory-dao";
-import OutboxDao from "@/lib/sqlite/dao/outbox-dao";
+import { ProductsDao } from "@/src/lib/dao/products-dao";
+import SessionInventoryDao from "@/src/lib/dao/session-inventory-dao";
+import { markStoreVisited } from "../services/visitLocalService";
 import { useDistributionLog } from "./useDistributionLog";
 import { computeSummary } from "../helpers/distribution-helpers";
 
@@ -54,12 +53,7 @@ export function useStorePage() {
 
   const confirmVisit = useCallback(() => {
     if (!sessionStoreId) return;
-    SessionStoresDao.markVisited(sessionStoreId);
-    OutboxDao.insertOutbox(
-      "SESSION_STORE_VISITED",
-      JSON.stringify({ id: sessionStoreId, visited: true }),
-      5,
-    );
+    markStoreVisited(sessionStoreId);
     router.back();
   }, [sessionStoreId]);
 

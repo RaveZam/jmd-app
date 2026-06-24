@@ -1,8 +1,7 @@
 import { useState, useCallback } from "react";
 import type { Product } from "../types/store-types";
-import SessionInventoryDao from "@/lib/sqlite/dao/session-inventory-dao";
-import OutboxDao from "@/lib/sqlite/dao/outbox-dao";
-import { getPhTime } from "@/helpers/getPhTime";
+import SessionInventoryDao from "@/src/lib/dao/session-inventory-dao";
+import * as inventoryService from "../services/inventoryLocalService";
 
 export type InventoryItem = {
   inventoryId: string;
@@ -27,12 +26,7 @@ export function useMorningInventory(
 
       const existing = items.find((it) => it.productId === productId);
       if (existing) {
-        SessionInventoryDao.updateQuantity(existing.inventoryId, qty);
-        OutboxDao.insertOutbox(
-          "INVENTORY_UPDATED",
-          JSON.stringify({ id: existing.inventoryId, quantity: qty }),
-          3,
-        );
+        inventoryService.updateInventoryQuantity(existing.inventoryId, qty);
         setItems((prev) =>
           prev.map((it) =>
             it.productId === productId ? { ...it, qty } : it,
@@ -41,32 +35,15 @@ export function useMorningInventory(
         return;
       }
 
-      const inventoryId = SessionInventoryDao.insert(
+      const inventoryId = inventoryService.createInventory({
         sessionId,
-        product.id,
-        product.name,
+        productId: product.id,
+        productName: product.name,
         qty,
-      );
-      OutboxDao.insertOutbox(
-        "INVENTORY_CREATED",
-        JSON.stringify({
-          id: inventoryId,
-          route_session_id: sessionId,
-          product_id: product.id,
-          snapshot_product_name: product.name,
-          quantity: qty,
-          created_at: getPhTime().toISOString(),
-        }),
-        3,
-      );
+      });
       setItems((prev) => [
         ...prev,
-        {
-          inventoryId,
-          productId: product.id,
-          productName: product.name,
-          qty,
-        },
+        { inventoryId, productId: product.id, productName: product.name, qty },
       ]);
     },
     [products, sessionId, items],
@@ -75,14 +52,7 @@ export function useMorningInventory(
   const removeItem = useCallback((productId: string) => {
     setItems((prev) => {
       const item = prev.find((it) => it.productId === productId);
-      if (item) {
-        SessionInventoryDao.delete(item.inventoryId);
-        OutboxDao.insertOutbox(
-          "INVENTORY_DELETED",
-          JSON.stringify({ id: item.inventoryId }),
-          3,
-        );
-      }
+      if (item) inventoryService.deleteInventory(item.inventoryId);
       return prev.filter((it) => it.productId !== productId);
     });
   }, []);

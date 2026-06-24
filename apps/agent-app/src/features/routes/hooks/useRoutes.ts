@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import RoutesDao from "@/lib/sqlite/dao/routes-dao";
+import RoutesDao from "@/src/lib/dao/routes-dao";
 import { Route } from "../types/routes-type";
 
 export function useRoutes() {

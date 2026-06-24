@@ -6,11 +6,12 @@ import {
 } from "react-native-safe-area-context";
 import { router, useLocalSearchParams, Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { ThemedView } from "@/components/ThemedView";
-import RouteSessionsDao from "@/lib/sqlite/dao/route-sessions-dao";
-import SessionInventoryDao from "@/lib/sqlite/dao/session-inventory-dao";
-import SessionStoresDao from "@/lib/sqlite/dao/session-stores-dao";
-import SalesDao from "@/lib/sqlite/dao/sales-dao";
+import { ThemedView } from "@/src/shared/components/ThemedView";
+import RouteSessionsDao from "@/src/lib/dao/route-sessions-dao";
+import SessionInventoryDao from "@/src/lib/dao/session-inventory-dao";
+import SessionStoresDao from "@/src/lib/dao/session-stores-dao";
+import SalesDao from "@/src/lib/dao/sales-dao";
+import EndingInventoryDao from "@/src/lib/dao/ending-inventory-dao";
 import type { LoggedItem } from "@/src/features/store/hooks/useDistributionLog";
 
 const HEADER_BG = "#0b4c29";
@@ -38,6 +39,11 @@ export default function HistorySessionScreen() {
     for (const s of stores) map[s.id] = SalesDao.getBySessionStoreId(s.id);
     return map;
   }, [stores]);
+
+  const hasEndingInventory = useMemo(
+    () => sessionId ? EndingInventoryDao.getBySessionId(sessionId).length > 0 : false,
+    [sessionId],
+  );
 
   const visitedCount = stores.filter((s) => s.visited === 1).length;
   const formattedDate = session?.session_date
@@ -70,6 +76,12 @@ export default function HistorySessionScreen() {
             {formattedDate}
             {session ? ` • ${visitedCount} of ${stores.length} visited` : ""}
           </Text>
+          {!hasEndingInventory && inventory.length > 0 && (
+            <View style={styles.warningBanner}>
+              <Ionicons name="warning-outline" size={13} color="#92400E" />
+              <Text style={styles.warningText}>No Ending Inventory Logged</Text>
+            </View>
+          )}
         </View>
 
         <ScrollView
@@ -173,6 +185,28 @@ export default function HistorySessionScreen() {
             })
           )}
         </ScrollView>
+
+        {inventory.length > 0 && (
+          <TouchableOpacity
+            style={styles.fab}
+            activeOpacity={0.85}
+            onPress={() =>
+              router.push({
+                pathname: "/main/routes/ending-inventory",
+                params: { sessionId, routeName: session?.route_name ?? "" },
+              })
+            }
+          >
+            <Ionicons
+              name={hasEndingInventory ? "checkmark-circle-outline" : "layers-outline"}
+              size={20}
+              color="#FFFFFF"
+            />
+            <Text style={styles.fabText}>
+              {hasEndingInventory ? "Update Ending Inventory" : "Log Ending Inventory"}
+            </Text>
+          </TouchableOpacity>
+        )}
       </ThemedView>
     </SafeAreaView>
   );
@@ -209,8 +243,25 @@ const styles = StyleSheet.create({
   },
   headerSub: { fontSize: 13, color: "#BBF7D0", marginTop: 6 },
 
+  warningBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 10,
+    backgroundColor: "#FEF3C7",
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    alignSelf: "flex-start",
+  },
+  warningText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#92400E",
+  },
+
   scroll: { flex: 1 },
-  scrollContent: { padding: 16, gap: 10 },
+  scrollContent: { padding: 16, gap: 10, paddingBottom: 100 },
 
   sectionTitle: {
     fontSize: 11,
@@ -347,4 +398,29 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   itemTotalValue: { fontSize: 14, fontWeight: "700", color: "#0b4c29" },
+
+  fab: {
+    position: "absolute",
+    bottom: 24,
+    left: 20,
+    right: 20,
+    backgroundColor: "#0b4c29",
+    borderRadius: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+    paddingVertical: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.22,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  fabText: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#FFFFFF",
+    letterSpacing: 0.2,
+  },
 });

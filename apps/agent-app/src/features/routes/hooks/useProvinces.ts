@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
-import ProvincesDao from "@/lib/sqlite/dao/province-dao";
-import StoresDao from "@/lib/sqlite/dao/store-dao";
+import ProvincesDao from "@/src/lib/dao/province-dao";
+import StoresDao from "@/src/lib/dao/store-dao";
 import { ProvinceRow, StoreRow } from "../types/db-rows";
 
 

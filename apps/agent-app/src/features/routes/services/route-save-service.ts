@@ -1,7 +1,7 @@
-import { db } from "@/lib/sqlite/db-migration";
-import RoutesDao from "@/lib/sqlite/dao/routes-dao";
-import ProvincesDao from "@/lib/sqlite/dao/province-dao";
-import StoresDao from "@/lib/sqlite/dao/store-dao";
+import { getDb } from "@/src/lib/db";
+import RoutesDao from "@/src/lib/dao/routes-dao";
+import ProvincesDao from "@/src/lib/dao/province-dao";
+import StoresDao from "@/src/lib/dao/store-dao";
 import type { CreateRouteDraft } from "../types/routes-type";
 
 export const routeSaveService = {
@@ -16,7 +16,7 @@ export const routeSaveService = {
       throw new Error("Add at least one province.");
     }
 
-    db.withTransactionSync(() => {
+    getDb().withTransactionSync(() => {
       const routeId = RoutesDao.insertRoute(trimmedRouteName);
 
       draft.provinces.forEach((province) => {

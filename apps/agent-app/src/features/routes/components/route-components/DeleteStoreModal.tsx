@@ -1,7 +1,7 @@
 import { Modal, View, Text, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { StoreRow } from "../../types/db-rows";
-import { modalStyles as m } from "@/styles/modalStyles";
+import { modalStyles as m } from "@/src/shared/styles/modalStyles";
 
 type Props = {
   store: StoreRow | null;

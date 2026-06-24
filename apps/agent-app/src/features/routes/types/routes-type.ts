@@ -20,3 +20,22 @@ export type TenderedCard = {
   contactName: string;
   contactNumber: string;
 };
+
+export type DraftStore = {
+  name: string;
+  province?: string;
+  city?: string;
+  barangay?: string;
+  contactName?: string;
+  contactPhone?: string;
+};
+
+export type DraftProvince = {
+  name: string;
+  stores: DraftStore[];
+};
+
+export type CreateRouteDraft = {
+  name: string;
+  provinces: DraftProvince[];
+};

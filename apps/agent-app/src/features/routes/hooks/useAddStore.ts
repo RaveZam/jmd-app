@@ -1,6 +1,4 @@
-import OutboxDao from "@/lib/sqlite/dao/outbox-dao";
-import StoresDao from "@/lib/sqlite/dao/store-dao";
-import { supabase } from "@/lib/supabase";
+import { addStore } from "../services/storesLocalService";
 
 export async function useAddStore(
   provinceId: string,
@@ -11,31 +9,12 @@ export async function useAddStore(
   contactName: string,
   contactPhone: string,
 ) {
-  const id = StoresDao.insertStore({
-    provinceId,
-    name: name.trim(),
-    province: province.trim(),
-    city: city.trim(),
-    barangay: barangay.trim(),
-    contactName: contactName.trim(),
-    contactPhone: contactPhone.trim(),
+  await addStore(provinceId, {
+    name,
+    province,
+    city,
+    barangay,
+    contactName,
+    contactPhone,
   });
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  OutboxDao.insertOutbox(
-    "STORE_ADDED",
-    JSON.stringify({
-      id: id,
-      store_name: name.trim(),
-      province: province.trim(),
-      city: city.trim(),
-      barangay: barangay.trim(),
-      contact_number: contactPhone.trim(),
-      contact_name: contactName.trim(),
-      tendered_by: session?.user?.id,
-    }),
-    1,
-  );
 }
