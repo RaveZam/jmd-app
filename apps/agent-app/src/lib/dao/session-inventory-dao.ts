@@ -1,7 +1,13 @@
 import { getDb } from "@/src/lib/db";
 import { generateUUID } from "@/src/lib/uuid";
 import { logTable } from "@/src/lib/log-table";
-import type { InventoryItem } from "@/src/features/store/hooks/useMorningInventory";
+
+export type InventoryItem = {
+  inventoryId: string;
+  productId: string;
+  productName: string;
+  qty: number;
+};
 
 const SessionInventoryDao = {
   getBySessionId(sessionId: string): InventoryItem[] {

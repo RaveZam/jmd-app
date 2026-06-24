@@ -1,7 +1,16 @@
 import { getDb } from "@/src/lib/db";
 import { generateUUID } from "@/src/lib/uuid";
 import { logTable } from "@/src/lib/log-table";
-import type { LoggedItem } from "@/src/features/store/hooks/useDistributionLog";
+
+export type LoggedItem = {
+  saleId: string;
+  productId: string;
+  productName: string;
+  price: number;
+  qty: number;
+  boQty: number;
+  boReason?: string;
+};
 
 const SalesDao = {
   getBySessionStoreId(sessionStoreId: string): LoggedItem[] {

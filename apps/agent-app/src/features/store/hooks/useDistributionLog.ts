@@ -1,17 +1,9 @@
 import { useState, useCallback } from "react";
 import type { Product } from "../types/store-types";
-import SalesDao from "@/src/lib/dao/sales-dao";
+import SalesDao, { type LoggedItem } from "@/src/lib/dao/sales-dao";
 import * as salesService from "../services/salesLocalService";
 
-export type LoggedItem = {
-  saleId: string;
-  productId: string;
-  productName: string;
-  price: number;
-  qty: number;
-  boQty: number;
-  boReason?: string;
-};
+export type { LoggedItem };
 
 export function useDistributionLog(
   products: Product[],

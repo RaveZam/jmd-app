@@ -1,14 +1,11 @@
 import { useState, useCallback } from "react";
 import type { Product } from "../types/store-types";
-import SessionInventoryDao from "@/src/lib/dao/session-inventory-dao";
+import SessionInventoryDao, {
+  type InventoryItem,
+} from "@/src/lib/dao/session-inventory-dao";
 import * as inventoryService from "../services/inventoryLocalService";
 
-export type InventoryItem = {
-  inventoryId: string;
-  productId: string;
-  productName: string;
-  qty: number;
-};
+export type { InventoryItem };
 
 export function useMorningInventory(
   products: Product[],

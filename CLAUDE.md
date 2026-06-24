@@ -77,24 +77,27 @@ Three layers, strictly separated:
 
 ### Feature-Based Structure
 
+Dependencies flow **down only**: `app/ → src/features/ → src/shared/ → src/lib/` (lib is the bottom layer; shared may use lib). Features must not import each other except the few edges declared in `eslint.config.js` (`import/no-restricted-paths` enforces this): `routes→sessions`, `inventory→store`, `history→store`.
+
 ```
-src/lib/                       # centralized data/core layer (mirrors FlexApp)
+src/lib/                       # bottom layer: data/infra (mirrors FlexApp), imports nothing above it
   db.ts                        # lazy getDb() + async initDb() (PRAGMAs, schema, indexes)
   uuid.ts                      # generateUUID()
   network.ts                   # isWifiConnected()
   supabase.ts                  # Supabase client (expo-sqlite/localStorage for session)
-  dao/                         # pure data access (routes-dao, sales-dao, ...)
+  dao/                         # pure data access (routes-dao, sales-dao, ...); owns row types (LoggedItem, InventoryItem)
   sync/
     outbox.ts                  # enqueueOutbox() + runOutboxSync()
     download.ts                # runDownloadSync(userId): Supabase -> local pull
-src/features/
+src/shared/                    # cross-feature UI + utils (may import src/lib, never features)
+  components/ (ThemedText, ThemedView, ui/header)  hooks/  helpers/ (getPhTime)  constants/ (Colors)  styles/ (modalStyles)
+src/features/                  # one feature = one subdomain; screens/ components/ hooks/ (React-only) services/ types/
   auth/                        # useLogin hook, sign-in screen
-  routes/                      # Route management (main feature)
-    screens/ components/ types/
-    hooks/                     # React-only (useRoutes, usePlanRoute, ...)
-    services/                  # storesLocalService, sessionLocalService, route-save-service
-  store/                       # Distribution log + inventory
-    services/                  # salesLocalService, inventoryLocalService, visitLocalService
+  routes/                      # route + province + store CRUD, route list/select
+  sessions/                    # running a session (SessionRoute, EndRoute, plan/session hooks)
+  inventory/                   # morning + ending inventory screens
+  history/                     # session history screens
+  store/                       # distribution log + inventory (salesLocalService, inventoryLocalService, visitLocalService)
   settings/
 ```
 
@@ -147,8 +150,8 @@ router.replace("/auth/sign-in");
 
 - All styles via `StyleSheet.create()` (React Native)
 - Flexbox for layout; `SafeAreaView` wraps screens
-- Theme colors from `constants/Colors.ts` (light/dark variants)
-- Reusable header: `components/ui/header.tsx` (back button, title, right element slot)
+- Theme colors from `src/shared/constants/Colors.ts` (light/dark variants)
+- Reusable header: `src/shared/components/ui/header.tsx` (back button, title, right element slot)
 - FABs: absolutely positioned with `expo-linear-gradient` backgrounds
 - Cards: `borderRadius: 8`, `borderColor: "#E5E7EB"`
 
