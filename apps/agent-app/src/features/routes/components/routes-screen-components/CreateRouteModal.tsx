@@ -22,7 +22,7 @@ export function CreateRouteModal() {
 
   return (
     <Modal
-      visible={true}
+      visible={createModal.isOpen}
       animationType="fade"
       transparent={true}
       statusBarTranslucent={true}

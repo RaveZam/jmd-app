@@ -6,7 +6,6 @@ import { useRoutesContext } from "../../context/useRoutesContext";
 
 export function DeleteRouteModal() {
   const { deleteModal } = useRoutesContext();
-
   return (
     <Modal
       visible={!!deleteModal.pending}

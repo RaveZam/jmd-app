@@ -8,7 +8,7 @@ import { CreateRouteFab } from "./CreateRouteFab";
 import { DeleteRouteModal } from "./DeleteRouteModal";
 
 export function RouteList() {
-  const { routes, createModal } = useRoutesContext();
+  const { routes } = useRoutesContext();
 
   return (
     <>
@@ -32,10 +32,8 @@ export function RouteList() {
         </ScrollView>
       </View>
 
-      {!createModal.isOpen && <CreateRouteFab />}
-
-      {createModal.isOpen && <CreateRouteModal />}
-
+      <CreateRouteFab />
+      <CreateRouteModal />
       <DeleteRouteModal />
     </>
   );
