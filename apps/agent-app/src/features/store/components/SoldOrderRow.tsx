@@ -36,6 +36,7 @@ export function SoldOrderRow({ item, index, onPress, onDelete }: SoldRowProps) {
       <TouchableOpacity
         style={styles.deleteBtn}
         onPress={() => onDelete(index)}
+        accessibilityLabel="delete-row"
         hitSlop={8}
       >
         <Ionicons name="close" size={13} color="#CBD5E1" />
