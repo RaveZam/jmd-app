@@ -8,9 +8,11 @@ import { Colors } from "@/src/shared/constants/Colors";
 import { ProvinceList } from "../components/route-detail-screen-components/ProvinceList";
 import { ViewStoreModal } from "../components/route-detail-screen-components/storemodal";
 import { AddProvinceModal } from "../components/route-detail-screen-components/AddProvinceModal";
+import { EditProvinceModal } from "../components/route-detail-screen-components/EditProvinceModal";
 import { RouteDetailBanner } from "../components/route-detail-screen-components/RouteDetailBanner";
 import { useStoreDetail } from "../hooks/useStoreDetail";
 import { useProvinces } from "../hooks/useProvinces";
+import { ProvinceRow } from "../types/db-rows";
 
 export default function RouteDetailScreen() {
   const { routeId, routeName } = useLocalSearchParams<{
@@ -21,6 +23,7 @@ export default function RouteDetailScreen() {
   const { provinces, loadProvinces } = useProvinces(routeId ?? "");
 
   const [showAddProvince, setShowAddProvince] = useState(false);
+  const [editProvince, setEditProvince] = useState<ProvinceRow | null>(null);
   const [storeRefresh, setStoreRefresh] = useState(0);
 
   return (
@@ -35,6 +38,7 @@ export default function RouteDetailScreen() {
         <ProvinceList
           provinces={provinces}
           onSelectStore={openStore}
+          onEditProvince={setEditProvince}
           refreshKey={storeRefresh}
         />
       </ThemedView>
@@ -47,6 +51,12 @@ export default function RouteDetailScreen() {
           setShowAddProvince(false);
           loadProvinces();
         }}
+      />
+
+      <EditProvinceModal
+        province={editProvince}
+        onClose={() => setEditProvince(null)}
+        onChanged={loadProvinces}
       />
 
       <ViewStoreModal

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { ProvinceRow } from "../../types/db-rows";
 import { useStores } from "../../hooks/useStores";
@@ -8,10 +8,16 @@ import { StoreListRow } from "./StoreListRow";
 type Props = {
   province: ProvinceRow;
   onSelectStore: (storeId: string) => void;
+  onEditProvince: (province: ProvinceRow) => void;
   refreshKey?: number;
 };
 
-export function ProvinceCard({ province, onSelectStore, refreshKey }: Props) {
+export function ProvinceCard({
+  province,
+  onSelectStore,
+  onEditProvince,
+  refreshKey,
+}: Props) {
   const { stores, loadStores } = useStores(province.id);
 
   // Reload when the screen signals a store changed (the hook already loads on mount).
@@ -21,7 +27,12 @@ export function ProvinceCard({ province, onSelectStore, refreshKey }: Props) {
 
   return (
     <View style={styles.provincePanel} testID={`province-item-${province.id}`}>
-      <View style={styles.provinceHeader}>
+      <TouchableOpacity
+        style={styles.provinceHeader}
+        activeOpacity={0.7}
+        onPress={() => onEditProvince(province)}
+        testID={`province-edit-${province.id}`}
+      >
         <View style={styles.provinceIconWrap}>
           <Ionicons name="map-outline" size={15} color="#3F7355" />
         </View>
@@ -34,7 +45,8 @@ export function ProvinceCard({ province, onSelectStore, refreshKey }: Props) {
             {stores.length === 1 ? "store" : "stores"}
           </Text>
         </View>
-      </View>
+        <Ionicons name="ellipsis-horizontal" size={16} color="#CBD5E1" />
+      </TouchableOpacity>
 
       {stores.length === 0 ? (
         <Text style={styles.noStoresText}>No stores added yet</Text>

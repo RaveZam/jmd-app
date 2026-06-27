@@ -12,6 +12,10 @@ const ProvincesDao = {
     return id;
   },
 
+  renameProvince(id: string, name: string) {
+    getDb().runSync(`UPDATE provinces SET name = ? WHERE id = ?`, [name, id]);
+  },
+
   deleteProvince(id: string) {
     const db = getDb();
     db.runSync(`DELETE FROM stores WHERE province_id = ?`, [id]);

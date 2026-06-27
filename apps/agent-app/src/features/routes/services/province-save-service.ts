@@ -24,3 +24,31 @@ export function createProvince(routeId: string, name: string): string {
   });
   return id;
 }
+
+export function updateProvinceName(id: string, name: string) {
+  const trimmed = name.trim();
+  if (!trimmed) {
+    throw new Error("Province name is required.");
+  }
+  getDb().withTransactionSync(() => {
+    ProvincesDao.renameProvince(id, trimmed);
+    enqueueOutbox({
+      entityType: "province",
+      entityId: id,
+      operation: "update",
+      payload: { name: trimmed },
+    });
+  });
+}
+
+export function deleteProvince(id: string) {
+  getDb().withTransactionSync(() => {
+    ProvincesDao.deleteProvince(id);
+    enqueueOutbox({
+      entityType: "province",
+      entityId: id,
+      operation: "delete",
+      payload: { id },
+    });
+  });
+}
