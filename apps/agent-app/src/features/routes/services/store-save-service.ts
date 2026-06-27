@@ -11,6 +11,41 @@ export type StoreFields = {
   contactPhone: string;
 };
 
+export function createStore(provinceId: string, fields: StoreFields): string {
+  const name = fields.name.trim();
+  if (!name) {
+    throw new Error("Store name is required.");
+  }
+  let id = "";
+  getDb().withTransactionSync(() => {
+    id = StoresDao.insertStore({
+      provinceId,
+      name,
+      province: fields.province,
+      city: fields.city,
+      barangay: fields.barangay,
+      contactName: fields.contactName,
+      contactPhone: fields.contactPhone,
+    });
+    enqueueOutbox({
+      entityType: "store",
+      entityId: id,
+      operation: "create",
+      payload: {
+        id,
+        province_id: provinceId,
+        store_name: name,
+        province: fields.province,
+        city: fields.city,
+        barangay: fields.barangay,
+        contact_number: fields.contactPhone,
+        contact_name: fields.contactName,
+      },
+    });
+  });
+  return id;
+}
+
 export function updateStore(
   id: string,
   provinceId: string,

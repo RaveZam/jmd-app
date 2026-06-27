@@ -1,9 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { ProvinceRow } from "../../types/db-rows";
 import { useStores } from "../../hooks/useStores";
 import { StoreListRow } from "./StoreListRow";
+import { AddStoreModal } from "./AddStoreModal";
 
 type Props = {
   province: ProvinceRow;
@@ -19,6 +20,7 @@ export function ProvinceCard({
   refreshKey,
 }: Props) {
   const { stores, loadStores } = useStores(province.id);
+  const [showAddStore, setShowAddStore] = useState(false);
 
   // Reload when the screen signals a store changed (the hook already loads on mount).
   useEffect(() => {
@@ -27,26 +29,36 @@ export function ProvinceCard({
 
   return (
     <View style={styles.provincePanel} testID={`province-item-${province.id}`}>
-      <TouchableOpacity
-        style={styles.provinceHeader}
-        activeOpacity={0.7}
-        onPress={() => onEditProvince(province)}
-        testID={`province-edit-${province.id}`}
-      >
-        <View style={styles.provinceIconWrap}>
-          <Ionicons name="map-outline" size={15} color="#3F7355" />
-        </View>
-        <Text style={styles.provinceName} numberOfLines={1}>
-          {province.name}
-        </Text>
-        <View style={styles.countBadge}>
-          <Text style={styles.countBadgeText}>{stores.length}</Text>
-          <Text style={styles.countBadgeLabel}>
-            {stores.length === 1 ? "store" : "stores"}
+      <View style={styles.provinceHeader}>
+        <TouchableOpacity
+          style={styles.provinceHeaderMain}
+          activeOpacity={0.7}
+          onPress={() => onEditProvince(province)}
+          testID={`province-edit-${province.id}`}
+        >
+          <View style={styles.provinceIconWrap}>
+            <Ionicons name="map-outline" size={15} color="#3F7355" />
+          </View>
+          <Text style={styles.provinceName} numberOfLines={1}>
+            {province.name}
           </Text>
-        </View>
-        <Ionicons name="ellipsis-horizontal" size={16} color="#CBD5E1" />
-      </TouchableOpacity>
+          <View style={styles.countBadge}>
+            <Text style={styles.countBadgeText}>{stores.length}</Text>
+            <Text style={styles.countBadgeLabel}>
+              {stores.length === 1 ? "store" : "stores"}
+            </Text>
+          </View>
+          <Ionicons name="ellipsis-horizontal" size={16} color="#CBD5E1" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.addStoreButton}
+          activeOpacity={0.7}
+          onPress={() => setShowAddStore(true)}
+          testID={`province-add-store-${province.id}`}
+        >
+          <Ionicons name="add" size={18} color="#3F7355" />
+        </TouchableOpacity>
+      </View>
 
       {stores.length === 0 ? (
         <Text style={styles.noStoresText}>No stores added yet</Text>
@@ -60,6 +72,17 @@ export function ProvinceCard({
           ))}
         </View>
       )}
+
+      <AddStoreModal
+        provinceId={province.id}
+        provinceName={province.name}
+        visible={showAddStore}
+        onClose={() => setShowAddStore(false)}
+        onAdded={() => {
+          setShowAddStore(false);
+          loadStores();
+        }}
+      />
     </View>
   );
 }
@@ -75,11 +98,27 @@ const styles = StyleSheet.create({
   provinceHeader: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: 8,
     paddingHorizontal: 14,
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: "#F1F5F9",
+  },
+  provinceHeaderMain: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  addStoreButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: "#ECFDF5",
+    borderWidth: 1,
+    borderColor: "#D1FAE5",
+    alignItems: "center",
+    justifyContent: "center",
   },
   provinceIconWrap: {
     width: 32,
