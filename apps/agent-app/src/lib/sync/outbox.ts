@@ -80,7 +80,10 @@ async function dispatchRow(row: OutboxRow): Promise<void> {
   }
 
   if (row.operation === "delete") {
-    const { error } = await supabase.from(table).delete().eq("id", row.entity_id);
+    const { error } = await supabase
+      .from(table)
+      .delete()
+      .eq("id", row.entity_id);
     if (error) throw error;
   }
 }
@@ -105,7 +108,10 @@ function markSynced(id: string): void {
  * Drains the outbox to Supabase. Safe to call repeatedly (launch, foreground,
  * interval). A failed row is left pending so it retries on the next run.
  */
-export async function runOutboxSync(): Promise<{ synced: number; failed: number }> {
+export async function runOutboxSync(): Promise<{
+  synced: number;
+  failed: number;
+}> {
   if (!(await isWifiConnected())) return { synced: 0, failed: 0 };
 
   const {
