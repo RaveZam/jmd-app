@@ -4,7 +4,7 @@ let db: SQLite.SQLiteDatabase | null = null;
 
 export function getDb(): SQLite.SQLiteDatabase {
   if (!db) {
-    db = SQLite.openDatabaseSync("routeledger-v2.db");
+    db = SQLite.openDatabaseSync("routeledger-v3.db");
   }
   return db;
 }
@@ -50,6 +50,7 @@ export async function initDb(): Promise<void> {
       id               TEXT PRIMARY KEY,
       route_session_id TEXT NOT NULL REFERENCES route_sessions(id) ON DELETE CASCADE,
       store_id         TEXT NOT NULL,
+      province_id      TEXT,
       visited          INTEGER NOT NULL DEFAULT 0,
       created_at       TEXT NOT NULL DEFAULT (datetime('now')),
       UNIQUE(route_session_id, store_id)

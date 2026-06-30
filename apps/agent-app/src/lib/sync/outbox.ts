@@ -57,6 +57,7 @@ export function enqueueOutbox(params: {
 
 async function dispatchRow(row: OutboxRow): Promise<void> {
   const table = ENTITY_TABLE[row.entity_type];
+
   if (!table) {
     console.warn(`[outbox] unknown entity_type: ${row.entity_type}`);
     return; // leave pending; nothing we can do until a mapping exists
@@ -117,9 +118,11 @@ export async function runOutboxSync(): Promise<{
   const {
     data: { session },
   } = await supabase.auth.getSession();
+
   if (!session) return { synced: 0, failed: 0 };
 
   const pending = getPendingRows();
+
   let synced = 0;
   let failed = 0;
 

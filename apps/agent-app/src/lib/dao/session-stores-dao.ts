@@ -3,10 +3,15 @@ import { generateUUID } from "@/src/lib/uuid";
 import { logTable } from "@/src/lib/log-table";
 
 const SessionStoresDao = {
-  insert(routeSessionId: string, storeId: string, id: string = generateUUID()): string {
+  insert(
+    routeSessionId: string,
+    storeId: string,
+    provinceId: string | null = null,
+    id: string = generateUUID(),
+  ): string {
     getDb().runSync(
-      `INSERT INTO session_stores (id, route_session_id, store_id) VALUES (?, ?, ?)`,
-      [id, routeSessionId, storeId],
+      `INSERT INTO session_stores (id, route_session_id, store_id, province_id) VALUES (?, ?, ?, ?)`,
+      [id, routeSessionId, storeId, provinceId],
     );
     return id;
   },
