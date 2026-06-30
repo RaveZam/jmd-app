@@ -4,7 +4,12 @@ import { LinearGradient } from "expo-linear-gradient";
 
 export function CreateRouteFab({ onPress }: { onPress: () => void }) {
   return (
-    <TouchableOpacity style={styles.fab} activeOpacity={0.9} onPress={onPress}>
+    <TouchableOpacity
+      style={styles.fab}
+      activeOpacity={0.9}
+      onPress={onPress}
+      testID="create-route-fab"
+    >
       <LinearGradient
         colors={["#1b6e40", "#0b4c29"]}
         start={{ x: 0, y: 0 }}
