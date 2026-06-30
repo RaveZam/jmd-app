@@ -17,7 +17,7 @@ const FEATURES = [
 // Allowed cross-feature edges: importer -> [allowed targets].
 // Keep this list tiny; every entry is a coupling we accept on purpose.
 const ALLOWED_FEATURE_EDGES = {
-  routes: ["sessions"], // ListRouteScreen starts a session via usePlanRoute
+  routes: ["sessions"], // RouteDetailScreen starts a session via useStartSession
   inventory: ["store"], // morning inventory reuses store's picker/types
   history: ["store"], // session history renders store distribution items
 };

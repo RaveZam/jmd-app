@@ -37,21 +37,23 @@ export function AddStoreModal({
   onClose,
   onAdded,
 }: AddStoreModalProps) {
-  const [fields, setFields] = useState<StoreFields>(EMPTY_FIELDS);
+  const [fields, setFields] = useState<StoreFields>({ ...EMPTY_FIELDS, province: provinceName });
   const setField = (key: keyof StoreFields, value: string) =>
     setFields((prev) => ({ ...prev, [key]: value }));
 
   const canSubmit = fields.name.trim().length > 0;
 
+  const reset = () => setFields({ ...EMPTY_FIELDS, province: provinceName });
+
   const handleCancel = () => {
-    setFields(EMPTY_FIELDS);
+    reset();
     onClose();
   };
 
   const handleAdd = () => {
     if (!canSubmit) return;
     createStore(provinceId, fields);
-    setFields(EMPTY_FIELDS);
+    reset();
     onAdded();
   };
 
