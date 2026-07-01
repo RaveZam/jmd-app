@@ -134,9 +134,8 @@ export async function runOutboxSync(): Promise<{
     } catch (err) {
       failed++;
       console.warn(
-        `[outbox] sync failed for ${row.entity_type}/${row.entity_id} (${row.operation}): ${
-          err instanceof Error ? err.message : String(err)
-        }`,
+        `[outbox] sync failed for ${row.entity_type}/${row.entity_id} (${row.operation}):`,
+        err,
       );
     }
   }
