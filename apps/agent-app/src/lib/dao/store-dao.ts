@@ -46,6 +46,31 @@ const StoresDao = {
     ]);
   },
 
+  upsertStore(input: InsertStoreInput & { id: string }) {
+    getDb().runSync(
+      `INSERT INTO stores (id, province_id, name, province, city, barangay, contact_number, contact_name)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+       ON CONFLICT(id) DO UPDATE SET
+         province_id   = excluded.province_id,
+         name          = excluded.name,
+         province      = excluded.province,
+         city          = excluded.city,
+         barangay      = excluded.barangay,
+         contact_number = excluded.contact_number,
+         contact_name  = excluded.contact_name`,
+      [
+        input.id,
+        input.provinceId,
+        input.name,
+        input.province ?? "",
+        input.city ?? "",
+        input.barangay ?? "",
+        input.contactPhone ?? "",
+        input.contactName ?? "",
+      ],
+    );
+  },
+
   deleteStore(id: string) {
     getDb().runSync(`DELETE FROM stores WHERE id = ?`, [id]);
   },

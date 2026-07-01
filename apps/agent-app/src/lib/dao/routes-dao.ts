@@ -19,6 +19,14 @@ const RoutesDao = {
     getDb().runSync(`UPDATE routes SET name = ? WHERE id = ?`, [name, id]);
   },
 
+  upsertRoute(id: string, name: string) {
+    getDb().runSync(
+      `INSERT INTO routes (id, name) VALUES (?, ?)
+       ON CONFLICT(id) DO UPDATE SET name = excluded.name`,
+      [id, name],
+    );
+  },
+
   deleteRoute(id: string) {
     const db = getDb();
     db.runSync(

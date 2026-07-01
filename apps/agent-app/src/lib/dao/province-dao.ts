@@ -12,6 +12,14 @@ const ProvincesDao = {
     return id;
   },
 
+  upsertProvince(id: string, routeId: string, name: string) {
+    getDb().runSync(
+      `INSERT INTO provinces (id, name, route_id) VALUES (?, ?, ?)
+       ON CONFLICT(id) DO UPDATE SET name = excluded.name, route_id = excluded.route_id`,
+      [id, name, routeId],
+    );
+  },
+
   renameProvince(id: string, name: string) {
     getDb().runSync(`UPDATE provinces SET name = ? WHERE id = ?`, [name, id]);
   },
